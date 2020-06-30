@@ -20,7 +20,7 @@ namespace trackID3TagSwitcher
             InitializeComponent();
         }
 
-        public void SetFormState(string msg, int mode, string imgPath)
+        public void SetFormState(string msg, int mode, string imgPath = null)
         {
             this.lblMessage.Text = msg;
             switch (mode)
@@ -36,10 +36,15 @@ namespace trackID3TagSwitcher
                     this.answerOK.Visible = true;
                     break;
             }
-            if (imgPath != "")
+            if (imgPath != null)
             {
                 this.picture.Visible = true;
                 this.picture.ImageLocation = imgPath;
+            }
+            else
+            {
+                this.picture.Visible = false;
+                this.picture.ImageLocation = "";
             }
         }
 

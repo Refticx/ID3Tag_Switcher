@@ -208,17 +208,25 @@ namespace trackID3TagSwitcher
                         //MessageBox.Show("取得されたアートワークの格納先\r\n" + this.artworkPath, "取得内容確認", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
 
-                    if (isExt >= loopCount)
-                        isLoop = false;
                     /* 拡張子を変更 */
                     isExt++;
+
+                    /* 全拡張子の検索が終わったらループ中断。 */
+                    if (isExt >= loopCount)
+                        isLoop = false;
                 }
             }
             else
             {
                 /* 手動指定されたファイルパスを検索 */
                 if (File.Exists(this.artworkPath))
-                    isFind = true;
+                {
+                    /* 確認ダイアログを表示 */
+                    messageForm.SetFormState("取得されたアートワークの確認です。\r\nこちらでよろしいでしょうか？\r\n格納先：" + this.artworkPath, MODE_YN, this.artworkPath);
+                    DialogResult dr = messageForm.ShowDialog();
+                    if (dr == DialogResult.Yes)
+                        isFind = true;
+                }
                 else
                     return false;
             }
@@ -447,7 +455,13 @@ namespace trackID3TagSwitcher
                     ret = GetAlbumInfoList(file);     /* まずID3 Tagリストを取得 */
                     if (!ret) msg = "trackinfo.cblが見つかりませんでした。\r\nID3リストを作成しますか？";
                     ret = GetAlbumArtwork(path);    /* 設定されているパスからアートワークを取得する */
-                    if (!ret) msg = "アートワークが見つかりませんでした。\r\nジャケット名を確認してください。";
+                    if (!ret)
+                    {
+                        /* 確認ダイアログを表示 */
+                        messageForm.SetFormState("設定可能なアートワークを取得できませんでした。", MODE_OK);
+                        DialogResult dr = messageForm.ShowDialog();
+                    }
+                        msg = "アートワークが見つかりませんでした。\r\nジャケット名を確認してください。";
                     ret = GetMaxTrack( path);         /* 一度曲保存先にあるmo3を全部取得し、何曲あるか確認する */
                     if (!ret) msg = "曲数を取得できませんでした。\r\n曲階層を確認してください。";
                     GetID3TagInfoList();        /* 取得できた曲数分、ID3 Tagの配列を生成し、リストの解析を行う */
