@@ -103,6 +103,9 @@ namespace trackID3TagSwitcher
             this.lblArrow2.Visible = false;
             this.isTypeFYS = false;
             this.canStartSwitcher = false;
+            /* 曲数 */
+            this.lblTrackCount.Visible = false;
+            this.lblTrackCount.Text = "";
 
             for (int tag = 0; tag < MAX_TAG; tag++)
             {
@@ -180,7 +183,6 @@ namespace trackID3TagSwitcher
         {
             /* アートワークを見つけたかのフラグ、後半での共通処理で使う */
             bool isFind = false;
-            bool isLoop = true;
             int loopCount = 4;
 
             /* 自動検索分岐前に、両分岐先で使う変数に値だけ代入しておく */
@@ -199,7 +201,7 @@ namespace trackID3TagSwitcher
                 /* アートワークが複数あることを想定してループ処理 */
                 string[] atw = null;
                 int isExt = 0;
-                while (isLoop)
+                while (isExt <= loopCount)
                 {
                     switch (isExt)
                     {
@@ -229,7 +231,6 @@ namespace trackID3TagSwitcher
                                 {
                                     this.artworkPath = atw[i];
                                     isFind = true;
-                                    isLoop = false;
                                     break;
                                 }
                             }
@@ -239,10 +240,6 @@ namespace trackID3TagSwitcher
 
                     /* 拡張子を変更 */
                     isExt++;
-
-                    /* 全拡張子の検索が終わったらループ中断。 */
-                    if (isExt >= loopCount)
-                        isLoop = false;
                 }
             }
             else
