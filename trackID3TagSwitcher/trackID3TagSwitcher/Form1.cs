@@ -454,14 +454,21 @@ namespace trackID3TagSwitcher
                 {
                     ret = GetAlbumInfoList(file);     /* まずID3 Tagリストを取得 */
                     if (!ret) msg = "trackinfo.cblが見つかりませんでした。\r\nID3リストを作成しますか？";
+
                     ret = GetAlbumArtwork(path);    /* 設定されているパスからアートワークを取得する */
                     if (!ret)
                     {
                         /* 確認ダイアログを表示 */
                         messageForm.SetFormState("設定可能なアートワークを取得できませんでした。", MODE_OK);
                         DialogResult dr = messageForm.ShowDialog();
-                    }
+
+                        /* アートワークを非表示 */
+                        this.imgCurrentAlbumArtwork.ImageLocation = "";
+                        this.imgCurrentAlbumArtwork.Visible = false;
+
                         msg = "アートワークが見つかりませんでした。\r\nジャケット名を確認してください。";
+                    }
+
                     ret = GetMaxTrack( path);         /* 一度曲保存先にあるmo3を全部取得し、何曲あるか確認する */
                     if (!ret) msg = "曲数を取得できませんでした。\r\n曲階層を確認してください。";
                     GetID3TagInfoList();        /* 取得できた曲数分、ID3 Tagの配列を生成し、リストの解析を行う */
