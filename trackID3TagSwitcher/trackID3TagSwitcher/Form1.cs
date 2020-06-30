@@ -25,18 +25,19 @@ namespace trackID3TagSwitcher
         private const string VERSION_INFO_URL = "https://chaoticbootstrage.wixsite.com/scene/idtool-ver";   /* アプリ更新があるかを確認するページ */
         private const string CURRENT_VERSION = "1.12";                                                      /* 現在のアプリのバージョン */
 
-        private string trackcbl = "";                       /* trackinfo.cblから読み込んだ文字列全体を格納する変数 */
-        private string[,] TrackID3Tag;                      /* trackinfo.cblから読み込んだ各ID3 Tag情報を記憶する二次元配列 */
-        private string currentAlbumReleaseTitle = "";       /* 現在読み込んでいるアルバムのリリースタイトル */
-        private string currentAlbumReleaseNumber = "";      /* 現在読み込んでいるアルバムのリリース番号 */
-        private string currentAlbumLabelName = "";          /* 現在読み込んでいるアルバムのリリース元レーベル */
-        private int currentMaxTrack = 0;                    /* 現在読み込んでいるアルバムの曲数 */
-        private bool isTypeFYS = false;                     /* 現在読み込んでいるアルバムの曲形式がARNかFYSかを判断する変数 */
-        private bool canStartSwitcher = false;              /* アルバムを正常に読み込めていて、変換可能かを示す変数 */
-        private string new_ver = "";                        /* 取得したアプリ更新ページのバージョンを記憶する変数 */
-        private string artworkPath = "";                    /* 取得したアートワークのファイルパスを格納する変数 */
-        private string tracksPath = "";                     /* 楽曲が格納されているディレクトリパスを格納する変数 */
-        private TagLib.IPicture aawork;                     /* 取得したアートワークのイメージを格納する変数 */
+        private string trackcbl = "";                           /* trackinfo.cblから読み込んだ文字列全体を格納する変数 */
+        private string[,] TrackID3Tag;                          /* trackinfo.cblから読み込んだ各ID3 Tag情報を記憶する二次元配列 */
+        private string currentAlbumReleaseTitle = "";           /* 現在読み込んでいるアルバムのリリースタイトル */
+        private string currentAlbumReleaseNumber = "";          /* 現在読み込んでいるアルバムのリリース番号 */
+        private string currentAlbumLabelName = "";              /* 現在読み込んでいるアルバムのリリース元レーベル */
+        private int currentMaxTrack = 0;                        /* 現在読み込んでいるアルバムの曲数 */
+        private bool isTypeFYS = false;                         /* 現在読み込んでいるアルバムの曲形式がARNかFYSかを判断する変数 */
+        private bool canStartSwitcher = false;                  /* アルバムを正常に読み込めていて、変換可能かを示す変数 */
+        private string new_ver = "";                            /* 取得したアプリ更新ページのバージョンを記憶する変数 */
+        private string artworkPath = "";                        /* 取得したアートワークのファイルパスを格納する変数 */
+        private string tracksPath = "";                         /* 楽曲が格納されているディレクトリパスを格納する変数 */
+        private TagLib.IPicture aawork;                         /* 取得したアートワークのイメージを格納する変数 */
+        private MessageForm messageForm = new MessageForm();    /* ダイアログ用フォームを作成しておく */
 
         /* 配列参照時の要素数 */
         private const int ARN_NAME = 0;
@@ -151,7 +152,7 @@ namespace trackID3TagSwitcher
             /* アートワークを見つけたかのフラグ、後半での共通処理で使う */
             bool isFind = false;
             bool isLoop = true;
-            MessageDialog form = new MessageDialog();
+            int loopCount = 4;
 
             /* 自動検索分岐前に、両分岐先で使う変数に値だけ代入しておく */
             this.artworkPath = path + this.boxArtworkName.Text;
@@ -193,12 +194,13 @@ namespace trackID3TagSwitcher
                             else
                             {
                                 /* 確認ダイアログを表示 */
-                                form.SetFormState("取得されたアートワークの確認です。\r\nこちらでよろしいでしょうか？\r\n格納先：" + atw[i], MODE_YN, atw[i]);
-                                DialogResult dr = form.ShowDialog();
+                                messageForm.SetFormState("取得されたアートワークの確認です。\r\nこちらでよろしいでしょうか？\r\n格納先：" + atw[i], MODE_YN, atw[i]);
+                                DialogResult dr = messageForm.ShowDialog();
                                 if (dr == DialogResult.Yes)
                                 {
                                     this.artworkPath = atw[i];
                                     isFind = true;
+                                    isLoop = false;
                                     break;
                                 }
                             }
@@ -206,6 +208,8 @@ namespace trackID3TagSwitcher
                         //MessageBox.Show("取得されたアートワークの格納先\r\n" + this.artworkPath, "取得内容確認", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
 
+                    if (isExt >= loopCount)
+                        isLoop = false;
                     /* 拡張子を変更 */
                     isExt++;
                 }
@@ -456,9 +460,9 @@ namespace trackID3TagSwitcher
                     this.boxAlbumPath.Text = path;
                     this.canStartSwitcher = true;
                 }
-                catch
+                catch (Exception ex)
                 {
-                    DialogResult result = MessageBox.Show(msg2 + "\r\n\r\n" + msg, "【読み込み失敗】",
+                    DialogResult result = MessageBox.Show(msg2 + "\r\n\r\n" + msg + ex.ToString(), "【読み込み失敗】",
                                                             MessageBoxButtons.YesNo,
                                                             MessageBoxIcon.Exclamation,
                                                             MessageBoxDefaultButton.Button2);
