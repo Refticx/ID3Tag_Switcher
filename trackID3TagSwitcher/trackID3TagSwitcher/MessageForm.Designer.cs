@@ -55,7 +55,7 @@
             this.lblMessage.Size = new System.Drawing.Size(410, 61);
             this.lblMessage.TabIndex = 8;
             this.lblMessage.Text = "message";
-            this.lblMessage.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblMessage.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // answerOK
             // 
