@@ -450,10 +450,30 @@ namespace trackID3TagSwitcher
             bool ret = (File.Exists(file));
             if (ret)
             {
+            }
                 try
                 {
-                    ret = GetAlbumInfoList(file);     /* まずID3 Tagリストを取得 */
-                    if (!ret) msg = "trackinfo.cblが見つかりませんでした。\r\nID3リストを作成しますか？";
+                    /* まずID3 Tagリストを取得 */
+                    ret = GetAlbumInfoList(file);
+                    /* 取得できなかった場合 */
+                    if (!ret)
+                    {
+                        /* 確認ダイアログを表示 */
+                        messageForm.SetFormState("楽曲情報を構成する「trackinfo.cbl」が見つかりませんでした。\r\nID3リストを作成しますか？", MODE_YN);
+                        DialogResult dr = messageForm.ShowDialog();
+
+                        /* YesならID3作成画面へ飛ばす */
+                        if (dr == DialogResult.Yes)
+                            btnOpenTrackInfoPage.PerformClick();
+
+                        /* ログメッセージ表示 */
+                        SetLog(Color.Orange, "ID3リストの作成が必要です。");
+
+                        /* try処理終わらせるために例外発生させる */
+                        throw new Exception();
+
+                        //msg = "trackinfo.cblが見つかりませんでした。\r\nID3リストを作成しますか？";
+                    }
 
                     ret = GetAlbumArtwork(path);    /* 設定されているパスからアートワークを取得する */
                     if (!ret)
@@ -466,7 +486,7 @@ namespace trackID3TagSwitcher
                         this.imgCurrentAlbumArtwork.ImageLocation = "";
                         this.imgCurrentAlbumArtwork.Visible = false;
 
-                        msg = "アートワークが見つかりませんでした。\r\nジャケット名を確認してください。";
+                        //msg = "アートワークが見つかりませんでした。\r\nジャケット名を確認してください。";
                     }
 
                     ret = GetMaxTrack( path);         /* 一度曲保存先にあるmo3を全部取得し、何曲あるか確認する */
@@ -483,7 +503,7 @@ namespace trackID3TagSwitcher
                 }
                 catch (Exception ex)
                 {
-                    DialogResult result = MessageBox.Show(msg2 + "\r\n\r\n" + msg + ex.ToString(), "【読み込み失敗】",
+                    /*DialogResult result = MessageBox.Show(msg2 + "\r\n\r\n" + msg + ex.ToString(), "【読み込み失敗】",
                                                             MessageBoxButtons.YesNo,
                                                             MessageBoxIcon.Exclamation,
                                                             MessageBoxDefaultButton.Button2);
@@ -495,9 +515,8 @@ namespace trackID3TagSwitcher
                     else if (result == DialogResult.No)
                     {
                         SetLog(Color.Orange, msg2);
-                    }
-                }
-            }
+                    }*/
+                }/*
             else
             {
                 msg = "trackinfo.cblが見つかりませんでした。\r\nID3リストを作成しますか？";
@@ -514,7 +533,7 @@ namespace trackID3TagSwitcher
                 {
                     SetLog(Color.Orange, "変換可能なアルバムではありません。");
                 }
-            }
+            }*/
         }
 
         #endregion
