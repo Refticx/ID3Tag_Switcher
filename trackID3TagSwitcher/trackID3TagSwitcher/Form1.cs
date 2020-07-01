@@ -11,6 +11,7 @@ using System.IO;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Threading;
 using System.Net;
+using System.Linq;
 
 namespace trackID3TagSwitcher
 {
@@ -298,6 +299,7 @@ namespace trackID3TagSwitcher
                                     {
                                         this.artworkPath = atw[i];
                                         isFind = true;
+                                        isExt = 100;
                                         break;
                                     }
                                 }
@@ -797,21 +799,23 @@ namespace trackID3TagSwitcher
             string num = "";
             int track = 0;
 
-            /* エラーなどでファイル変更が止まった不具合の可能性も考慮し、差し替え前はもう一度ファイル検索する */
+            /* 楽曲をすべて取得し、名前順にソートする */
             DirectoryInfo di = new DirectoryInfo(this.tracksPath);
             FileInfo[] files = di.GetFiles("*.mp3", SearchOption.AllDirectories);
+            Array.Sort(files, (x, y) => StringComparer.OrdinalIgnoreCase.Compare(x.Name, y.Name));
 
+            /*
             string msg = "";
             for (int i = 0; i < files.Length; i++)
             {
                 msg += files[i].Name + "\r\n";
             }
 
-            /* 確認ダイアログを表示 */
             messageForm.SetFormState(msg, MODE_OK);
             messageForm.ShowDialog();
+            */
 
-            foreach (FileInfo f in files)
+            foreach (var f in files)
             {
                 TagLib.File file = TagLib.File.Create( f.FullName );
                 file.Tag.Title = TrackID3Tag[track, nameNum];
@@ -845,6 +849,10 @@ namespace trackID3TagSwitcher
                     num += ". ";
                 else
                     num += " ";
+
+                /* 確認ダイアログを表示 
+                messageForm.SetFormState("target = " + f.FullName + "\r\nfix = " + TrackID3Tag[track, nameNum], MODE_OK);
+                messageForm.ShowDialog();*/
 
                 File.Move(f.FullName , f.DirectoryName + "\\" + num + TrackID3Tag[track, nameNum] + ".mp3" );
                 file.Dispose( );
