@@ -24,7 +24,7 @@ namespace trackID3TagSwitcher
 
         private const string APP_DOWNLOAD_URL = "https://chaoticbootstrage.wixsite.com/scene/id3-tool";     /* アプリ更新があった時に開かせるURL */
         private const string VERSION_INFO_URL = "https://chaoticbootstrage.wixsite.com/scene/idtool-ver";   /* アプリ更新があるかを確認するページ */
-        private const string CURRENT_VERSION = "1.12";                                                      /* 現在のアプリのバージョン */
+        private const string CURRENT_VERSION = "1.20";                                                       /* 現在のアプリのバージョン */
 
         private string trackcbl = "";                           /* trackinfo.cblから読み込んだ文字列全体を格納する変数 */
         private string[,] TrackID3Tag;                          /* trackinfo.cblから読み込んだ各ID3 Tag情報を記憶する二次元配列 */
