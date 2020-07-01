@@ -190,7 +190,7 @@ namespace trackID3TagSwitcher
 
         #region 各読み込みスクリプト
 
-        private bool GetAlbumInfoList( string path )
+        private bool GetID3List( string path )
         {
             /* ID3リストファイルがあるか検索 */
             bool ret = File.Exists(path);
@@ -335,7 +335,7 @@ namespace trackID3TagSwitcher
                 return false;
             }
         }
-        private void GetAlbumName( string path )
+        private void GetAlbumInfo( string path )
         {
             this.lblID3TagNumber.Text = "リリースナンバー：" + this.currentAlbumReleaseNumber;
             this.lblID3TagNumber.Visible = true;
@@ -473,7 +473,7 @@ namespace trackID3TagSwitcher
                 return false;
             }
         }
-        private bool GetID3TagInfoList()
+        private bool AnalysisID3List()
         {
             /* 
              要素数8（ARN名、FYS名、サブタイトル、アーティスト、コメント、作曲者、BPM、ジャンル）
@@ -593,7 +593,7 @@ namespace trackID3TagSwitcher
             }
             return true;
         }
-        private void LoadTrackInfo()
+        private void SetID3ListValue()
         {
             int st = 0;
             int ed;
@@ -620,8 +620,6 @@ namespace trackID3TagSwitcher
         }
         private void CheckAlbumConfig( string path )
         {
-            string msg = "";
-            string msg2 = "アルバムの読み込みに失敗しました。";
             string file = path + "\\trackinfo.cbl";
             bool ret = true;
             try
@@ -639,7 +637,8 @@ namespace trackID3TagSwitcher
                     this.imgCurrentAlbumArtwork.Visible = false;
                 }
 
-                ret = GetMaxTrack( path);         /* 一度曲保存先にあるmp3を全部取得し、何曲あるか確認する */
+                /* 一度曲保存先にあるmp3を全部取得し、何曲あるか確認する */
+                ret = GetMaxTrack( path);
                 if (!ret)
                 {
                     /* try処理終わらせるために例外発生させる */
@@ -647,7 +646,7 @@ namespace trackID3TagSwitcher
                 }
 
                 /* ID3 Tagリストを取得 */
-                ret = GetAlbumInfoList(file);
+                ret = GetID3List(file);
                 /* 取得できなかった場合 */
                 if (!ret)
                 {
@@ -656,7 +655,7 @@ namespace trackID3TagSwitcher
                 }
 
                 /* 取得できた曲数分、ID3 Tagの配列を生成し、リストの解析を行う */
-                ret = GetID3TagInfoList( );
+                ret = AnalysisID3List( );
                 /* データが破損していた場合 */
                 if (!ret)
                 {
@@ -664,9 +663,16 @@ namespace trackID3TagSwitcher
                     throw new Exception();
                 }
 
-                GetCurrentType(path);       /* 現在のアルバム形式がARNかFYSかを表示する */
-                GetAlbumName(path);         /* ディレクトリ名からアルバム名を取得 */
-                LoadTrackInfo();
+                /* 現在のアルバム形式がARNかFYSかを表示する */
+                GetCurrentType(path);
+
+                /* ディレクトリ名からアルバム名を取得 */
+                GetAlbumInfo(path);
+
+                /* ID3リスト作成ページに、解析したタグデータを入力 */
+                SetID3ListValue();
+
+                /* ID3リスト作成ページの各ボックスを初期化 */
                 DeleteAnotherBoxes();
 
                 SetLog(Color.LimeGreen, "アルバムを読み込みました。");
@@ -1586,9 +1592,9 @@ namespace trackID3TagSwitcher
                 bool ret = File.Exists(file );
                 if ( ret )
                 {
-                    GetAlbumInfoList(file);     /* まずID3 Tagリストを取得 */
-                    GetID3TagInfoList();        /* 取得できた曲数分、ID3 Tagの配列を生成し、リストの解析を行う */
-                    LoadTrackInfo();
+                    GetID3List(file);     /* まずID3 Tagリストを取得 */
+                    AnalysisID3List();        /* 取得できた曲数分、ID3 Tagの配列を生成し、リストの解析を行う */
+                    SetID3ListValue();
                 }
 
             }
