@@ -925,8 +925,15 @@ namespace trackID3TagSwitcher
             {
                 try
                 {
+                    /* 連続実行できないようにするため、ボタンロックする */
+                    this.btnSwitcher.Enabled = false;
+                    this.btnClearCache.Enabled = false;
+                    this.btnLoadAlbum.Enabled = false;
+                    this.btnOpenTrackInfoPage.Enabled = false;
+                    
                     StartTypeSwitch( );
                     RewriteCBL( );
+
                     SetLog(Color.LimeGreen, this.SYS_MSG_LIST[(int)STRNUM.Success_Convert_Song_ID3]);
                 }
                 catch (Exception ex)
@@ -935,6 +942,14 @@ namespace trackID3TagSwitcher
                     messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Irregular_Error] + ex.ToString(), MODE_OK);
                     messageForm.ShowDialog();
                     SetLog(Color.Orange, this.SYS_MSG_LIST[(int)STRNUM.Failed_Convert_Song_ID3]);
+                }
+                finally
+                {
+                    /* ボタンロックを解除する */
+                    this.btnSwitcher.Enabled = true;
+                    this.btnClearCache.Enabled = true;
+                    this.btnLoadAlbum.Enabled = true;
+                    this.btnOpenTrackInfoPage.Enabled = true;
                 }
             }
         }
