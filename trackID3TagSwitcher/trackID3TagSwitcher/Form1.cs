@@ -333,13 +333,19 @@ namespace trackID3TagSwitcher
         {
             try
             {
+                /* 楽曲ディレクトリの変数に、仮でテキストボックスの値を入れておく */
                 this.tracksPath = path + this.boxTrackFolder.Text;
                 /* 楽曲自動検索 */
                 if (this.autoSearchFile.Checked)
                 {
+                    /* 指定ディレクトリ以下のファイルを総取得 */
                     string[] allFiles = System.IO.Directory.GetFiles(path, "*", System.IO.SearchOption.AllDirectories);
+
+                    /* mp3ファイルのみを取得 */
                     string[] songs;
                     songs = allFiles.Where(s => s.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase)).ToArray();
+
+                    /* mp3ファイルがあるかどうか */
                     if (songs.Length != 0)
                     {
                         this.currentMaxTrack = songs.Length;
@@ -494,80 +500,46 @@ namespace trackID3TagSwitcher
             string msg = "";
             string msg2 = "アルバムの読み込みに失敗しました。";
             string file = path + "\\trackinfo.cbl";
-            bool ret = (File.Exists(file));
-            if (ret)
+            bool ret = true;
+            try
+            {
+                /* まずID3 Tagリストを取得 */
+                ret = GetAlbumInfoList(file);
+                /* 取得できなかった場合 */
+                if (!ret)
+                {
+                    /* try処理終わらせるために例外発生させる */
+                    throw new Exception();
+                }
+
+                /* 設定されているパスからアートワークを取得する */
+                ret = GetAlbumArtwork(path);
+                if (!ret)
+                {
+                    /* 確認ダイアログを表示 */
+                    messageForm.SetFormState("設定可能なアートワークを取得できませんでした。", MODE_OK);
+                    DialogResult dr = messageForm.ShowDialog();
+
+                    /* アートワークを非表示 */
+                    this.imgCurrentAlbumArtwork.ImageLocation = "";
+                    this.imgCurrentAlbumArtwork.Visible = false;
+                }
+
+                ret = GetMaxTrack( path);         /* 一度曲保存先にあるmp3を全部取得し、何曲あるか確認する */
+                if (!ret) msg = "曲数を取得できませんでした。\r\n曲階層を確認してください。";
+                GetID3TagInfoList();        /* 取得できた曲数分、ID3 Tagの配列を生成し、リストの解析を行う */
+                GetCurrentType(path);       /* 現在のアルバム形式がARNかFYSかを表示する */
+                GetAlbumName(path);         /* ディレクトリ名からアルバム名を取得 */
+                LoadTrackInfo();
+                DeleteAnotherBoxes();
+
+                SetLog(Color.LimeGreen, "アルバムを読み込みました。");
+                this.boxAlbumPath.Text = path;
+                this.canStartSwitcher = true;
+            }
+            catch (Exception ex)
             {
             }
-                try
-                {
-                    /* まずID3 Tagリストを取得 */
-                    ret = GetAlbumInfoList(file);
-                    /* 取得できなかった場合 */
-                    if (!ret)
-                    {
-                        /* try処理終わらせるために例外発生させる */
-                        throw new Exception();
-                    }
-
-                    ret = GetAlbumArtwork(path);    /* 設定されているパスからアートワークを取得する */
-                    if (!ret)
-                    {
-                        /* 確認ダイアログを表示 */
-                        messageForm.SetFormState("設定可能なアートワークを取得できませんでした。", MODE_OK);
-                        DialogResult dr = messageForm.ShowDialog();
-
-                        /* アートワークを非表示 */
-                        this.imgCurrentAlbumArtwork.ImageLocation = "";
-                        this.imgCurrentAlbumArtwork.Visible = false;
-
-                        //msg = "アートワークが見つかりませんでした。\r\nジャケット名を確認してください。";
-                    }
-
-                    ret = GetMaxTrack( path);         /* 一度曲保存先にあるmo3を全部取得し、何曲あるか確認する */
-                    if (!ret) msg = "曲数を取得できませんでした。\r\n曲階層を確認してください。";
-                    GetID3TagInfoList();        /* 取得できた曲数分、ID3 Tagの配列を生成し、リストの解析を行う */
-                    GetCurrentType(path);       /* 現在のアルバム形式がARNかFYSかを表示する */
-                    GetAlbumName(path);         /* ディレクトリ名からアルバム名を取得 */
-                    LoadTrackInfo();
-                    DeleteAnotherBoxes();
-
-                    SetLog(Color.LimeGreen, "アルバムを読み込みました。");
-                    this.boxAlbumPath.Text = path;
-                    this.canStartSwitcher = true;
-                }
-                catch (Exception ex)
-                {
-                    /*DialogResult result = MessageBox.Show(msg2 + "\r\n\r\n" + msg + ex.ToString(), "【読み込み失敗】",
-                                                            MessageBoxButtons.YesNo,
-                                                            MessageBoxIcon.Exclamation,
-                                                            MessageBoxDefaultButton.Button2);
-                    if (result == DialogResult.Yes)
-                    {
-                        btnOpenTrackInfoPage.PerformClick( );
-                        SetLog(Color.Orange, msg2);
-                    }
-                    else if (result == DialogResult.No)
-                    {
-                        SetLog(Color.Orange, msg2);
-                    }*/
-                }/*
-            else
-            {
-                msg = "trackinfo.cblが見つかりませんでした。\r\nID3リストを作成しますか？";
-                DialogResult result = MessageBox.Show(msg2 + "\r\n\r\n" + msg, "【読み込み失敗】",
-                                                        MessageBoxButtons.YesNo,
-                                                        MessageBoxIcon.Exclamation,
-                                                        MessageBoxDefaultButton.Button2);
-                if (result == DialogResult.Yes)
-                {
-                    btnOpenTrackInfoPage.PerformClick();
-                    SetLog(Color.Orange, "変換可能なアルバムではありません。");
-                }
-                else if (result == DialogResult.No)
-                {
-                    SetLog(Color.Orange, "変換可能なアルバムではありません。");
-                }
-            }*/
         }
 
         #endregion
