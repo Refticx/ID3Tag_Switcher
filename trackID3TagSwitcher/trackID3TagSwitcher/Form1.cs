@@ -76,6 +76,27 @@ namespace trackID3TagSwitcher
         private const int MODE_YN = 0;
         private const int MODE_OK = 1;
 
+        /* システムメッセージ */
+
+        enum STRNUM
+        {
+            CLEAR_LOAD_DATA,
+            NOT_FOUND_ID3LIST,
+            QST_MAKE_ID3LIST,
+            FOUND_ID3LIST,
+            NODATA_ID3LIST,
+            NEED_MAKE_ID3LIST,
+        }
+        private string[] SYS_MSG_LIST =
+        {
+            "読み込んだアルバム情報をクリアしました。",
+            "楽曲情報を構成する「trackinfo.cbl」が見つかりませんでした。\r\n",
+            "ID3リストを作成しますか？",
+            "楽曲情報を構成する「trackinfo.cbl」は見つかりました。\r\n",
+            "しかしリストデータが空でした。\r\n",
+            "ID3リストの作成が必要です。",
+        };
+
         #region 汎用型スクリプト
 
         /// <summary>
@@ -131,7 +152,7 @@ namespace trackID3TagSwitcher
         private void BtnClearCache_Click(object sender, EventArgs e)
         {
             ClearCache();
-            SetLog(Color.LimeGreen, "読み込んだアルバム情報をクリアしました。");
+            SetLog(Color.LimeGreen, this.SYS_MSG_LIST[(int)STRNUM.CLEAR_LOAD_DATA]);
         }
         #endregion
 
@@ -146,7 +167,7 @@ namespace trackID3TagSwitcher
             if (!ret)
             {
                 /* 確認ダイアログを表示 */
-                messageForm.SetFormState("楽曲情報を構成する「trackinfo.cbl」が見つかりませんでした。\r\nID3リストを作成しますか？", MODE_YN);
+                messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.NOT_FOUND_ID3LIST] + this.SYS_MSG_LIST[(int)STRNUM.QST_MAKE_ID3LIST], MODE_YN);
                 DialogResult dr = messageForm.ShowDialog();
 
                 /* YesならID3作成画面へ飛ばす */
@@ -154,7 +175,7 @@ namespace trackID3TagSwitcher
                     btnOpenTrackInfoPage.PerformClick();
 
                 /* ログメッセージ表示 */
-                SetLog(Color.Orange, "ID3リストの作成が必要です。");
+                SetLog(Color.Orange, this.SYS_MSG_LIST[(int)STRNUM.NEED_MAKE_ID3LIST]);
                 return false;
             }
 
@@ -165,7 +186,7 @@ namespace trackID3TagSwitcher
             if (this.trackcbl.Length == 0)
             {
                 /* 確認ダイアログを表示 */
-                messageForm.SetFormState("楽曲情報を構成する「trackinfo.cbl」は見つかりました。\r\nしかしリストデータが空でした。\r\nID3リストを作成しますか？", MODE_YN);
+                messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.FOUND_ID3LIST] + this.SYS_MSG_LIST[(int)STRNUM.NODATA_ID3LIST] + this.SYS_MSG_LIST[(int)STRNUM.QST_MAKE_ID3LIST], MODE_YN);
                 DialogResult dr = messageForm.ShowDialog();
 
                 /* YesならID3作成画面へ飛ばす */
@@ -173,7 +194,7 @@ namespace trackID3TagSwitcher
                     btnOpenTrackInfoPage.PerformClick();
 
                 /* ログメッセージ表示 */
-                SetLog(Color.Orange, "ID3リストの作成が必要です。");
+                SetLog(Color.Orange, this.SYS_MSG_LIST[(int)STRNUM.NEED_MAKE_ID3LIST]);
                 return false;
             }
 
