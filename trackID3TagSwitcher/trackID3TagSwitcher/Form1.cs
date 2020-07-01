@@ -101,6 +101,12 @@ namespace trackID3TagSwitcher
 
             Break_ID3List,
             Plz_Make_ID3List,
+
+            Not_Loaded_Album,
+            Not_Loaded_Album_Reason,
+
+            Success_Convert_Song_ID3,
+            Failed_Convert_Song_ID3,
         }
         private string[] SYS_MSG_LIST =
         {
@@ -125,6 +131,12 @@ namespace trackID3TagSwitcher
 
             "ID3リストファイルが破損しています。",
             "\r\nデータを読み取ることができませんでした。\r\n再度作り直してください。",
+
+            "アルバムを読み込んでいないため、開始できません。",
+            "\r\n以下の原因が考えられます。\r\n\r\n・楽曲のあるディレクトリを指定していない。\r\n・ID3リストを作っていない。\r\n・ID3リストはあるが、データが破損している。",
+
+            "曲方式の変換に成功しました。",
+            "曲方式の変換に失敗しました。",
         };
 
         #region 汎用型スクリプト
@@ -889,7 +901,14 @@ namespace trackID3TagSwitcher
         {
             if ( !canStartSwitcher )
             {
-                SetLog(Color.Orange, "アルバムを読み込んでいないため、開始できません。");
+                /* 確認ダイアログを表示 */
+                messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Not_Loaded_Album] +
+                                            this.SYS_MSG_LIST[(int)STRNUM.Not_Loaded_Album_Reason],
+                                            MODE_OK);
+                messageForm.ShowDialog();
+
+                SetLog(Color.Orange, this.SYS_MSG_LIST[(int)STRNUM.Not_Loaded_Album]);
+                
             }
             else
             {
@@ -897,12 +916,14 @@ namespace trackID3TagSwitcher
                 {
                     StartTypeSwitch( );
                     RewriteCBL( );
-                    SetLog(Color.LimeGreen, "曲方式の変換に成功しました。");
+                    SetLog(Color.LimeGreen, this.SYS_MSG_LIST[(int)STRNUM.Success_Convert_Song_ID3]);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show( ex.ToString(), "変換エラー" );
-                    SetLog(Color.Orange, "曲方式の変換に失敗しました。");
+                    /* 確認ダイアログを表示 */
+                    messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Irregular_Error] + ex.ToString(), MODE_OK);
+                    messageForm.ShowDialog();
+                    SetLog(Color.Orange, this.SYS_MSG_LIST[(int)STRNUM.Failed_Convert_Song_ID3]);
                 }
             }
         }
