@@ -78,7 +78,6 @@ C:\Users\refti\Documents\ID3Tag_Switcher\trackID3TagSwitcher\trackID3TagSwitcher
 C:\Users\refti\Documents\ID3Tag_Switcher\trackID3TagSwitcher\trackID3TagSwitcher\bin\Release\Microsoft.WindowsAPICodePack.Shell.xml
 C:\Users\refti\Documents\ID3Tag_Switcher\trackID3TagSwitcher\trackID3TagSwitcher\bin\Release\policy.2.0.taglib-sharp.config
 C:\Users\refti\Documents\ID3Tag_Switcher\trackID3TagSwitcher\trackID3TagSwitcher\obj\Release\trackID3TagSwitcher.csprojAssemblyReference.cache
-C:\Users\refti\Documents\ID3Tag_Switcher\trackID3TagSwitcher\trackID3TagSwitcher\obj\Release\trackID3TagSwitcher.MessageDialog.resources
 C:\Users\refti\Documents\ID3Tag_Switcher\trackID3TagSwitcher\trackID3TagSwitcher\obj\Release\trackID3TagSwitcher.Form1.resources
 C:\Users\refti\Documents\ID3Tag_Switcher\trackID3TagSwitcher\trackID3TagSwitcher\obj\Release\trackID3TagSwitcher.Properties.Resources.resources
 C:\Users\refti\Documents\ID3Tag_Switcher\trackID3TagSwitcher\trackID3TagSwitcher\obj\Release\trackID3TagSwitcher.csproj.GenerateResource.cache
@@ -86,3 +85,4 @@ C:\Users\refti\Documents\ID3Tag_Switcher\trackID3TagSwitcher\trackID3TagSwitcher
 C:\Users\refti\Documents\ID3Tag_Switcher\trackID3TagSwitcher\trackID3TagSwitcher\obj\Release\trackID3TagSwitcher.csproj.CopyComplete
 C:\Users\refti\Documents\ID3Tag_Switcher\trackID3TagSwitcher\trackID3TagSwitcher\obj\Release\trackID3TagSwitcher.exe
 C:\Users\refti\Documents\ID3Tag_Switcher\trackID3TagSwitcher\trackID3TagSwitcher\obj\Release\trackID3TagSwitcher.pdb
+C:\Users\refti\Documents\ID3Tag_Switcher\trackID3TagSwitcher\trackID3TagSwitcher\obj\Release\trackID3TagSwitcher.MessageForm.resources
