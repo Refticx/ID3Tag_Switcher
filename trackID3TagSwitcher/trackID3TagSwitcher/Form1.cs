@@ -96,6 +96,11 @@ namespace trackID3TagSwitcher
             NOT_FOUND_SONG,
 
             Irregular_Error,
+
+            Not_Found_Artwork,
+
+            Break_ID3List,
+            Plz_Make_ID3List,
         }
         private string[] SYS_MSG_LIST =
         {
@@ -115,6 +120,11 @@ namespace trackID3TagSwitcher
             "楽曲が見つかりません。",
 
             "想定外のエラーが発生しました。\r\n今後の本ソフトウェア安定性向上のため、製作者にスクリーンショットを添えてご報告お願いします。\r\n\r\n",
+
+            "設定可能なアートワークを取得できませんでした。",
+
+            "ID3リストファイルが破損しています。",
+            "\r\nデータを読み取ることができませんでした。\r\n再度作り直してください。",
         };
 
         #region 汎用型スクリプト
@@ -338,7 +348,6 @@ namespace trackID3TagSwitcher
         }
         private void GetCurrentType( string path )
         {
-
             if (!this.isTypeFYS)
             {
                 this.lblCurrentText.Text = "A-Remix Nation方式";
@@ -464,7 +473,7 @@ namespace trackID3TagSwitcher
                 return false;
             }
         }
-        private void GetID3TagInfoList()
+        private bool GetID3TagInfoList()
         {
             /* 
              要素数8（ARN名、FYS名、サブタイトル、アーティスト、コメント、作曲者、BPM、ジャンル）
@@ -475,6 +484,7 @@ namespace trackID3TagSwitcher
             string num = "";
             int st = 0;
             int ed = 0;
+            int isBreak = 0;
             bool isFind = false;
 
             StringReader rs = new StringReader(this.trackcbl);
@@ -489,6 +499,8 @@ namespace trackID3TagSwitcher
                     st = target.Length;
                     ed = line.Length - st;
                     this.currentAlbumLabelName = line.Substring(st, ed);
+                    /* どれか1つでも対象のワードを発見できたらデータ正常扱いにする */
+                    isBreak++;
                     continue;
                 }
 
@@ -498,6 +510,8 @@ namespace trackID3TagSwitcher
                     st = target.Length;
                     ed = line.Length - st;
                     this.currentAlbumReleaseTitle = line.Substring(st, ed);
+                    /* どれか1つでも対象のワードを発見できたらデータ正常扱いにする */
+                    isBreak++;
                     continue;
                 }
 
@@ -507,6 +521,8 @@ namespace trackID3TagSwitcher
                     st = target.Length;
                     ed = line.Length - st;
                     this.currentAlbumReleaseNumber = line.Substring(st, ed);
+                    /* どれか1つでも対象のワードを発見できたらデータ正常扱いにする */
+                    isBreak++;
                     continue;
                 }
 
@@ -520,6 +536,8 @@ namespace trackID3TagSwitcher
                         this.isTypeFYS = false;
                     else if (mode == "FYS")
                         this.isTypeFYS = true;
+                    /* どれか1つでも対象のワードを発見できたらデータ正常扱いにする */
+                    isBreak++;
                     continue;
                 }
 
@@ -560,6 +578,20 @@ namespace trackID3TagSwitcher
                 }
             }
             rs.Close();
+            /* 最低限必要な4つのタグが見つけられなかったら破損データ扱いにする */
+            if ( isBreak < 4 )
+            {
+                /* 確認ダイアログを表示 */
+                messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Break_ID3List] +
+                                            this.SYS_MSG_LIST[(int)STRNUM.Plz_Make_ID3List], 
+                                            MODE_OK);
+                messageForm.ShowDialog();
+
+                /* ログメッセージ表示 */
+                SetLog(Color.Orange, this.SYS_MSG_LIST[(int)STRNUM.Break_ID3List]);
+                return false;
+            }
+            return true;
         }
         private void LoadTrackInfo()
         {
@@ -599,7 +631,7 @@ namespace trackID3TagSwitcher
                 if (!ret)
                 {
                     /* 確認ダイアログを表示 */
-                    messageForm.SetFormState("設定可能なアートワークを取得できませんでした。", MODE_OK);
+                    messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Not_Found_Artwork], MODE_OK);
                     DialogResult dr = messageForm.ShowDialog();
 
                     /* アートワークを非表示 */
@@ -623,7 +655,15 @@ namespace trackID3TagSwitcher
                     throw new Exception();
                 }
 
-                GetID3TagInfoList();        /* 取得できた曲数分、ID3 Tagの配列を生成し、リストの解析を行う */
+                /* 取得できた曲数分、ID3 Tagの配列を生成し、リストの解析を行う */
+                ret = GetID3TagInfoList( );
+                /* データが破損していた場合 */
+                if (!ret)
+                {
+                    /* try処理終わらせるために例外発生させる */
+                    throw new Exception();
+                }
+
                 GetCurrentType(path);       /* 現在のアルバム形式がARNかFYSかを表示する */
                 GetAlbumName(path);         /* ディレクトリ名からアルバム名を取得 */
                 LoadTrackInfo();
