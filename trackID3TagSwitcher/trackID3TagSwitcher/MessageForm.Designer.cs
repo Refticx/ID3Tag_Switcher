@@ -48,14 +48,15 @@
             // 
             // lblMessage
             // 
-            this.lblMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
+            this.lblMessage.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(64)))));
+            this.lblMessage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.lblMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblMessage.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblMessage.Location = new System.Drawing.Point(12, 151);
+            this.lblMessage.Location = new System.Drawing.Point(12, 148);
             this.lblMessage.Name = "lblMessage";
-            this.lblMessage.Size = new System.Drawing.Size(410, 251);
+            this.lblMessage.Size = new System.Drawing.Size(410, 355);
             this.lblMessage.TabIndex = 8;
             this.lblMessage.Text = "message";
-            this.lblMessage.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // answerOK
             // 
@@ -63,7 +64,7 @@
             this.answerOK.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.answerOK.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.answerOK.ForeColor = System.Drawing.Color.Navy;
-            this.answerOK.Location = new System.Drawing.Point(176, 419);
+            this.answerOK.Location = new System.Drawing.Point(180, 519);
             this.answerOK.Name = "answerOK";
             this.answerOK.Size = new System.Drawing.Size(75, 30);
             this.answerOK.TabIndex = 7;
@@ -78,7 +79,7 @@
             this.answerNo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.answerNo.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.answerNo.ForeColor = System.Drawing.Color.Yellow;
-            this.answerNo.Location = new System.Drawing.Point(275, 419);
+            this.answerNo.Location = new System.Drawing.Point(279, 519);
             this.answerNo.Name = "answerNo";
             this.answerNo.Size = new System.Drawing.Size(75, 30);
             this.answerNo.TabIndex = 6;
@@ -93,7 +94,7 @@
             this.answerYes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.answerYes.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.answerYes.ForeColor = System.Drawing.Color.White;
-            this.answerYes.Location = new System.Drawing.Point(69, 419);
+            this.answerYes.Location = new System.Drawing.Point(73, 519);
             this.answerYes.Name = "answerYes";
             this.answerYes.Size = new System.Drawing.Size(75, 30);
             this.answerYes.TabIndex = 5;
@@ -107,10 +108,10 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.MidnightBlue;
-            this.ClientSize = new System.Drawing.Size(434, 461);
+            this.ClientSize = new System.Drawing.Size(434, 561);
             this.ControlBox = false;
-            this.Controls.Add(this.picture);
             this.Controls.Add(this.lblMessage);
+            this.Controls.Add(this.picture);
             this.Controls.Add(this.answerOK);
             this.Controls.Add(this.answerNo);
             this.Controls.Add(this.answerYes);

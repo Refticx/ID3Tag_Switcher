@@ -63,6 +63,7 @@
             this.chkIsDot = new System.Windows.Forms.CheckBox();
             this.btnOpenTrackInfoPage = new System.Windows.Forms.Button();
             this.pnlPage1 = new System.Windows.Forms.Panel();
+            this.lblTrackCount = new System.Windows.Forms.Label();
             this.autoSearchFile = new System.Windows.Forms.CheckBox();
             this.pnlTrackInfo = new System.Windows.Forms.Panel();
             this.btnShowCurrentTrackName = new System.Windows.Forms.Button();
@@ -98,7 +99,6 @@
             this.boxEx1 = new System.Windows.Forms.TextBox();
             this.lblARNName = new System.Windows.Forms.Label();
             this.tipIsDot = new System.Windows.Forms.ToolTip(this.components);
-            this.lblTrackCount = new System.Windows.Forms.Label();
             this.pnlAppHeader.SuspendLayout();
             this.pnlAppFooter.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imgCurrentMode)).BeginInit();
@@ -563,6 +563,19 @@
             this.pnlPage1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnlPage1_MouseDown);
             this.pnlPage1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnlPage1_MouseMove);
             // 
+            // lblTrackCount
+            // 
+            this.lblTrackCount.AutoSize = true;
+            this.lblTrackCount.BackColor = System.Drawing.Color.Transparent;
+            this.lblTrackCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblTrackCount.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.lblTrackCount.Location = new System.Drawing.Point(106, 174);
+            this.lblTrackCount.Name = "lblTrackCount";
+            this.lblTrackCount.Size = new System.Drawing.Size(40, 15);
+            this.lblTrackCount.TabIndex = 34;
+            this.lblTrackCount.Text = "曲数：";
+            this.lblTrackCount.Visible = false;
+            // 
             // autoSearchFile
             // 
             this.autoSearchFile.AutoSize = true;
@@ -658,7 +671,7 @@
             this.boxEx9.ReadOnly = true;
             this.boxEx9.Size = new System.Drawing.Size(66, 21);
             this.boxEx9.TabIndex = 64;
-            this.boxEx9.Text = "Saber Maji Kawa-Eeeeeee Mix";
+            this.boxEx9.Text = "Refticx\'s Saber Maji Kawa-Eeeeeee Mix";
             this.tipIsDot.SetToolTip(this.boxEx9, "FYS式に変換時、曲名にジャンル名を入れたくない場合に、それ以降の文章をカスタマイズできます。\r\n例）記入：Saber Maji Kawa-Eeeeeee Mix" +
         "\r\n　　反映：01. ideal white (Refticx\'s Saber Maji Kawa-Eeeeeee Mix).mp3");
             // 
@@ -1013,19 +1026,6 @@
             this.tipIsDot.AutoPopDelay = 5000;
             this.tipIsDot.InitialDelay = 100;
             this.tipIsDot.ReshowDelay = 100;
-            // 
-            // lblTrackCount
-            // 
-            this.lblTrackCount.AutoSize = true;
-            this.lblTrackCount.BackColor = System.Drawing.Color.Transparent;
-            this.lblTrackCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblTrackCount.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblTrackCount.Location = new System.Drawing.Point(106, 174);
-            this.lblTrackCount.Name = "lblTrackCount";
-            this.lblTrackCount.Size = new System.Drawing.Size(40, 15);
-            this.lblTrackCount.TabIndex = 34;
-            this.lblTrackCount.Text = "曲数：";
-            this.lblTrackCount.Visible = false;
             // 
             // Form1
             // 
