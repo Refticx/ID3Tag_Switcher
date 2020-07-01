@@ -76,7 +76,7 @@ namespace trackID3TagSwitcher
         private const int MODE_YN = 0;
         private const int MODE_OK = 1;
 
-        /* システムメッセージ */
+        #region システムメッセージ
 
         enum STRNUM
         {
@@ -138,6 +138,8 @@ namespace trackID3TagSwitcher
             "曲方式の変換に成功しました。",
             "曲方式の変換に失敗しました。",
         };
+
+        #endregion
 
         #region 汎用型スクリプト
 
@@ -796,11 +798,20 @@ namespace trackID3TagSwitcher
             int track = 0;
 
             /* エラーなどでファイル変更が止まった不具合の可能性も考慮し、差し替え前はもう一度ファイル検索する */
-            //DirectoryInfo di = new DirectoryInfo(this.tracksPath);
-            string[] filepathes = Directory.GetFiles( this.tracksPath , "*mp3" );
-            MessageBox.Show(filepathes.ToString());
-            //FileInfo[] files = di.GetFiles("*.mp3", SearchOption.AllDirectories);
-            /*foreach (FileInfo f in files)
+            DirectoryInfo di = new DirectoryInfo(this.tracksPath);
+            FileInfo[] files = di.GetFiles("*.mp3", SearchOption.AllDirectories);
+
+            string msg = "";
+            for (int i = 0; i < files.Length; i++)
+            {
+                msg += files[i].Name + "\r\n";
+            }
+
+            /* 確認ダイアログを表示 */
+            messageForm.SetFormState(msg, MODE_OK);
+            messageForm.ShowDialog();
+
+            foreach (FileInfo f in files)
             {
                 TagLib.File file = TagLib.File.Create( f.FullName );
                 file.Tag.Title = TrackID3Tag[track, nameNum];
@@ -838,7 +849,7 @@ namespace trackID3TagSwitcher
                 File.Move(f.FullName , f.DirectoryName + "\\" + num + TrackID3Tag[track, nameNum] + ".mp3" );
                 file.Dispose( );
                 track++;
-            }*/
+            }
             
             if ( !this.isTypeFYS )
             {
