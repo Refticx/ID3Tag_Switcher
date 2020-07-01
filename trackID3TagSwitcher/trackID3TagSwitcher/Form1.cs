@@ -98,6 +98,8 @@ namespace trackID3TagSwitcher
 
             Irregular_Error,
 
+            Plz_Check_Artwork,
+            Is_This_OK,
             Not_Found_Artwork,
 
             Break_ID3List,
@@ -106,6 +108,7 @@ namespace trackID3TagSwitcher
             Not_Loaded_Album,
             Not_Loaded_Album_Reason,
 
+            Success_Load_Album,
             Success_Convert_Song_ID3,
             Failed_Convert_Song_ID3,
         }
@@ -128,6 +131,8 @@ namespace trackID3TagSwitcher
 
             "想定外のエラーが発生しました。\r\n今後の本ソフトウェア安定性向上のため、製作者にスクリーンショットを添えてご報告お願いします。\r\n\r\n",
 
+            "取得されたアートワークの確認です。\r\n",
+            "こちらでよろしいでしょうか？\r\n",
             "設定可能なアートワークを取得できませんでした。",
 
             "ID3リストファイルが破損しています。",
@@ -136,8 +141,10 @@ namespace trackID3TagSwitcher
             "アルバムを読み込んでいないため、開始できません。",
             "\r\n以下の原因が考えられます。\r\n\r\n・楽曲のあるディレクトリを指定していない。\r\n・ID3リストを作っていない。\r\n・ID3リストはあるが、データが破損している。",
 
+            "アルバムを読み込みました。",
             "曲方式の変換に成功しました。",
             "曲方式の変換に失敗しました。",
+
         };
 
         #endregion
@@ -287,13 +294,16 @@ namespace trackID3TagSwitcher
                             for (int i = 0; i < atw.Length; i++)
                             {
                                 /* 楽曲に設定済みの、システムが自動生成したアートワークファイルは排除する */
-                                if (atw[i].Contains("AlbumArtSmall") || atw[i].Contains("Folder"))
+                                if (atw[i].Contains("AlbumArtSmall") || atw[i].Contains("Folder") || atw[i].Contains("AlbumArt_{"))
                                     continue;
                                 /* それ以外の画像は */
                                 else
                                 {
                                     /* 確認ダイアログを表示 */
-                                    messageForm.SetFormState("取得されたアートワークの確認です。\r\nこちらでよろしいでしょうか？\r\n格納先：" + atw[i], MODE_YN, atw[i]);
+                                    messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Plz_Check_Artwork] +
+                                                                this.SYS_MSG_LIST[(int)STRNUM.Is_This_OK] +
+                                                                this.SYS_MSG_LIST[(int)STRNUM.DIR] +
+                                                                atw[i], MODE_YN, atw[i]);
                                     DialogResult dr = messageForm.ShowDialog();
                                     if (dr == DialogResult.Yes)
                                     {
@@ -304,7 +314,6 @@ namespace trackID3TagSwitcher
                                     }
                                 }
                             }
-                            //MessageBox.Show("取得されたアートワークの格納先\r\n" + this.artworkPath, "取得内容確認", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
 
                         /* 拡張子を変更 */
@@ -317,7 +326,10 @@ namespace trackID3TagSwitcher
                     if (File.Exists(this.artworkPath))
                     {
                         /* 確認ダイアログを表示 */
-                        messageForm.SetFormState("取得されたアートワークの確認です。\r\nこちらでよろしいでしょうか？\r\n格納先：" + this.artworkPath, MODE_YN, this.artworkPath);
+                        messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Plz_Check_Artwork] +
+                                                    this.SYS_MSG_LIST[(int)STRNUM.Is_This_OK] +
+                                                    this.SYS_MSG_LIST[(int)STRNUM.DIR] +
+                                                    this.artworkPath, MODE_YN, this.artworkPath);
                         DialogResult dr = messageForm.ShowDialog();
                         if (dr == DialogResult.Yes)
                             isFind = true;
@@ -690,8 +702,8 @@ namespace trackID3TagSwitcher
 
                 /* ID3リスト作成ページの各ボックスを初期化 */
                 DeleteAnotherBoxes();
-
-                SetLog(Color.LimeGreen, "アルバムを読み込みました。");
+                
+                SetLog(Color.LimeGreen, this.SYS_MSG_LIST[(int)STRNUM.Success_Load_Album]);
                 this.boxAlbumPath.Text = path;
                 this.canStartSwitcher = true;
             }
@@ -938,6 +950,7 @@ namespace trackID3TagSwitcher
                     this.btnClearCache.Enabled = false;
                     this.btnLoadAlbum.Enabled = false;
                     this.btnOpenTrackInfoPage.Enabled = false;
+                    this.btnExit.Enabled = false;
                     
                     StartTypeSwitch( );
                     RewriteCBL( );
@@ -958,6 +971,7 @@ namespace trackID3TagSwitcher
                     this.btnClearCache.Enabled = true;
                     this.btnLoadAlbum.Enabled = true;
                     this.btnOpenTrackInfoPage.Enabled = true;
+                    this.btnExit.Enabled = true;
                 }
             }
         }
