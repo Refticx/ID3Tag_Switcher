@@ -81,20 +81,40 @@ namespace trackID3TagSwitcher
         enum STRNUM
         {
             CLEAR_LOAD_DATA,
+
             NOT_FOUND_ID3LIST,
             QST_MAKE_ID3LIST,
             FOUND_ID3LIST,
             NODATA_ID3LIST,
             NEED_MAKE_ID3LIST,
+
+            FOUND_MP3S,
+            DIR,
+
+            NOT_FOUND_SONG_DIR,
+            PLZ_CHECK_FILE_PATH,
+            NOT_FOUND_SONG,
+
+            Irregular_Error,
         }
         private string[] SYS_MSG_LIST =
         {
             "読み込んだアルバム情報をクリアしました。",
+
             "楽曲情報を構成する「trackinfo.cbl」が見つかりませんでした。\r\n",
             "ID3リストを作成しますか？",
             "楽曲情報を構成する「trackinfo.cbl」は見つかりました。\r\n",
             "しかしリストデータが空でした。\r\n",
             "ID3リストの作成が必要です。",
+
+            "楽曲を発見しました、ご確認ください。\r\n",
+            "格納先：",
+
+            "指定された曲階層が見つかりませんでした。\r\n",
+            "再度ファイルパスをご確認ください。",
+            "楽曲が見つかりません。",
+
+            "想定外のエラーが発生しました。\r\n今後の本ソフトウェア安定性向上のため、製作者にスクリーンショットを添えてご報告お願いします。\r\n\r\n",
         };
 
         #region 汎用型スクリプト
@@ -202,98 +222,108 @@ namespace trackID3TagSwitcher
         }
         private bool GetAlbumArtwork( string path )
         {
-            /* アートワークを見つけたかのフラグ、後半での共通処理で使う */
-            bool isFind = false;
-            int loopCount = 4;
-
-            /* 自動検索分岐前に、両分岐先で使う変数に値だけ代入しておく */
-            this.artworkPath = path + this.boxArtworkName.Text;
-
-            /* アートワーク自動検索の分岐 */
-            if ( this.autoSearchFile.Checked )
+            try
             {
-                /* 指定されたアルバムディレクトリ配下のファイルを全て取得 */
-                string[] files = System.IO.Directory.GetFiles(path, "*", System.IO.SearchOption.AllDirectories);
+                /* アートワークを見つけたかのフラグ、後半での共通処理で使う */
+                bool isFind = false;
+                int loopCount = 4;
 
-                /* ファイルが1つも取得できなかった場合はエラー通知する */
-                if (files.Length == 0)
-                    return false;
+                /* 自動検索分岐前に、両分岐先で使う変数に値だけ代入しておく */
+                this.artworkPath = path + this.boxArtworkName.Text;
 
-                /* アートワークが複数あることを想定してループ処理 */
-                string[] atw = null;
-                int isExt = 0;
-                while (isExt <= loopCount)
+                /* アートワーク自動検索の分岐 */
+                if (this.autoSearchFile.Checked)
                 {
-                    switch (isExt)
+                    /* 指定されたアルバムディレクトリ配下のファイルを全て取得 */
+                    string[] files = System.IO.Directory.GetFiles(path, "*", System.IO.SearchOption.AllDirectories);
+
+                    /* ファイルが1つも取得できなかった場合はエラー通知する */
+                    if (files.Length == 0)
+                        return false;
+
+                    /* アートワークが複数あることを想定してループ処理 */
+                    string[] atw = null;
+                    int isExt = 0;
+                    while (isExt <= loopCount)
                     {
-                        /* 拡張子を検索 */
-                        case 0: atw = files.Where(s => s.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase)).ToArray(); break;
-                        case 1: atw = files.Where(s => s.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase)).ToArray(); break;
-                        case 2: atw = files.Where(s => s.EndsWith(".png", StringComparison.OrdinalIgnoreCase)).ToArray(); break;
-                        case 3: atw = files.Where(s => s.EndsWith(".gif", StringComparison.OrdinalIgnoreCase)).ToArray(); break;
-                    }
-                    
-                    /* 結果が何か入っていれば */
-                    if ((atw != null) && (atw.Length != 0))
-                    {
-                        /* 検索をする */
-                        for (int i = 0; i < atw.Length; i++)
+                        switch (isExt)
                         {
-                            /* 楽曲に設定済みの、システムが自動生成したアートワークファイルは排除する */
-                            if (atw[i].Contains("AlbumArtSmall") || atw[i].Contains("Folder"))
-                                continue;
-                            /* それ以外の画像は */
-                            else
+                            /* 拡張子を検索 */
+                            case 0: atw = files.Where(s => s.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase)).ToArray(); break;
+                            case 1: atw = files.Where(s => s.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase)).ToArray(); break;
+                            case 2: atw = files.Where(s => s.EndsWith(".png", StringComparison.OrdinalIgnoreCase)).ToArray(); break;
+                            case 3: atw = files.Where(s => s.EndsWith(".gif", StringComparison.OrdinalIgnoreCase)).ToArray(); break;
+                        }
+
+                        /* 結果が何か入っていれば */
+                        if ((atw != null) && (atw.Length != 0))
+                        {
+                            /* 検索をする */
+                            for (int i = 0; i < atw.Length; i++)
                             {
-                                /* 確認ダイアログを表示 */
-                                messageForm.SetFormState("取得されたアートワークの確認です。\r\nこちらでよろしいでしょうか？\r\n格納先：" + atw[i], MODE_YN, atw[i]);
-                                DialogResult dr = messageForm.ShowDialog();
-                                if (dr == DialogResult.Yes)
+                                /* 楽曲に設定済みの、システムが自動生成したアートワークファイルは排除する */
+                                if (atw[i].Contains("AlbumArtSmall") || atw[i].Contains("Folder"))
+                                    continue;
+                                /* それ以外の画像は */
+                                else
                                 {
-                                    this.artworkPath = atw[i];
-                                    isFind = true;
-                                    break;
+                                    /* 確認ダイアログを表示 */
+                                    messageForm.SetFormState("取得されたアートワークの確認です。\r\nこちらでよろしいでしょうか？\r\n格納先：" + atw[i], MODE_YN, atw[i]);
+                                    DialogResult dr = messageForm.ShowDialog();
+                                    if (dr == DialogResult.Yes)
+                                    {
+                                        this.artworkPath = atw[i];
+                                        isFind = true;
+                                        break;
+                                    }
                                 }
                             }
+                            //MessageBox.Show("取得されたアートワークの格納先\r\n" + this.artworkPath, "取得内容確認", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
-                        //MessageBox.Show("取得されたアートワークの格納先\r\n" + this.artworkPath, "取得内容確認", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
 
-                    /* 拡張子を変更 */
-                    isExt++;
-                }
-            }
-            else
-            {
-                /* 手動指定されたファイルパスを検索 */
-                if (File.Exists(this.artworkPath))
-                {
-                    /* 確認ダイアログを表示 */
-                    messageForm.SetFormState("取得されたアートワークの確認です。\r\nこちらでよろしいでしょうか？\r\n格納先：" + this.artworkPath, MODE_YN, this.artworkPath);
-                    DialogResult dr = messageForm.ShowDialog();
-                    if (dr == DialogResult.Yes)
-                        isFind = true;
+                        /* 拡張子を変更 */
+                        isExt++;
+                    }
                 }
                 else
-                    return false;
-            }
+                {
+                    /* 手動指定されたファイルパスを検索 */
+                    if (File.Exists(this.artworkPath))
+                    {
+                        /* 確認ダイアログを表示 */
+                        messageForm.SetFormState("取得されたアートワークの確認です。\r\nこちらでよろしいでしょうか？\r\n格納先：" + this.artworkPath, MODE_YN, this.artworkPath);
+                        DialogResult dr = messageForm.ShowDialog();
+                        if (dr == DialogResult.Yes)
+                            isFind = true;
+                    }
+                    else
+                        return false;
+                }
 
-            /* アートワークが見つかっていたら */
-            if ( isFind )
+                /* アートワークが見つかっていたら */
+                if (isFind)
+                {
+                    /* アートワークをアプリ上に表示 */
+                    this.imgCurrentAlbumArtwork.ImageLocation = this.artworkPath;
+                    this.imgCurrentAlbumArtwork.Visible = true;
+
+                    /* ID3タグを編集する用のアートワーク画像を設定 */
+                    this.aawork = new TagLib.Picture(this.artworkPath);
+
+                    /* アートワークが見つかった結果を返す */
+                    return true;
+                }
+
+                /* 念のための予防措置 */
+                return false;
+            }
+            catch (Exception ex)
             {
-                /* アートワークをアプリ上に表示 */
-                this.imgCurrentAlbumArtwork.ImageLocation = this.artworkPath;
-                this.imgCurrentAlbumArtwork.Visible = true;
-
-                /* ID3タグを編集する用のアートワーク画像を設定 */
-                this.aawork = new TagLib.Picture(this.artworkPath);
-
-                /* アートワークが見つかった結果を返す */
-                return true;
+                /* 確認ダイアログを表示 */
+                messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Irregular_Error] + ex.ToString(), MODE_OK);
+                messageForm.ShowDialog();
+                return false;
             }
-
-            /* 念のための予防措置 */
-            return false;
         }
         private void GetAlbumName( string path )
         {
@@ -348,28 +378,89 @@ namespace trackID3TagSwitcher
                     /* mp3ファイルがあるかどうか */
                     if (songs.Length != 0)
                     {
-                        this.currentMaxTrack = songs.Length;
-                        songs[0] = Path.GetDirectoryName(songs[0]);
-                        this.tracksPath = songs[0];
-                        MessageBox.Show("取得された楽曲の格納先\r\n" + this.tracksPath, "取得内容確認", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        /* 格納先ディレクトリを取得 */
+                        string songDir = Path.GetDirectoryName(songs[0]);
+
+                        /* 表示メッセージを作成 */
+                        string msg = this.SYS_MSG_LIST[(int)STRNUM.FOUND_MP3S] +
+                                        this.SYS_MSG_LIST[(int)STRNUM.DIR] + songDir + "\r\n\r\n";
+                        for ( int i = 0; i < songs.Length; i++ )
+                        {
+                            msg += Path.GetFileName(songs[i]) + "\r\n";
+                        }
+
+                        /* 確認ダイアログを表示 */
+                        messageForm.SetFormState(msg, MODE_YN);
+                        DialogResult dr = messageForm.ShowDialog();
+
+                        /* Yesなら格納先と曲数を記憶する */
+                        if (dr == DialogResult.Yes)
+                        {
+                            this.currentMaxTrack = songs.Length;
+                            this.tracksPath = songDir;
+                            return true;
+                        }
                     }
                 }
                 else
                 {
-                    DirectoryInfo di = new DirectoryInfo(this.tracksPath);
-                    FileInfo[] files = di.GetFiles("*.mp3", SearchOption.AllDirectories);
-                    this.currentMaxTrack = files.Length;
-                    /*
-                    foreach (FileInfo f in files)
+                    /* 指定ディレクトリがあるか確認 */
+                    bool ret = Directory.Exists(this.tracksPath);
+                    if (!ret)
                     {
-                        break;
+                        /* 確認ダイアログを表示 */
+                        messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.NOT_FOUND_SONG_DIR] +
+                                                this.SYS_MSG_LIST[(int)STRNUM.PLZ_CHECK_FILE_PATH], MODE_OK);
+                        messageForm.ShowDialog();
+
+                        /* ログメッセージ表示 */
+                        SetLog(Color.Orange, this.SYS_MSG_LIST[(int)STRNUM.NOT_FOUND_SONG]);
+
+                        /* 処理を中断 */
+                        return false;
                     }
-                    */
+
+                    DirectoryInfo di = new DirectoryInfo(this.tracksPath);
+                    FileInfo[] songs = di.GetFiles("*.mp3", SearchOption.AllDirectories);
+
+                    /* mp3ファイルがあるかどうか */
+                    if (songs.Length != 0)
+                    {
+                        /* 表示メッセージを作成 */
+                        string msg = this.SYS_MSG_LIST[(int)STRNUM.FOUND_MP3S] +
+                                        this.SYS_MSG_LIST[(int)STRNUM.DIR] + 
+                                        songs[0].DirectoryName + "\r\n\r\n";
+                        for (int i = 0; i < songs.Length; i++)
+                        {
+                            msg += songs[i].Name + "\r\n";
+                        }
+
+                        /* 確認ダイアログを表示 */
+                        messageForm.SetFormState(msg, MODE_YN);
+                        DialogResult dr = messageForm.ShowDialog();
+
+                        /* Yesなら格納先と曲数を記憶する */
+                        if (dr == DialogResult.Yes)
+                        {
+                            this.currentMaxTrack = songs.Length;
+                            this.tracksPath = songs[0].DirectoryName;
+                            return true;
+                        }
+                    }
                 }
-                return true;
+
+                /* ログメッセージ表示 */
+                SetLog(Color.Orange, this.SYS_MSG_LIST[(int)STRNUM.NOT_FOUND_SONG]);
+                /* 処理を終了 */
+                return false;
             }
-            catch
+            catch (Exception ex)
             {
+                /* 確認ダイアログを表示 */
+                messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Irregular_Error] + ex.ToString( ), MODE_OK);
+                messageForm.ShowDialog();
+                /* ログメッセージ表示 */
+                SetLog(Color.Orange, this.SYS_MSG_LIST[(int)STRNUM.NOT_FOUND_SONG]);
                 return false;
             }
         }
@@ -503,15 +594,6 @@ namespace trackID3TagSwitcher
             bool ret = true;
             try
             {
-                /* まずID3 Tagリストを取得 */
-                ret = GetAlbumInfoList(file);
-                /* 取得できなかった場合 */
-                if (!ret)
-                {
-                    /* try処理終わらせるために例外発生させる */
-                    throw new Exception();
-                }
-
                 /* 設定されているパスからアートワークを取得する */
                 ret = GetAlbumArtwork(path);
                 if (!ret)
@@ -526,7 +608,21 @@ namespace trackID3TagSwitcher
                 }
 
                 ret = GetMaxTrack( path);         /* 一度曲保存先にあるmp3を全部取得し、何曲あるか確認する */
-                if (!ret) msg = "曲数を取得できませんでした。\r\n曲階層を確認してください。";
+                if (!ret)
+                {
+                    /* try処理終わらせるために例外発生させる */
+                    throw new Exception();
+                }
+
+                /* ID3 Tagリストを取得 */
+                ret = GetAlbumInfoList(file);
+                /* 取得できなかった場合 */
+                if (!ret)
+                {
+                    /* try処理終わらせるために例外発生させる */
+                    throw new Exception();
+                }
+
                 GetID3TagInfoList();        /* 取得できた曲数分、ID3 Tagの配列を生成し、リストの解析を行う */
                 GetCurrentType(path);       /* 現在のアルバム形式がARNかFYSかを表示する */
                 GetAlbumName(path);         /* ディレクトリ名からアルバム名を取得 */
