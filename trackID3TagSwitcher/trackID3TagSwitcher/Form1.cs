@@ -11,7 +11,6 @@ using System.IO;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Threading;
 using System.Net;
-using System.Linq;
 
 namespace trackID3TagSwitcher
 {
@@ -99,6 +98,7 @@ namespace trackID3TagSwitcher
             NOT_FOUND_SONG,
 
             Irregular_Error,
+            Process_Use_Error,
 
             Plz_Check_Artwork,
             Is_This_OK,
@@ -137,6 +137,7 @@ namespace trackID3TagSwitcher
             "楽曲が見つかりません。",
 
             "想定外のエラーが発生しました。\r\n今後の本ソフトウェア安定性向上のため、製作者にスクリーンショットを添えてご報告お願いします。\r\n\r\n",
+            "変換中の音源ファイルを、他のアプリケーションが使用中のため、処理を続行できません。\r\nWindows Media PlayerやiTunesなど、アクセスしている可能性のあるアプリを閉じてから再度変換を行ってください。\r\n\r\n--以下Windowsエラーコード--\r\n",
 
             "取得されたアートワークの確認です。\r\n",
             "こちらでよろしいでしょうか？\r\n",
@@ -970,9 +971,18 @@ namespace trackID3TagSwitcher
                 }
                 catch (Exception ex)
                 {
-                    /* 確認ダイアログを表示 */
-                    messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Irregular_Error] + ex.ToString(), MODE_OK);
-                    messageForm.ShowDialog();
+                    if (ex.Message.Contains( "別のプロセスで使用" ))
+                    {
+                        /* 確認ダイアログを表示 */
+                        messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Process_Use_Error] + ex.Message, MODE_OK);
+                        messageForm.ShowDialog();
+                    }
+                    else
+                    {
+                        /* 確認ダイアログを表示 */
+                        messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Irregular_Error] + ex.ToString(), MODE_OK);
+                        messageForm.ShowDialog();
+                    }
                     SetLog(Color.Orange, this.SYS_MSG_LIST[(int)STRNUM.Failed_Convert_Song_ID3]);
                 }
                 finally
