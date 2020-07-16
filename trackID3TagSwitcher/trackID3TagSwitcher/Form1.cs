@@ -116,6 +116,7 @@ namespace trackID3TagSwitcher
 
             Found_Cannot_Use_Word,
             Cannot_Word_Replace_Another_Word,
+            Select_Replace_Way,
             Target_Word,
         }
         private string[] SYS_MSG_LIST =
@@ -152,7 +153,8 @@ namespace trackID3TagSwitcher
             "曲方式の変換に失敗しました。",
 
             "ファイル名に使用できない文字が含まれています。\r\n",
-            "ユーザー設定により空白か全角文字に置き換えられます。\r\n\r\n",
+            "ユーザー設定により空白か全角文字に置き換えられます。\r\n",
+            "「はい」の場合は空白に、「いいえ」の場合は全角に置き換え実行します。\r\n\r\n",
             "対象文字：",
 
         };
@@ -872,10 +874,9 @@ namespace trackID3TagSwitcher
                 else
                     num += " ";
 
-                /* 確認ダイアログを表示 
-                messageForm.SetFormState("target = " + f.FullName + "\r\nfix = " + TrackID3Tag[track, nameNum], MODE_OK);
-                messageForm.ShowDialog();*/
-
+                /* システム予約文字が含まれているかの確認 */
+                TrackID3Tag[track, nameNum] = CheckRegisterWord( TrackID3Tag[track, nameNum] );
+                
                 File.Move(f.FullName , f.DirectoryName + "\\" + num + TrackID3Tag[track, nameNum] + ".mp3" );
                 file.Dispose( );
                 track++;
@@ -1687,29 +1688,63 @@ namespace trackID3TagSwitcher
             }
         }
 
-        private bool CheckRegisterWord( string text )
+        private string CheckRegisterWord( string text )
         {
             /* ワード内にシステム予約文字が含まれていないかったら */
             if (text.IndexOfAny(invalidChars) < 0)
             {
-                /* trueを返して処理を続行させる */
-                return true;
+                /* そのまま文字を返す */
+                return text;
             }
-            /* ワード内にシステム予約文字が含まれていないたら */
+            /* ワード内にシステム予約文字が含まれていたら */
             else
             {
-                /* 確認ダイアログを表示 */
-                messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Found_Cannot_Use_Word] +
-                                            this.SYS_MSG_LIST[(int)STRNUM.Cannot_Word_Replace_Another_Word] +
-                                            this.SYS_MSG_LIST[(int)STRNUM.Target_Word] +
-                                            text,
-                                            MODE_OK);
-                messageForm.ShowDialog();
-                return false;
+                /* 置き換えを毎回確認する場合 */
+                if (this.isReplaceRegisterWord.Checked)
+                {
+                    /* 確認ダイアログを表示 */
+                    messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Found_Cannot_Use_Word] +
+                                                this.SYS_MSG_LIST[(int)STRNUM.Cannot_Word_Replace_Another_Word] +
+                                                this.SYS_MSG_LIST[(int)STRNUM.Select_Replace_Way] +
+                                                this.SYS_MSG_LIST[(int)STRNUM.Target_Word] +
+                                                text,
+                                                MODE_YN);
+                    DialogResult dr = messageForm.ShowDialog();
+
+                    /* Yesなら空白に置き換える */
+                    if (dr == DialogResult.Yes)
+                        text = ReolaceRegisterWordToNull(text);
+                    /* Noなら全角文字に置き換える */
+                    else
+                        text = ReolaceRegisterWordToEM(text);
+                }
+                /* そうでない場合 */
+                else
+                {
+                    /* 空白に置き換える */
+                    text = ReolaceRegisterWordToNull(text);
+                }
+
+                /* 変換した文字を返す */
+                return text;
             }
         }
 
-        private string ReolaceRegisterWord(string text)
+        private string ReolaceRegisterWordToEM(string text)
+        {
+            text = text.Replace("\\", "￥");
+            text = text.Replace(":", "：");
+            text = text.Replace("*", "＊");
+            text = text.Replace("?", "？");
+            text = text.Replace("\"", "”");
+            text = text.Replace("<", "＜");
+            text = text.Replace(">", "＞");
+            text = text.Replace("|", "｜");
+            text = text.Replace("/", "／");
+            return text;
+        }
+
+        private string ReolaceRegisterWordToNull(string text)
         {
             /* システム使用不可能な文字を1字ずつチェックする */
             foreach (char c in invalidReplase)
@@ -1719,7 +1754,7 @@ namespace trackID3TagSwitcher
             }
             return text;
         }
-        
+
         private void WriteTrackInfo( )
         {
             string path = Application.StartupPath + "\\trackinfo.cbl";
