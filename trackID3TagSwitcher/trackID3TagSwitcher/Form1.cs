@@ -39,6 +39,8 @@ namespace trackID3TagSwitcher
         private string tracksPath = "";                         /* 楽曲が格納されているディレクトリパスを格納する変数 */
         private TagLib.IPicture aawork;                         /* 取得したアートワークのイメージを格納する変数 */
         private MessageForm messageForm = new MessageForm();    /* ダイアログ用フォームを作成しておく */
+        private char[] invalidChars;                            /* 設定中の文字列内に、使用不可能な文字があるかチェックするための変数 */
+        private string invalidReplase;                          /* 設定中の文字列内に、使用不可能な文字があっ他場合に、置き換えするための変数 */
 
         /* 配列参照時の要素数 */
         private const int ARN_NAME = 0;
@@ -111,6 +113,10 @@ namespace trackID3TagSwitcher
             Success_Load_Album,
             Success_Convert_Song_ID3,
             Failed_Convert_Song_ID3,
+
+            Found_Cannot_Use_Word,
+            Cannot_Word_Replace_Another_Word,
+            Target_Word,
         }
         private string[] SYS_MSG_LIST =
         {
@@ -144,6 +150,10 @@ namespace trackID3TagSwitcher
             "アルバムを読み込みました。",
             "曲方式の変換に成功しました。",
             "曲方式の変換に失敗しました。",
+
+            "ファイル名に使用できない文字が含まれています。\r\n",
+            "ユーザー設定により空白か全角文字に置き換えられます。\r\n\r\n",
+            "対象文字：",
 
         };
 
@@ -1038,6 +1048,10 @@ namespace trackID3TagSwitcher
             this.pnlAppFooter.Location      = new Point(DESIGN_DEF_X, FOOTER_Y);
             this.pnlTrackInfo.Location      = new Point(SUB_AREA_HIDE_X, MAIN_AREA_Y);
             SetupTrackInfoPanel();
+
+            /* 使用不可能な文字があるかチェックできるようにするための初期化 */
+            invalidChars = System.IO.Path.GetInvalidFileNameChars();
+            invalidReplase = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
         }
 
         private void BtnExit_Click(object sender, EventArgs e)
@@ -1673,9 +1687,41 @@ namespace trackID3TagSwitcher
             }
         }
 
+        private bool CheckRegisterWord( string text )
+        {
+            /* ワード内にシステム予約文字が含まれていないかったら */
+            if (text.IndexOfAny(invalidChars) < 0)
+            {
+                /* trueを返して処理を続行させる */
+                return true;
+            }
+            /* ワード内にシステム予約文字が含まれていないたら */
+            else
+            {
+                /* 確認ダイアログを表示 */
+                messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Found_Cannot_Use_Word] +
+                                            this.SYS_MSG_LIST[(int)STRNUM.Cannot_Word_Replace_Another_Word] +
+                                            this.SYS_MSG_LIST[(int)STRNUM.Target_Word] +
+                                            text,
+                                            MODE_OK);
+                messageForm.ShowDialog();
+                return false;
+            }
+        }
+
+        private string ReolaceRegisterWord(string text)
+        {
+            /* システム使用不可能な文字を1字ずつチェックする */
+            foreach (char c in invalidReplase)
+            {
+                /* その文字が含まれていたら空白にする */
+                text = text.Replace(c.ToString(), "");
+            }
+            return text;
+        }
+        
         private void WriteTrackInfo( )
         {
-
             string path = Application.StartupPath + "\\trackinfo.cbl";
             string zero = "";
             string text = "";
