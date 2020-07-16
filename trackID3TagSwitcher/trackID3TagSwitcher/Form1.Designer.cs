@@ -99,6 +99,7 @@
             this.boxEx1 = new System.Windows.Forms.TextBox();
             this.lblARNName = new System.Windows.Forms.Label();
             this.tipIsDot = new System.Windows.Forms.ToolTip(this.components);
+            this.isReplaceRegisterWord = new System.Windows.Forms.CheckBox();
             this.pnlAppHeader.SuspendLayout();
             this.pnlAppFooter.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imgCurrentMode)).BeginInit();
@@ -531,6 +532,7 @@
             // pnlPage1
             // 
             this.pnlPage1.BackColor = System.Drawing.Color.MidnightBlue;
+            this.pnlPage1.Controls.Add(this.isReplaceRegisterWord);
             this.pnlPage1.Controls.Add(this.lblTrackCount);
             this.pnlPage1.Controls.Add(this.autoSearchFile);
             this.pnlPage1.Controls.Add(this.lblArtworkTitle);
@@ -1027,6 +1029,21 @@
             this.tipIsDot.InitialDelay = 100;
             this.tipIsDot.ReshowDelay = 100;
             // 
+            // isReplaceRegisterWord
+            // 
+            this.isReplaceRegisterWord.AutoSize = true;
+            this.isReplaceRegisterWord.Checked = true;
+            this.isReplaceRegisterWord.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.isReplaceRegisterWord.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
+            this.isReplaceRegisterWord.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.isReplaceRegisterWord.Location = new System.Drawing.Point(6, 358);
+            this.isReplaceRegisterWord.Name = "isReplaceRegisterWord";
+            this.isReplaceRegisterWord.Size = new System.Drawing.Size(191, 19);
+            this.isReplaceRegisterWord.TabIndex = 35;
+            this.isReplaceRegisterWord.Text = "使用不可能な文字は毎回確認";
+            this.tipIsDot.SetToolTip(this.isReplaceRegisterWord, "有効にすると、変換時に「/ * ?」などのシステム予約文字が含まれている場合は毎回置き換え方法を確認します。\r\n無効の場合は、確認を取らず空白に置き換えます。");
+            this.isReplaceRegisterWord.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1132,6 +1149,7 @@
         private System.Windows.Forms.Button btnShowCurrentTrackName;
         private System.Windows.Forms.CheckBox autoSearchFile;
         private System.Windows.Forms.Label lblTrackCount;
+        private System.Windows.Forms.CheckBox isReplaceRegisterWord;
     }
 }
 

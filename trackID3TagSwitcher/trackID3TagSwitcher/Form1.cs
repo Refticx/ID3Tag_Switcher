@@ -1121,6 +1121,18 @@ namespace trackID3TagSwitcher
                             this.boxTrackFolder.Enabled = true;
                         }
                     }
+                    target = "Is_ReplaceRegisterWord:";
+                    if (line.Contains(target))
+                    {
+                        if (line.Contains("1"))
+                        {
+                            this.isReplaceRegisterWord.Checked = true;
+                        }
+                        else if (line.Contains("0"))
+                        {
+                            this.isReplaceRegisterWord.Checked = false;
+                        }
+                    }
                 }
             }
             else
@@ -1144,7 +1156,11 @@ namespace trackID3TagSwitcher
                 text += "Is_AutoSearch:" + "1\r\n";
             else
                 text += "Is_AutoSearch:" + "0\r\n";
-            
+            if (this.isReplaceRegisterWord.Checked)
+                text += "Is_ReplaceRegisterWord:" + "1\r\n";
+            else
+                text += "Is_ReplaceRegisterWord:" + "0\r\n";
+
             StreamWriter sw = new StreamWriter(path, false);
             sw.Write(text);
             sw.Close();
