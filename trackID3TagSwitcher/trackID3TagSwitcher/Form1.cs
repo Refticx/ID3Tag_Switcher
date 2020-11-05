@@ -38,7 +38,7 @@ namespace trackID3TagSwitcher
         private string tracksPath = "";                         /* 楽曲が格納されているディレクトリパスを格納する変数 */
         private TagLib.IPicture aawork;                         /* 取得したアートワークのイメージを格納する変数 */
         private MessageForm messageForm = new MessageForm();    /* ダイアログ用フォームを作成しておく */
-        private LoginForm loginForm = new LoginForm( );         /* ログイン用フォームを作成しておく */
+        private AccountForm loginForm = new AccountForm( );     /* ログイン用フォームを作成しておく */
         private char[] invalidChars;                            /* 設定中の文字列内に、使用不可能な文字があるかチェックするための変数 */
         private string invalidReplase;                          /* 設定中の文字列内に、使用不可能な文字があっ他場合に、置き換えするための変数 */
 

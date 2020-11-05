@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace trackID3TagSwitcher
 {
-    public partial class LoginForm : Form
+    public partial class AccountForm : Form
     {
         private MessageForm messageForm = new MessageForm( );    /* ダイアログ用フォームを作成しておく */
 
@@ -35,9 +35,9 @@ namespace trackID3TagSwitcher
         private PasteData[] m_serverDatas;
         private string m_serverContent = "";
 
-        public LoginForm( )
+        public AccountForm( )
         {
-            InitializeComponent();
+            InitializeComponent( );
         }
 
         private void LoginForm_Load( object sender , EventArgs e )
@@ -63,10 +63,10 @@ namespace trackID3TagSwitcher
 
         private void CheckServiceInfo( )
         {
-            if ( (m_serverUsername.Length == 0) ||
-                    (m_serverPassword.Length == 0) ||
-                    (m_serverKey.Length == 0) ||
-                    (m_serverPage.Length == 0) )
+            if ( ( m_serverUsername.Length == 0 ) ||
+                    ( m_serverPassword.Length == 0 ) ||
+                    ( m_serverKey.Length == 0 ) ||
+                    ( m_serverPage.Length == 0 ) )
             {
                 /* 確認ダイアログを表示 */
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_ServerInfo] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Press_Reflesh] , MODE_OK );
