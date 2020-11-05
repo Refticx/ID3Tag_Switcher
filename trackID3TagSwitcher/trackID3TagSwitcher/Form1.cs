@@ -80,83 +80,8 @@ namespace trackID3TagSwitcher
 
         #region システムメッセージ
 
-        enum STRNUM
-        {
-            CLEAR_LOAD_DATA,
-
-            NOT_FOUND_ID3LIST,
-            QST_MAKE_ID3LIST,
-            FOUND_ID3LIST,
-            NODATA_ID3LIST,
-            NEED_MAKE_ID3LIST,
-
-            FOUND_MP3S,
-            DIR,
-
-            NOT_FOUND_SONG_DIR,
-            PLZ_CHECK_FILE_PATH,
-            NOT_FOUND_SONG,
-
-            Irregular_Error,
-            Process_Use_Error,
-
-            Plz_Check_Artwork,
-            Is_This_OK,
-            Not_Found_Artwork,
-
-            Break_ID3List,
-            Plz_Make_ID3List,
-
-            Not_Loaded_Album,
-            Not_Loaded_Album_Reason,
-
-            Success_Load_Album,
-            Success_Convert_Song_ID3,
-            Failed_Convert_Song_ID3,
-
-            Found_Cannot_Use_Word,
-            Cannot_Word_Replace_Another_Word,
-            Select_Replace_Way,
-            Target_Word,
-        }
         private string[] SYS_MSG_LIST =
         {
-            "読み込んだアルバム情報をクリアしました。",
-
-            "楽曲情報を構成する「trackinfo.cbl」が見つかりませんでした。\r\n",
-            "ID3リストを作成しますか？",
-            "楽曲情報を構成する「trackinfo.cbl」は見つかりました。\r\n",
-            "しかしリストデータが空でした。\r\n",
-            "ID3リストの作成が必要です。",
-
-            "楽曲を発見しました、ご確認ください。\r\n",
-            "格納先：",
-
-            "指定された曲階層が見つかりませんでした。\r\n",
-            "再度ファイルパスをご確認ください。",
-            "楽曲が見つかりません。",
-
-            "想定外のエラーが発生しました。\r\n今後の本ソフトウェア安定性向上のため、製作者にスクリーンショットを添えてご報告お願いします。\r\n\r\n",
-            "変換中の音源ファイルを、他のアプリケーションが使用中のため、処理を続行できません。\r\nWindows Media PlayerやiTunesなど、アクセスしている可能性のあるアプリを閉じてから再度変換を行ってください。\r\n\r\n--以下Windowsエラーコード--\r\n",
-
-            "取得されたアートワークの確認です。\r\n",
-            "こちらでよろしいでしょうか？\r\n",
-            "設定可能なアートワークを取得できませんでした。",
-
-            "ID3リストファイルが破損しています。",
-            "\r\nデータを読み取ることができませんでした。\r\n再度作り直してください。",
-
-            "アルバムを読み込んでいないため、開始できません。",
-            "\r\n以下の原因が考えられます。\r\n\r\n・楽曲のあるディレクトリを指定していない。\r\n・ID3リストを作っていない。\r\n・ID3リストはあるが、データが破損している。",
-
-            "アルバムを読み込みました。",
-            "曲方式の変換に成功しました。",
-            "曲方式の変換に失敗しました。",
-
-            "ファイル名に使用できない文字が含まれています。\r\n",
-            "ユーザー設定により空白か全角文字に置き換えられます。\r\n",
-            "「はい」の場合は空白に、「いいえ」の場合は全角に置き換え実行します。\r\n\r\n",
-            "対象文字：",
 
         };
 
@@ -217,7 +142,7 @@ namespace trackID3TagSwitcher
         private void BtnClearCache_Click(object sender, EventArgs e)
         {
             ClearCache();
-            SetLog(Color.LimeGreen, this.SYS_MSG_LIST[(int)STRNUM.CLEAR_LOAD_DATA]);
+            SetLog(Color.LimeGreen, MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.CLEAR_LOAD_DATA]);
         }
         #endregion
 
@@ -232,7 +157,7 @@ namespace trackID3TagSwitcher
             if (!ret)
             {
                 /* 確認ダイアログを表示 */
-                messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.NOT_FOUND_ID3LIST] + this.SYS_MSG_LIST[(int)STRNUM.QST_MAKE_ID3LIST], MODE_YN);
+                messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.NOT_FOUND_ID3LIST] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.QST_MAKE_ID3LIST], MODE_YN);
                 DialogResult dr = messageForm.ShowDialog();
 
                 /* YesならID3作成画面へ飛ばす */
@@ -240,7 +165,7 @@ namespace trackID3TagSwitcher
                     btnOpenTrackInfoPage.PerformClick();
 
                 /* ログメッセージ表示 */
-                SetLog(Color.Orange, this.SYS_MSG_LIST[(int)STRNUM.NEED_MAKE_ID3LIST]);
+                SetLog(Color.Orange, MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.NEED_MAKE_ID3LIST]);
                 return false;
             }
 
@@ -251,7 +176,7 @@ namespace trackID3TagSwitcher
             if (this.trackcbl.Length == 0)
             {
                 /* 確認ダイアログを表示 */
-                messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.FOUND_ID3LIST] + this.SYS_MSG_LIST[(int)STRNUM.NODATA_ID3LIST] + this.SYS_MSG_LIST[(int)STRNUM.QST_MAKE_ID3LIST], MODE_YN);
+                messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.FOUND_ID3LIST] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.NODATA_ID3LIST] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.QST_MAKE_ID3LIST], MODE_YN);
                 DialogResult dr = messageForm.ShowDialog();
 
                 /* YesならID3作成画面へ飛ばす */
@@ -259,7 +184,7 @@ namespace trackID3TagSwitcher
                     btnOpenTrackInfoPage.PerformClick();
 
                 /* ログメッセージ表示 */
-                SetLog(Color.Orange, this.SYS_MSG_LIST[(int)STRNUM.NEED_MAKE_ID3LIST]);
+                SetLog(Color.Orange, MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.NEED_MAKE_ID3LIST]);
                 return false;
             }
 
@@ -313,9 +238,9 @@ namespace trackID3TagSwitcher
                                 else
                                 {
                                     /* 確認ダイアログを表示 */
-                                    messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Plz_Check_Artwork] +
-                                                                this.SYS_MSG_LIST[(int)STRNUM.Is_This_OK] +
-                                                                this.SYS_MSG_LIST[(int)STRNUM.DIR] +
+                                    messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Check_Artwork] +
+                                                                MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Is_This_OK] +
+                                                                MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.DIR] +
                                                                 atw[i], MODE_YN, atw[i]);
                                     DialogResult dr = messageForm.ShowDialog();
                                     if (dr == DialogResult.Yes)
@@ -339,9 +264,9 @@ namespace trackID3TagSwitcher
                     if (File.Exists(this.artworkPath))
                     {
                         /* 確認ダイアログを表示 */
-                        messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Plz_Check_Artwork] +
-                                                    this.SYS_MSG_LIST[(int)STRNUM.Is_This_OK] +
-                                                    this.SYS_MSG_LIST[(int)STRNUM.DIR] +
+                        messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Check_Artwork] +
+                                                    MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Is_This_OK] +
+                                                    MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.DIR] +
                                                     this.artworkPath, MODE_YN, this.artworkPath);
                         DialogResult dr = messageForm.ShowDialog();
                         if (dr == DialogResult.Yes)
@@ -371,7 +296,7 @@ namespace trackID3TagSwitcher
             catch (Exception ex)
             {
                 /* 確認ダイアログを表示 */
-                messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Irregular_Error] + ex.ToString(), MODE_OK);
+                messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Error] + ex.ToString(), MODE_OK);
                 messageForm.ShowDialog();
                 return false;
             }
@@ -432,8 +357,8 @@ namespace trackID3TagSwitcher
                         string songDir = Path.GetDirectoryName(songs[0]);
 
                         /* 表示メッセージを作成 */
-                        string msg = this.SYS_MSG_LIST[(int)STRNUM.FOUND_MP3S] +
-                                        this.SYS_MSG_LIST[(int)STRNUM.DIR] + songDir + "\r\n\r\n";
+                        string msg = MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.FOUND_MP3S] +
+                                        MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.DIR] + songDir + "\r\n\r\n";
                         for ( int i = 0; i < songs.Length; i++ )
                         {
                             msg += Path.GetFileName(songs[i]) + "\r\n";
@@ -459,12 +384,12 @@ namespace trackID3TagSwitcher
                     if (!ret)
                     {
                         /* 確認ダイアログを表示 */
-                        messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.NOT_FOUND_SONG_DIR] +
-                                                this.SYS_MSG_LIST[(int)STRNUM.PLZ_CHECK_FILE_PATH], MODE_OK);
+                        messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.NOT_FOUND_SONG_DIR] +
+                                                MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.PLZ_CHECK_FILE_PATH], MODE_OK);
                         messageForm.ShowDialog();
 
                         /* ログメッセージ表示 */
-                        SetLog(Color.Orange, this.SYS_MSG_LIST[(int)STRNUM.NOT_FOUND_SONG]);
+                        SetLog(Color.Orange, MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.NOT_FOUND_SONG]);
 
                         /* 処理を中断 */
                         return false;
@@ -477,8 +402,8 @@ namespace trackID3TagSwitcher
                     if (songs.Length != 0)
                     {
                         /* 表示メッセージを作成 */
-                        string msg = this.SYS_MSG_LIST[(int)STRNUM.FOUND_MP3S] +
-                                        this.SYS_MSG_LIST[(int)STRNUM.DIR] + 
+                        string msg = MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.FOUND_MP3S] +
+                                        MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.DIR] + 
                                         songs[0].DirectoryName + "\r\n\r\n";
                         for (int i = 0; i < songs.Length; i++)
                         {
@@ -500,17 +425,17 @@ namespace trackID3TagSwitcher
                 }
 
                 /* ログメッセージ表示 */
-                SetLog(Color.Orange, this.SYS_MSG_LIST[(int)STRNUM.NOT_FOUND_SONG]);
+                SetLog(Color.Orange, MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.NOT_FOUND_SONG]);
                 /* 処理を終了 */
                 return false;
             }
             catch (Exception ex)
             {
                 /* 確認ダイアログを表示 */
-                messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Irregular_Error] + ex.ToString( ), MODE_OK);
+                messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Error] + ex.ToString( ), MODE_OK);
                 messageForm.ShowDialog();
                 /* ログメッセージ表示 */
-                SetLog(Color.Orange, this.SYS_MSG_LIST[(int)STRNUM.NOT_FOUND_SONG]);
+                SetLog(Color.Orange, MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.NOT_FOUND_SONG]);
                 return false;
             }
         }
@@ -623,13 +548,13 @@ namespace trackID3TagSwitcher
             if ( isBreak < 4 )
             {
                 /* 確認ダイアログを表示 */
-                messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Break_ID3List] +
-                                            this.SYS_MSG_LIST[(int)STRNUM.Plz_Make_ID3List], 
+                messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Break_ID3List] +
+                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Make_ID3List], 
                                             MODE_OK);
                 messageForm.ShowDialog();
 
                 /* ログメッセージ表示 */
-                SetLog(Color.Orange, this.SYS_MSG_LIST[(int)STRNUM.Break_ID3List]);
+                SetLog(Color.Orange, MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Break_ID3List]);
                 return false;
             }
             return true;
@@ -670,7 +595,7 @@ namespace trackID3TagSwitcher
                 if (!ret)
                 {
                     /* 確認ダイアログを表示 */
-                    messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Not_Found_Artwork], MODE_OK);
+                    messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Found_Artwork], MODE_OK);
                     DialogResult dr = messageForm.ShowDialog();
 
                     /* アートワークを非表示 */
@@ -716,7 +641,7 @@ namespace trackID3TagSwitcher
                 /* ID3リスト作成ページの各ボックスを初期化 */
                 DeleteAnotherBoxes();
                 
-                SetLog(Color.LimeGreen, this.SYS_MSG_LIST[(int)STRNUM.Success_Load_Album]);
+                SetLog(Color.LimeGreen, MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Load_Album]);
                 this.boxAlbumPath.Text = path;
                 this.canStartSwitcher = true;
             }
@@ -945,12 +870,12 @@ namespace trackID3TagSwitcher
             if ( !canStartSwitcher )
             {
                 /* 確認ダイアログを表示 */
-                messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Not_Loaded_Album] +
-                                            this.SYS_MSG_LIST[(int)STRNUM.Not_Loaded_Album_Reason],
+                messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Loaded_Album] +
+                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Loaded_Album_Reason],
                                             MODE_OK);
                 messageForm.ShowDialog();
 
-                SetLog(Color.Orange, this.SYS_MSG_LIST[(int)STRNUM.Not_Loaded_Album]);
+                SetLog(Color.Orange, MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Loaded_Album]);
                 
             }
             else
@@ -967,23 +892,23 @@ namespace trackID3TagSwitcher
                     StartTypeSwitch( );
                     RewriteCBL( );
 
-                    SetLog(Color.LimeGreen, this.SYS_MSG_LIST[(int)STRNUM.Success_Convert_Song_ID3]);
+                    SetLog(Color.LimeGreen, MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Convert_Song_ID3]);
                 }
                 catch (Exception ex)
                 {
                     if (ex.Message.Contains( "別のプロセスで使用" ))
                     {
                         /* 確認ダイアログを表示 */
-                        messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Process_Use_Error] + ex.Message, MODE_OK);
+                        messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Process_Use_Error] + ex.Message, MODE_OK);
                         messageForm.ShowDialog();
                     }
                     else
                     {
                         /* 確認ダイアログを表示 */
-                        messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Irregular_Error] + ex.ToString(), MODE_OK);
+                        messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Error] + ex.ToString(), MODE_OK);
                         messageForm.ShowDialog();
                     }
-                    SetLog(Color.Orange, this.SYS_MSG_LIST[(int)STRNUM.Failed_Convert_Song_ID3]);
+                    SetLog(Color.Orange, MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Failed_Convert_Song_ID3]);
                 }
                 finally
                 {
@@ -1729,10 +1654,10 @@ namespace trackID3TagSwitcher
                 if (this.isReplaceRegisterWord.Checked)
                 {
                     /* 確認ダイアログを表示 */
-                    messageForm.SetFormState(this.SYS_MSG_LIST[(int)STRNUM.Found_Cannot_Use_Word] +
-                                                this.SYS_MSG_LIST[(int)STRNUM.Cannot_Word_Replace_Another_Word] +
-                                                this.SYS_MSG_LIST[(int)STRNUM.Select_Replace_Way] +
-                                                this.SYS_MSG_LIST[(int)STRNUM.Target_Word] +
+                    messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Found_Cannot_Use_Word] +
+                                                MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Cannot_Word_Replace_Another_Word] +
+                                                MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Select_Replace_Way] +
+                                                MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Target_Word] +
                                                 text,
                                                 MODE_YN);
                     DialogResult dr = messageForm.ShowDialog();
