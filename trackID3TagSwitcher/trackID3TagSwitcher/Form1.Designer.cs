@@ -63,6 +63,7 @@
             this.chkIsDot = new System.Windows.Forms.CheckBox();
             this.btnOpenTrackInfoPage = new System.Windows.Forms.Button();
             this.pnlPage1 = new System.Windows.Forms.Panel();
+            this.isReplaceRegisterWord = new System.Windows.Forms.CheckBox();
             this.lblTrackCount = new System.Windows.Forms.Label();
             this.autoSearchFile = new System.Windows.Forms.CheckBox();
             this.pnlTrackInfo = new System.Windows.Forms.Panel();
@@ -99,7 +100,7 @@
             this.boxEx1 = new System.Windows.Forms.TextBox();
             this.lblARNName = new System.Windows.Forms.Label();
             this.tipIsDot = new System.Windows.Forms.ToolTip(this.components);
-            this.isReplaceRegisterWord = new System.Windows.Forms.CheckBox();
+            this.loginSetting = new System.Windows.Forms.Button();
             this.pnlAppHeader.SuspendLayout();
             this.pnlAppFooter.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imgCurrentMode)).BeginInit();
@@ -156,6 +157,7 @@
             // pnlAppHeader
             // 
             this.pnlAppHeader.BackColor = System.Drawing.Color.SteelBlue;
+            this.pnlAppHeader.Controls.Add(this.loginSetting);
             this.pnlAppHeader.Controls.Add(this.btnExit);
             this.pnlAppHeader.Controls.Add(this.lblAppTitle);
             this.pnlAppHeader.Location = new System.Drawing.Point(0, 0);
@@ -564,6 +566,21 @@
             this.pnlPage1.TabIndex = 33;
             this.pnlPage1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnlPage1_MouseDown);
             this.pnlPage1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnlPage1_MouseMove);
+            // 
+            // isReplaceRegisterWord
+            // 
+            this.isReplaceRegisterWord.AutoSize = true;
+            this.isReplaceRegisterWord.Checked = true;
+            this.isReplaceRegisterWord.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.isReplaceRegisterWord.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
+            this.isReplaceRegisterWord.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.isReplaceRegisterWord.Location = new System.Drawing.Point(6, 358);
+            this.isReplaceRegisterWord.Name = "isReplaceRegisterWord";
+            this.isReplaceRegisterWord.Size = new System.Drawing.Size(191, 19);
+            this.isReplaceRegisterWord.TabIndex = 35;
+            this.isReplaceRegisterWord.Text = "使用不可能な文字は毎回確認";
+            this.tipIsDot.SetToolTip(this.isReplaceRegisterWord, "有効にすると、変換時に「/ * ?」などのシステム予約文字が含まれている場合は毎回置き換え方法を確認します。\r\n無効の場合は、確認を取らず空白に置き換えます。");
+            this.isReplaceRegisterWord.UseVisualStyleBackColor = true;
             // 
             // lblTrackCount
             // 
@@ -1029,20 +1046,19 @@
             this.tipIsDot.InitialDelay = 100;
             this.tipIsDot.ReshowDelay = 100;
             // 
-            // isReplaceRegisterWord
+            // loginSetting
             // 
-            this.isReplaceRegisterWord.AutoSize = true;
-            this.isReplaceRegisterWord.Checked = true;
-            this.isReplaceRegisterWord.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.isReplaceRegisterWord.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.isReplaceRegisterWord.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.isReplaceRegisterWord.Location = new System.Drawing.Point(6, 358);
-            this.isReplaceRegisterWord.Name = "isReplaceRegisterWord";
-            this.isReplaceRegisterWord.Size = new System.Drawing.Size(191, 19);
-            this.isReplaceRegisterWord.TabIndex = 35;
-            this.isReplaceRegisterWord.Text = "使用不可能な文字は毎回確認";
-            this.tipIsDot.SetToolTip(this.isReplaceRegisterWord, "有効にすると、変換時に「/ * ?」などのシステム予約文字が含まれている場合は毎回置き換え方法を確認します。\r\n無効の場合は、確認を取らず空白に置き換えます。");
-            this.isReplaceRegisterWord.UseVisualStyleBackColor = true;
+            this.loginSetting.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.loginSetting.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.loginSetting.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.loginSetting.ForeColor = System.Drawing.Color.Crimson;
+            this.loginSetting.Location = new System.Drawing.Point(330, 3);
+            this.loginSetting.Name = "loginSetting";
+            this.loginSetting.Size = new System.Drawing.Size(25, 25);
+            this.loginSetting.TabIndex = 10;
+            this.loginSetting.Text = "X";
+            this.loginSetting.UseVisualStyleBackColor = false;
+            this.loginSetting.Click += new System.EventHandler(this.loginSetting_Click);
             // 
             // Form1
             // 
@@ -1150,6 +1166,7 @@
         private System.Windows.Forms.CheckBox autoSearchFile;
         private System.Windows.Forms.Label lblTrackCount;
         private System.Windows.Forms.CheckBox isReplaceRegisterWord;
+        private System.Windows.Forms.Button loginSetting;
     }
 }
 

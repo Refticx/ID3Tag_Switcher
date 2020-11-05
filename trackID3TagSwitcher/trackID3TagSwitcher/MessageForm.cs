@@ -20,6 +20,12 @@ namespace trackID3TagSwitcher
             InitializeComponent();
         }
 
+        /// <summary>
+        /// 本アプリ専用の確認ダイアログフォームのテキスト、ボタン、画像設定を行う。
+        /// </summary>
+        /// <param name="msg">フォームに表示するメッセージ</param>
+        /// <param name="mode">フォームのボタン形式。OKかYesNoの2種類を設定可能。</param>
+        /// <param name="imgPath">表示する画像のファイルパスを記入することで、フォーム上に表示可能。</param>
         public void SetFormState(string msg, int mode, string imgPath = null)
         {
             this.lblMessage.Text = msg;
@@ -70,6 +76,11 @@ namespace trackID3TagSwitcher
             this.DialogResult = System.Windows.Forms.DialogResult.No;
             //ShowDialog()で表示されているので閉じないといけない
             this.Close();
+        }
+
+        private void MessageForm_Load( object sender , EventArgs e )
+        {
+
         }
     }
 }
