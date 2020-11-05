@@ -12,8 +12,8 @@ namespace trackID3TagSwitcher
 {
     public partial class MessageForm : Form
     {
-        private const int MODE_YN = 0;
-        private const int MODE_OK = 1;
+        public const int MODE_YN = 0;
+        public const int MODE_OK = 1;
 
         public MessageForm()
         {

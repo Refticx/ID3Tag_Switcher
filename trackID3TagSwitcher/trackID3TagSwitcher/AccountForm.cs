@@ -16,10 +16,6 @@ namespace trackID3TagSwitcher
     {
         private MessageForm messageForm = new MessageForm( );    /* ダイアログ用フォームを作成しておく */
 
-        /* ダイアログフォームの表示モード */
-        private const int MODE_YN = 0;
-        private const int MODE_OK = 1;
-
         /* サーバー設定 */
         private string m_serverUsername = "";
         private string m_serverPassword = "";
@@ -55,7 +51,7 @@ namespace trackID3TagSwitcher
             if ( !System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable( ) )
             {
                 /* 確認ダイアログを表示 */
-                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Connect_Network] , MODE_OK );
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Connect_Network] , MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
                 this.Close( );
             }
@@ -69,7 +65,7 @@ namespace trackID3TagSwitcher
                     ( m_serverPage.Length == 0 ) )
             {
                 /* 確認ダイアログを表示 */
-                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_ServerInfo] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Press_Reflesh] , MODE_OK );
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_ServerInfo] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Press_Reflesh] , MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
             }
         }
@@ -94,7 +90,7 @@ namespace trackID3TagSwitcher
             if ( m_serverLoggedUser.Length == 0 )
             {
                 /* 確認ダイアログを表示 */
-                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Connect_Server] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Press_Reflesh] , MODE_OK );
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Connect_Server] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Press_Reflesh] , MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
                 return false;
             }
@@ -129,7 +125,7 @@ namespace trackID3TagSwitcher
             }
 
             /* 確認ダイアログを表示 */
-            messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Server_Setting] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Press_Reflesh] , MODE_OK );
+            messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Server_Setting] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Press_Reflesh] , MessageForm.MODE_OK );
             messageForm.ShowDialog( );
             return false;
         }

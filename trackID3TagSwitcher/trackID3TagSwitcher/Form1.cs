@@ -75,19 +75,6 @@ namespace trackID3TagSwitcher
         private const int FOOTER_LINE_BIG_Y = (FOOTER_BIG_Y - 2);
         private const int EXIT_BIG_X        = (APP_BIG_WIDTH - 28);
 
-        /* ダイアログフォームの表示モード */
-        private const int MODE_YN = 0;
-        private const int MODE_OK = 1;
-
-        #region システムメッセージ
-
-        private string[] SYS_MSG_LIST =
-        {
-
-        };
-
-        #endregion
-
         #region 汎用型スクリプト
 
         /// <summary>
@@ -158,7 +145,7 @@ namespace trackID3TagSwitcher
             if (!ret)
             {
                 /* 確認ダイアログを表示 */
-                messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.NOT_FOUND_ID3LIST] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.QST_MAKE_ID3LIST], MODE_YN);
+                messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.NOT_FOUND_ID3LIST] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.QST_MAKE_ID3LIST], MessageForm.MODE_YN);
                 DialogResult dr = messageForm.ShowDialog();
 
                 /* YesならID3作成画面へ飛ばす */
@@ -177,7 +164,7 @@ namespace trackID3TagSwitcher
             if (this.trackcbl.Length == 0)
             {
                 /* 確認ダイアログを表示 */
-                messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.FOUND_ID3LIST] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.NODATA_ID3LIST] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.QST_MAKE_ID3LIST], MODE_YN);
+                messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.FOUND_ID3LIST] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.NODATA_ID3LIST] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.QST_MAKE_ID3LIST], MessageForm.MODE_YN);
                 DialogResult dr = messageForm.ShowDialog();
 
                 /* YesならID3作成画面へ飛ばす */
@@ -242,7 +229,7 @@ namespace trackID3TagSwitcher
                                     messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Check_Artwork] +
                                                                 MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Is_This_OK] +
                                                                 MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.DIR] +
-                                                                atw[i], MODE_YN, atw[i]);
+                                                                atw[i], MessageForm.MODE_YN, atw[i]);
                                     DialogResult dr = messageForm.ShowDialog();
                                     if (dr == DialogResult.Yes)
                                     {
@@ -268,7 +255,7 @@ namespace trackID3TagSwitcher
                         messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Check_Artwork] +
                                                     MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Is_This_OK] +
                                                     MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.DIR] +
-                                                    this.artworkPath, MODE_YN, this.artworkPath);
+                                                    this.artworkPath, MessageForm.MODE_YN, this.artworkPath);
                         DialogResult dr = messageForm.ShowDialog();
                         if (dr == DialogResult.Yes)
                             isFind = true;
@@ -297,7 +284,7 @@ namespace trackID3TagSwitcher
             catch (Exception ex)
             {
                 /* 確認ダイアログを表示 */
-                messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Error] + ex.ToString(), MODE_OK);
+                messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Error] + ex.ToString(), MessageForm.MODE_OK);
                 messageForm.ShowDialog();
                 return false;
             }
@@ -366,7 +353,7 @@ namespace trackID3TagSwitcher
                         }
 
                         /* 確認ダイアログを表示 */
-                        messageForm.SetFormState(msg, MODE_YN);
+                        messageForm.SetFormState(msg, MessageForm.MODE_YN);
                         DialogResult dr = messageForm.ShowDialog();
 
                         /* Yesなら格納先と曲数を記憶する */
@@ -386,7 +373,7 @@ namespace trackID3TagSwitcher
                     {
                         /* 確認ダイアログを表示 */
                         messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.NOT_FOUND_SONG_DIR] +
-                                                MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.PLZ_CHECK_FILE_PATH], MODE_OK);
+                                                MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.PLZ_CHECK_FILE_PATH], MessageForm.MODE_OK);
                         messageForm.ShowDialog();
 
                         /* ログメッセージ表示 */
@@ -412,7 +399,7 @@ namespace trackID3TagSwitcher
                         }
 
                         /* 確認ダイアログを表示 */
-                        messageForm.SetFormState(msg, MODE_YN);
+                        messageForm.SetFormState(msg, MessageForm.MODE_YN);
                         DialogResult dr = messageForm.ShowDialog();
 
                         /* Yesなら格納先と曲数を記憶する */
@@ -433,7 +420,7 @@ namespace trackID3TagSwitcher
             catch (Exception ex)
             {
                 /* 確認ダイアログを表示 */
-                messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Error] + ex.ToString( ), MODE_OK);
+                messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Error] + ex.ToString( ), MessageForm.MODE_OK);
                 messageForm.ShowDialog();
                 /* ログメッセージ表示 */
                 SetLog(Color.Orange, MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.NOT_FOUND_SONG]);
@@ -551,7 +538,7 @@ namespace trackID3TagSwitcher
                 /* 確認ダイアログを表示 */
                 messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Break_ID3List] +
                                             MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Make_ID3List], 
-                                            MODE_OK);
+                                            MessageForm.MODE_OK);
                 messageForm.ShowDialog();
 
                 /* ログメッセージ表示 */
@@ -596,7 +583,7 @@ namespace trackID3TagSwitcher
                 if (!ret)
                 {
                     /* 確認ダイアログを表示 */
-                    messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Found_Artwork], MODE_OK);
+                    messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Found_Artwork], MessageForm.MODE_OK);
                     DialogResult dr = messageForm.ShowDialog();
 
                     /* アートワークを非表示 */
@@ -762,7 +749,7 @@ namespace trackID3TagSwitcher
                 msg += files[i].Name + "\r\n";
             }
 
-            messageForm.SetFormState(msg, MODE_OK);
+            messageForm.SetFormState(msg, MessageForm.MODE_OK);
             messageForm.ShowDialog();
             */
 
@@ -873,7 +860,7 @@ namespace trackID3TagSwitcher
                 /* 確認ダイアログを表示 */
                 messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Loaded_Album] +
                                             MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Loaded_Album_Reason],
-                                            MODE_OK);
+                                            MessageForm.MODE_OK);
                 messageForm.ShowDialog();
 
                 SetLog(Color.Orange, MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Loaded_Album]);
@@ -900,13 +887,13 @@ namespace trackID3TagSwitcher
                     if (ex.Message.Contains( "別のプロセスで使用" ))
                     {
                         /* 確認ダイアログを表示 */
-                        messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Process_Use_Error] + ex.Message, MODE_OK);
+                        messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Process_Use_Error] + ex.Message, MessageForm.MODE_OK);
                         messageForm.ShowDialog();
                     }
                     else
                     {
                         /* 確認ダイアログを表示 */
-                        messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Error] + ex.ToString(), MODE_OK);
+                        messageForm.SetFormState(MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Error] + ex.ToString(), MessageForm.MODE_OK);
                         messageForm.ShowDialog();
                     }
                     SetLog(Color.Orange, MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Failed_Convert_Song_ID3]);
@@ -1660,7 +1647,7 @@ namespace trackID3TagSwitcher
                                                 MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Select_Replace_Way] +
                                                 MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Target_Word] +
                                                 text,
-                                                MODE_YN);
+                                                MessageForm.MODE_YN);
                     DialogResult dr = messageForm.ShowDialog();
 
                     /* Yesなら空白に置き換える */
