@@ -1,4 +1,5 @@
-﻿using PastebinAPIs;
+﻿using DeviceId;
+using PastebinAPIs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,6 +7,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -22,14 +24,28 @@ namespace trackID3TagSwitcher
         private string m_serverKey = "";
         private string m_serverLoggedUser = "";
         private string m_serverPage = "";
+        private string m_machineId = "";
 
         /* 各関数処理用変数 */
+        private const string START_TXT = "<textarea class=\"textarea\">";
+        private const string END_TXT = "</textarea>";
+        private const string SPACE_PASS = "[+@]";
+        private const string SPACE_MCNID = "[+$]";
+
         private bool m_coroutine_flag = false;
         private PastebinAPI m_serverAPI;
         private PasteLoginRequest m_serverLoginReq;
         private PasteListRequest m_serverListReq;
         private PasteData[] m_serverDatas;
+        private string m_serverUri = "";
         private string m_serverContent = "";
+        private WebClient m_webClient;
+        private int m_startPos = 0;
+        private int m_endPos = 0;
+        private int m_length = 0;
+        private StringReader m_sr;
+        private string m_line = "";
+        private DialogResult m_dResult;
 
         public AccountForm( )
         {
@@ -38,9 +54,26 @@ namespace trackID3TagSwitcher
 
         private void LoginForm_Load( object sender , EventArgs e )
         {
+            GetCurrentMachineID( );
             LoadSetting( );
             CheckNetwork( );
             CheckServiceInfo( );
+        }
+
+        private void GetCurrentMachineID( )
+        {
+            m_machineId = new DeviceIdBuilder( )
+                                .AddMachineName( )
+                                .AddMacAddress( )
+                                .AddProcessorId( )
+                                .AddMotherboardSerialNumber( )
+                                .ToString( );
+            if ( m_machineId.Length == 0 )
+            {
+                /* 確認ダイアログを表示 */
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Error_Get_MachineID] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Tell_Case_To_Developer] , MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+            }
         }
 
         /// <summary>
@@ -57,6 +90,9 @@ namespace trackID3TagSwitcher
             }
         }
 
+        /// <summary>
+        /// サーバー接続設定が取得できているかチェックし、できていなければ更新ボタンを押すよう促す
+        /// </summary>
         private void CheckServiceInfo( )
         {
             if ( ( m_serverUsername.Length == 0 ) ||
@@ -69,6 +105,8 @@ namespace trackID3TagSwitcher
                 messageForm.ShowDialog( );
             }
         }
+
+        #region サーバー接続処理
 
         /// <summary>
         /// アカウント管理サーバーにログインする
@@ -100,7 +138,7 @@ namespace trackID3TagSwitcher
         }
 
         /// <summary>
-        /// アカウント管理サーバーから全アカウント情報を取得する
+        /// アカウント管理サーバーからアカウント管理ページのURLを取得する
         /// </summary>
         private bool GetListToPastebin( )
         {
@@ -113,13 +151,11 @@ namespace trackID3TagSwitcher
             if ( m_serverDatas != null )
                 m_serverDatas = null;
             m_serverDatas = m_serverAPI.ListPastes( m_serverListReq );
-
             foreach ( var paste in m_serverDatas )
             {
                 if ( paste.Title == m_serverPage )
                 {
-                    m_serverContent = paste.FormatLong;
-                    MessageBox.Show( m_serverContent );
+                    m_serverUri = paste.Url;
                     return true;
                 }
             }
@@ -129,6 +165,108 @@ namespace trackID3TagSwitcher
             messageForm.ShowDialog( );
             return false;
         }
+
+        /// <summary>
+        /// アカウント管理ページから全アカウント情報を取得する
+        /// </summary>
+        private bool GetHtml( )
+        {
+            if ( m_webClient != null )
+                m_webClient = null;
+            m_webClient = new WebClient( );
+
+            try
+            {
+                m_serverContent = m_webClient.DownloadString( m_serverUri );
+                if ( m_serverContent.Contains( START_TXT ) )
+                {
+                    /* アカウントリストを取得する範囲設定 */
+                    m_startPos = m_serverContent.IndexOf( START_TXT );
+                    m_startPos += START_TXT.Length;
+                    m_endPos = m_serverContent.IndexOf( END_TXT );
+                    m_length = m_endPos - m_startPos;
+
+                    m_serverContent = m_serverContent.Substring( m_startPos , m_length );
+                    if ( m_serverContent.Length == 0 )
+                    {
+                        /* 確認ダイアログを表示 */
+                        messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_Account_Info] + 
+                                                    MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Re_Login_After] +
+                                                    MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Case_To_Developer] , 
+                                                    MessageForm.MODE_OK );
+                        messageForm.ShowDialog( );
+                        return false;
+                    }
+
+                    return true;
+                }
+            }
+            catch ( WebException exc )
+            {
+                /* 確認ダイアログを表示 */
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Error_Get_Account_Info] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Error_To_Developer] + exc.ToString( ) , MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 全アカウント情報の中から自分の情報があるか検索する
+        /// </summary>
+        private bool AnalysisHtml( )
+        {
+            /* 入力されたユーザー名が存在しないパターン */
+            if ( !m_serverContent.Contains( this.box_user.Text + SPACE_PASS ) )
+            {
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Found_Your_Account_Make_Now] , MessageForm.MODE_YN );
+                m_dResult = messageForm.ShowDialog( );
+                if ( m_dResult == DialogResult.Yes )
+                    return true;
+                else
+                    return false;
+            }
+
+            if ( m_sr != null )
+                m_sr = null;
+            m_sr = new StringReader( m_serverContent );
+            while ( m_sr.Peek( ) > -1 )
+            {
+                m_line = m_sr.ReadLine( );
+
+                /* その行内にユーザー名がマッチ */
+                if ( m_line.Contains( this.box_user.Text + SPACE_PASS ) )
+                {
+                    /* パスワードも一致 */
+                    if ( m_line.Contains( this.box_pass.Text + SPACE_MCNID ) )
+                    {
+                        /* アカウント作成したPCのIDも一致 */
+                        if ( m_line.Contains( SPACE_MCNID + m_machineId ) )
+                        {
+
+                            return true;
+                        }
+                        /* 違うPCからのログインの場合 */
+                        else
+                        {
+                            messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Match_MachineID] , MessageForm.MODE_OK );
+                            messageForm.ShowDialog( );
+                            return false;
+                        }
+                    }
+                    /* 入力されたユーザー名に対し、パスワードが一致しないパターン */
+                    else
+                    {
+                        messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Match_Password] , MessageForm.MODE_OK );
+                        messageForm.ShowDialog( );
+                        return false;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        #endregion
 
         #region ユーザー入力データの記憶、呼び出し
 
@@ -213,7 +351,7 @@ namespace trackID3TagSwitcher
             text += "s_title:" + m_serverPage + "\r\n";
             text += "l_user:" + this.box_user.Text + "\r\n";
             text += "l_pass:" + this.box_pass.Text + "\r\n";
-
+            
             StreamWriter sw = new StreamWriter( path , false );
             sw.Write( text );
             sw.Close( );
@@ -242,6 +380,14 @@ namespace trackID3TagSwitcher
                 return;
 
             m_coroutine_flag = GetListToPastebin( );
+            if ( !m_coroutine_flag )
+                return;
+
+            m_coroutine_flag = GetHtml( );
+            if ( !m_coroutine_flag )
+                return;
+
+            m_coroutine_flag = AnalysisHtml( );
             if ( !m_coroutine_flag )
                 return;
         }

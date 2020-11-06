@@ -55,6 +55,18 @@ namespace trackID3TagSwitcher
             Irregular_Server_Setting,
             Plz_Press_Reflesh,
 
+            Error_Get_Account_Info,
+            Plz_Send_Error_To_Developer,
+            Not_Get_Account_Info,
+            Plz_Re_Login_After,
+            Plz_Send_Case_To_Developer,
+
+            Not_Found_Your_Account_Make_Now,
+            Not_Match_Password,
+            Not_Match_MachineID,
+
+            Error_Get_MachineID,
+            Plz_Tell_Case_To_Developer,
         }
 
         /// <summary>
@@ -109,6 +121,18 @@ namespace trackID3TagSwitcher
             "サーバー設定が間違っている可能性があります。\r\n",
             "更新ボタンを押してください。\r\nもし症状が治らない場合は、アプリケーションをダウンロードし直してください。",
 
+            "アカウント情報の取得中にエラーが発生しました。\r\n",
+            "下記エラーコードをコピーし、本アプリの制作者にご送信お願いいたします。\r\n\r\n_______________\r\n",
+            "アカウント情報を取得できませんでした。\r\n",
+            "ネットワーク状況による可能性もあるため、しばらくしてから再度ログインを試してみてください。\r\n",
+            "このエラーが多発するようであれば、本アプリの制作者にお問合せをお願いいたします。\r\n",
+
+            "あなたのアカウントはまだ登録されていません。\r\n登録しますか？\r\n",
+            "パスワードが一致しません。\r\n再度パスワードを入力し直してください。\r\n",
+            "アカウントを登録したPCと一致しません。\r\n本アプリのオンラインサービスは複数の機器での利用はできません。\r\n本アプリの制作者に使用するPCの変更のお問合せをお願いいたします。",
+
+            "使用中のPC本体の情報の取得に失敗しました。\r\n",
+            "このエラーが発生したことを本アプリの制作者にお問合せお願いいたします。\r\n",
         };
     }
 }
