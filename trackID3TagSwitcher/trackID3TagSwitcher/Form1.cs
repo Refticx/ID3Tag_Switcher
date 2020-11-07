@@ -1879,6 +1879,10 @@ namespace trackID3TagSwitcher
 
         private void loginSetting_Click( object sender , EventArgs e )
         {
+            if ( loginForm.IsDisposed )
+            {
+                loginForm = new AccountForm( );
+            }
             loginForm.Show( );
         }
     }
