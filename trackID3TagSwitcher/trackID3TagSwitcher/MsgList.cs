@@ -72,6 +72,8 @@ namespace trackID3TagSwitcher
             Success_Register_pt2,
             Cannot_Use_Username,
             Cannot_Use_Password,
+            Success_Login_noticeBar,
+            Failed_Login_noticeBar,
 
             Error_Get_MachineID,
             Plz_Tell_Case_To_Developer,
@@ -146,6 +148,7 @@ namespace trackID3TagSwitcher
             "　】の登録、及びログインが完了しました。\r\n",
             "ユーザー名に使用できない文字が含まれています。\r\n",
             "パスワードに使用できない文字が含まれています。\r\n",
+            "ログインしました\r\n",
 
             "使用中のPC本体の情報の取得に失敗しました。\r\n",
             "このエラーが発生したことを本アプリの制作者にお問合せお願いいたします。\r\n",

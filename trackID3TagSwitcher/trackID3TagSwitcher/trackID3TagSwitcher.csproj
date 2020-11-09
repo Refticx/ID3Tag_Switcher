@@ -121,6 +121,14 @@
       <DependentUpon>MessageForm.cs</DependentUpon>
     </Compile>
     <Compile Include="MsgList.cs" />
+    <Compile Include="PastebinAPI\Expiration.cs" />
+    <Compile Include="PastebinAPI\Language.cs" />
+    <Compile Include="PastebinAPI\Paste.cs" />
+    <Compile Include="PastebinAPI\Pastebin.cs" />
+    <Compile Include="PastebinAPI\PastebinException.cs" />
+    <Compile Include="PastebinAPI\User.cs" />
+    <Compile Include="PastebinAPI\Utills.cs" />
+    <Compile Include="PastebinAPI\Visibility.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Win10DeviceId.cs" />

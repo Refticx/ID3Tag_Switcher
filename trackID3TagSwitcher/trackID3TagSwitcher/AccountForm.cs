@@ -11,6 +11,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using PastebinAPI_nikibobi;
 
 namespace trackID3TagSwitcher
 {
@@ -33,6 +34,7 @@ namespace trackID3TagSwitcher
         private const string SPACE_MCNID = "[+=]";
         private const string SPACE_UNQID = "[+!]";
 
+        private Task<bool> m_coroutine_task;
         private bool m_coroutine_flag = false;
         private PastebinAPI m_serverAPI;
         private PasteLoginRequest m_serverLoginReq;
@@ -51,9 +53,13 @@ namespace trackID3TagSwitcher
         private string m_line = "";
         private DialogResult m_dResult;
         private char m_char;
-        public bool isUnlockLicence = false;
+        public static bool isUnlockLicence = false;
         private PasteDeleteRequest m_serverDelReq;
         private PasteCreateRequest m_serverCreateReq;
+
+        private PastebinAPI_nikibobi.User m_userAsync;
+        private Uri m_uriAsync;
+        private PastebinAPI_nikibobi.Paste m_serverDelReqAsync;
 
         public AccountForm( )
         {
@@ -66,6 +72,7 @@ namespace trackID3TagSwitcher
             LoadSetting( );
             CheckNetwork( );
             CheckServiceInfo( );
+            LockLoginOnShowUI( );
         }
 
         #region フォーム起動時の初回取得、チェック
@@ -126,7 +133,7 @@ namespace trackID3TagSwitcher
         /// <summary>
         /// ユーザー名、パスワードに使用不可能な文字が含まれているかチェックする
         /// </summary>
-        private bool CheckUsernameNPassword( )
+        private async Task<bool> CheckUsernameNPassword( )
         {
             if ( this.box_user.Text.Contains( SPACE_PASS ) )
             {
@@ -169,9 +176,31 @@ namespace trackID3TagSwitcher
             return true;
         }
 
+        /// <summary>
+        /// 既にログイン済みであれば再ログインできないようにする
+        /// </summary>
+        private void LockLoginOnShowUI( )
+        {
+            if ( isUnlockLicence )
+            {
+                LockLogin( false );
+                SetLog( Color.LimeGreen , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Login_noticeBar] );
+            }
+        }
+
+        /// <summary>
+        /// 既にログイン済みであれば再ログインできないようにする
+        /// </summary>
+        private void LockLogin( bool onf )
+        {
+            this.box_user.Enabled = onf;
+            this.box_pass.Enabled = onf;
+            this.btn_Login.Enabled = onf;
+        }
+
         #endregion
 
-        #region サーバー接続処理
+        #region サーバー接続処理（同期）
 
         /// <summary>
         /// アカウント管理サーバーにログインする
@@ -483,6 +512,373 @@ namespace trackID3TagSwitcher
 
         #endregion
 
+        #region サーバー接続処理（非同期）
+
+        /// <summary>
+        /// アカウント管理サーバーにログインする
+        /// </summary>
+        private async Task<bool> LoginToPastebinAsync( )
+        {
+            /* 開発者用キーを設定する */
+            Pastebin.DevKey = m_serverKey;
+
+            /* ログイン試行 */
+            try
+            {
+                m_userAsync = await Pastebin.LoginAsync( m_serverUsername , m_serverPassword );
+            }
+            /* ログインに失敗した場合 */
+            catch ( PastebinAPI_nikibobi.PastebinException ex )
+            {
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Connect_Server] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Press_Reflesh] , MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// アカウント管理サーバーからアカウント管理ページのURLを取得する
+        /// </summary>
+        private async Task<bool> GetListToPastebinAsync( )
+        {
+            /* サーバーから3件ページを取得する */
+            try
+            {
+                foreach ( Paste paste in await m_userAsync.ListPastesAsync( 3 ) )
+                {
+                    if ( paste.Title == m_serverPage )
+                    {
+                        m_serverUri = paste.Url;
+                        m_serverReq = paste.Key;
+                        m_serverDelReqAsync = paste;
+                        return true;
+                    }
+                }
+
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Connect_Server] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Press_Reflesh] , MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                return false;
+            }
+            /* 取得に失敗した場合 */
+            catch ( PastebinAPI_nikibobi.PastebinException ex )
+            {
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Server_Setting] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Press_Reflesh] , MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// アカウント管理ページから全アカウント情報を取得する
+        /// </summary>
+        private async Task<bool> GetHtmlAsync( )
+        {
+            if ( m_webClient != null )
+                m_webClient = null;
+            m_webClient = new WebClient( );
+            
+            if ( m_uriAsync != null )
+                m_uriAsync = null;
+            m_uriAsync = new Uri( m_serverUri );
+
+            try
+            {
+                m_serverContent = await m_webClient.DownloadStringTaskAsync( m_uriAsync );
+                if ( m_serverContent.Contains( START_TXT ) )
+                {
+                    /* アカウントリストを取得する範囲設定 */
+                    m_startPos = m_serverContent.IndexOf( START_TXT );
+                    m_startPos += START_TXT.Length;
+                    m_endPos = m_serverContent.IndexOf( END_TXT );
+                    m_length = m_endPos - m_startPos;
+
+                    m_serverContent = m_serverContent.Substring( m_startPos , m_length );
+                    if ( m_serverContent.Length == 0 )
+                    {
+                        /* 確認ダイアログを表示 */
+                        messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_Account_Info] +
+                                                    MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Re_Login_After] +
+                                                    MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Case_To_Developer] ,
+                                                    MessageForm.MODE_OK );
+                        messageForm.ShowDialog( );
+                        return false;
+                    }
+
+                    // MessageBox.Show( m_serverContent );
+                    return true;
+                }
+            }
+            catch ( WebException exc )
+            {
+                /* 確認ダイアログを表示 */
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Error_Get_Account_Info] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Error_To_Developer] + exc.ToString( ) , MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 取得した全アカウント情報を復号化する
+        /// </summary>
+        private async Task<bool> DecryptHtmlAsync( )
+        {
+            try
+            {
+                m_decryptContent = "";
+                for ( int i = 0 ; i < m_serverContent.Length ; i++ )
+                {
+                    //m_char = m_serverContent[i];
+                    //m_char = (char)( (int)m_char - 2 );
+                    m_decryptContent += (char)( (int)m_serverContent[i] - 2 );
+                    await Task.Delay( 1 );
+                }
+                // MessageBox.Show( m_decryptContent );
+                return true;
+            }
+            catch ( Exception ex )
+            {
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_Account_Info] +
+                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Error_To_Developer] +
+                                            ex.Message ,
+                                            MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 全アカウント情報の中から自分の情報があるか検索する
+        /// </summary>
+        private async Task<bool> AnalysisHtmlAsync( )
+        {
+            try
+            {
+                isUnlockLicence = false;
+
+                /* 入力されたユーザー名が存在しないパターン */
+                if ( !m_decryptContent.Contains( this.box_user.Text + SPACE_PASS ) )
+                {
+                    messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Found_Your_Account_Make_Now] , MessageForm.MODE_YN );
+                    m_dResult = messageForm.ShowDialog( );
+                    if ( m_dResult == DialogResult.Yes )
+                        return true;
+                    else
+                        return false;
+                }
+
+                if ( m_sr != null )
+                    m_sr = null;
+                m_sr = new StringReader( m_decryptContent );
+                while ( m_sr.Peek( ) > -1 )
+                {
+                    m_line = m_sr.ReadLine( );
+
+                    /* その行内にユーザー名がマッチ */
+                    if ( m_line.Contains( this.box_user.Text + SPACE_PASS ) )
+                    {
+                        /* パスワードも一致 */
+                        if ( m_line.Contains( this.box_pass.Text + SPACE_MCNID ) )
+                        {
+                            /* アカウント作成したPCのIDも一致 */
+                            if ( m_line.Contains( SPACE_MCNID + m_machineId ) )
+                            {
+                                isUnlockLicence = true;
+                                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Login_pt1] +
+                                                            this.box_user.Text +
+                                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Login_pt2] ,
+                                                            MessageForm.MODE_OK );
+                                messageForm.ShowDialog( );
+                                return true;
+                            }
+                            /* 違うPCからのログインの場合 */
+                            else
+                            {
+                                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Match_MachineID] , MessageForm.MODE_OK );
+                                messageForm.ShowDialog( );
+                                return false;
+                            }
+                        }
+                        /* 入力されたユーザー名に対し、パスワードが一致しないパターン */
+                        else
+                        {
+                            messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Match_Password] , MessageForm.MODE_OK );
+                            messageForm.ShowDialog( );
+                            return false;
+                        }
+                    }
+
+                    await Task.Delay( 1 );
+                }
+            }
+            catch ( Exception ex )
+            {
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_Account_Info] +
+                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Error_To_Developer] +
+                                            ex.Message ,
+                                            MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                return false;
+            }
+
+            messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Found_Your_Account_Make_Now] , MessageForm.MODE_YN );
+            m_dResult = messageForm.ShowDialog( );
+            if ( m_dResult == DialogResult.Yes )
+                return true;
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// 自分のアカウント情報を付けたし、暗号化する
+        /// </summary>
+        private async Task<bool> EncryptHtmlAsync( )
+        {
+            try
+            {
+                m_decryptContent += "\r\n";
+                m_decryptContent += this.box_user.Text + SPACE_PASS;
+                m_decryptContent += this.box_pass.Text + SPACE_MCNID;
+                m_decryptContent += m_machineId;
+
+                m_encryptContent = "";
+                for ( int i = 0 ; i < m_decryptContent.Length ; i++ )
+                {
+                    m_encryptContent += (char)( (int)m_decryptContent[i] + 2 );
+                    await Task.Delay( 1 );
+                }
+                return true;
+            }
+            catch ( Exception ex )
+            {
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_Account_Info] +
+                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Error_To_Developer] +
+                                            ex.Message ,
+                                            MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 現在のアカウント管理ページを一旦削除する
+        /// </summary>
+        private async Task<bool> DeleteHtmlAsync( )
+        {
+            try
+            {
+                await m_userAsync.DeletePasteAsync( m_serverDelReqAsync );
+                return true;
+            }
+            catch ( PastebinAPI_nikibobi.PastebinException ex )
+            {
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Failed_Login] +
+                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Re_Login_After] +
+                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Case_To_Developer] ,
+                                            MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 新しくアカウントページを作り直す
+        /// </summary>
+        private async Task<bool> MakeHtmlAsync( )
+        {
+            try
+            {
+                await m_userAsync.CreatePasteAsync( m_encryptContent , m_serverPage , Language.None , Visibility.Unlisted , Expiration.Never );
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Login_pt1] +
+                                            this.box_user.Text +
+                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Register_pt2] ,
+                                            MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+
+                isUnlockLicence = true;
+                return true;
+            }
+            catch ( PastebinAPI_nikibobi.PastebinException ex )
+            {
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Failed_Login] +
+                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Re_Login_After] +
+                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Case_To_Developer] ,
+                                            MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                return false;
+            }
+        }
+
+        private void MainAsync( )
+        {
+            PastebinExampleAsync( ).GetAwaiter( ).GetResult( );
+        }
+
+        private async Task PastebinExampleAsync( )
+        {
+            //before using any class in the api you must enter your api dev key
+            Pastebin.DevKey = m_serverKey;
+            //you can see yours here: https://pastebin.com/api#1
+            try
+            {
+                // login and get user object
+                User me = await Pastebin.LoginAsync( m_serverUsername , m_serverPassword );
+                // user contains information like e-mail, location etc...
+                Console.WriteLine( "{0}({1}) lives in {2}" , me , me.Email , me.Location );
+                // lists all pastes for this user
+                foreach ( Paste paste in await me.ListPastesAsync( 3 ) ) // we limmit the results to 3
+                {
+                    Console.WriteLine( paste.Title );
+                }
+
+                string code = "<your fancy &code#() goes here>";
+                //creates a new paste and get paste object
+                Paste newPaste = await me.CreatePasteAsync( code , "MyPasteTitle" , Language.HTML5 , Visibility.Public , Expiration.TenMinutes );
+                //newPaste now contains the link returned from the server
+                Console.WriteLine( "URL: {0}" , newPaste.Url );
+                Console.WriteLine( "Paste key: {0}" , newPaste.Key );
+                Console.WriteLine( "Content: {0}" , newPaste.Text );
+                //deletes the paste we just created
+                await me.DeletePasteAsync( newPaste );
+
+                //lists all currently trending pastes(similar to me.ListPastes())
+                foreach ( Paste paste in await Pastebin.ListTrendingPastesAsync( ) )
+                {
+                    Console.WriteLine( "{0} - {1}" , paste.Title , paste.Url );
+                }
+                //you can create pastes directly from Pastebin static class but they are created as guests and you have a limited number of guest uploads
+                Paste anotherPaste = await Paste.CreateAsync( "another paste" , "MyPasteTitle2" , Language.CSharp , Visibility.Unlisted , Expiration.OneHour );
+                Console.WriteLine( anotherPaste.Title );
+            }
+            catch ( PastebinAPI_nikibobi.PastebinException ex ) //api throws PastebinException
+            {
+                //in the Parameter property you can see what invalid parameter was sent
+                //here we check if the exeption is thrown because of invalid login details
+                if ( ex.Parameter == PastebinAPI_nikibobi.PastebinException.ParameterType.Login )
+                {
+                    Console.Error.WriteLine( "Invalid username/password" );
+                }
+                else
+                {
+                    throw; //all other types are rethrown and not swalowed!
+                }
+            }
+            Console.ReadKey( );
+        }
+
+        #endregion
+
+        #region 汎用型スクリプト
+
+        private void SetLog( Color cl , string log )
+        {
+            this.lblAppLogText.ForeColor = cl;
+            this.lblAppLogText.Text = log;
+        }
+
+        #endregion
+
         #region ユーザー入力データの記憶、呼び出し
 
         private void LoadSetting( )
@@ -586,7 +982,7 @@ namespace trackID3TagSwitcher
         /// <summary>
         /// ログイン（アカウント登録）する
         /// </summary>
-        private void btn_Login_Click( object sender , EventArgs e )
+        private async void btn_Login_Click( object sender , EventArgs e )
         {
             if ( isUnlockLicence )
             {
@@ -598,47 +994,67 @@ namespace trackID3TagSwitcher
                 return;
             }
 
-            m_coroutine_flag = false;
+            LockLogin( false );
 
-            m_coroutine_flag = CheckUsernameNPassword( );
-            if ( !m_coroutine_flag )
-                return;
+            if ( await LoginThink( ) == false )
+            {
+                LockLogin( true );
+            }
+        }
 
-            m_coroutine_flag = LoginToPastebin( );
+        private async Task<bool> LoginThink( )
+        {
+            m_coroutine_task = CheckUsernameNPassword( );
+            m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
-                return;
+                return m_coroutine_flag;
 
-            m_coroutine_flag = GetListToPastebin( );
+            m_coroutine_task = LoginToPastebinAsync( );
+            m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
-                return;
+                return m_coroutine_flag;
 
-            m_coroutine_flag = GetHtml( );
+            m_coroutine_task = GetListToPastebinAsync( );
+            m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
-                return;
+                return m_coroutine_flag;
 
-            m_coroutine_flag = DecryptHtml( );
+            m_coroutine_task = GetHtmlAsync( );
+            m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
-                return;
+                return m_coroutine_flag;
 
-            m_coroutine_flag = AnalysisHtml( );
+            m_coroutine_task = DecryptHtmlAsync( );
+            m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
-                return;
+                return m_coroutine_flag;
+
+            m_coroutine_task = AnalysisHtmlAsync( );
+            m_coroutine_flag = await m_coroutine_task;
+            if ( !m_coroutine_flag )
+                return m_coroutine_flag;
 
             /* アカウントが無いため作らなければいけない */
             if ( !isUnlockLicence )
             {
-                m_coroutine_flag = EncryptHtml( );
+                m_coroutine_task = EncryptHtmlAsync( );
+                m_coroutine_flag = await m_coroutine_task;
                 if ( !m_coroutine_flag )
-                    return;
+                    return m_coroutine_flag;
 
-                m_coroutine_flag = DeleteHtml( );
+                m_coroutine_task = DeleteHtmlAsync( );
+                m_coroutine_flag = await m_coroutine_task;
                 if ( !m_coroutine_flag )
-                    return;
+                    return m_coroutine_flag;
 
-                m_coroutine_flag = MakeHtml( );
+                m_coroutine_task = MakeHtmlAsync( );
+                m_coroutine_flag = await m_coroutine_task;
                 if ( !m_coroutine_flag )
-                    return;
+                    return m_coroutine_flag;
             }
+
+            LockLoginOnShowUI( );
+            return m_coroutine_flag;
         }
     }
 }

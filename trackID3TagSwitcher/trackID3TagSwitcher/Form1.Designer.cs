@@ -34,6 +34,7 @@
             this.btnLoadAlbum = new System.Windows.Forms.Button();
             this.btnSwitcher = new System.Windows.Forms.Button();
             this.pnlAppHeader = new System.Windows.Forms.Panel();
+            this.loginSetting = new System.Windows.Forms.Button();
             this.btnExit = new System.Windows.Forms.Button();
             this.lblAppTitle = new System.Windows.Forms.Label();
             this.pnlAppHeaderLine = new System.Windows.Forms.Panel();
@@ -100,7 +101,6 @@
             this.boxEx1 = new System.Windows.Forms.TextBox();
             this.lblARNName = new System.Windows.Forms.Label();
             this.tipIsDot = new System.Windows.Forms.ToolTip(this.components);
-            this.loginSetting = new System.Windows.Forms.Button();
             this.pnlAppHeader.SuspendLayout();
             this.pnlAppFooter.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imgCurrentMode)).BeginInit();
@@ -166,6 +166,20 @@
             this.pnlAppHeader.TabIndex = 7;
             this.pnlAppHeader.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PnlAppHeader_MouseDown);
             this.pnlAppHeader.MouseMove += new System.Windows.Forms.MouseEventHandler(this.PnlAppHeader_MouseMove);
+            // 
+            // loginSetting
+            // 
+            this.loginSetting.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.loginSetting.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.loginSetting.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.loginSetting.ForeColor = System.Drawing.Color.Crimson;
+            this.loginSetting.Location = new System.Drawing.Point(330, 3);
+            this.loginSetting.Name = "loginSetting";
+            this.loginSetting.Size = new System.Drawing.Size(25, 25);
+            this.loginSetting.TabIndex = 10;
+            this.loginSetting.Text = "X";
+            this.loginSetting.UseVisualStyleBackColor = false;
+            this.loginSetting.Click += new System.EventHandler(this.loginSetting_Click);
             // 
             // btnExit
             // 
@@ -1045,20 +1059,6 @@
             this.tipIsDot.AutoPopDelay = 5000;
             this.tipIsDot.InitialDelay = 100;
             this.tipIsDot.ReshowDelay = 100;
-            // 
-            // loginSetting
-            // 
-            this.loginSetting.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.loginSetting.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.loginSetting.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.loginSetting.ForeColor = System.Drawing.Color.Crimson;
-            this.loginSetting.Location = new System.Drawing.Point(330, 3);
-            this.loginSetting.Name = "loginSetting";
-            this.loginSetting.Size = new System.Drawing.Size(25, 25);
-            this.loginSetting.TabIndex = 10;
-            this.loginSetting.Text = "X";
-            this.loginSetting.UseVisualStyleBackColor = false;
-            this.loginSetting.Click += new System.EventHandler(this.loginSetting_Click);
             // 
             // Form1
             // 
