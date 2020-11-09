@@ -77,6 +77,26 @@ namespace trackID3TagSwitcher
 
             Error_Get_MachineID,
             Plz_Tell_Case_To_Developer,
+
+            Progress_Try_Server_Connect,
+            Progress_Failed_Server_Connect,
+            Progress_Try_Get_Server_List,
+            Progress_Failed_Get_Server_List,
+            Progress_Failed_Find_Server_List,
+            Progress_Try_Get_Data_List,
+            Progress_Failed_Get_Data_List,
+            Progress_Try_Decrypt_Data_List,
+            Progress_Failed_Decrypt_Data_List,
+            Progress_Try_Find_Account,
+            Progress_Failed_Find_Account,
+            Progress_Failed_Account_Password_Mismatch,
+            Progress_Failed_Account_Device_Mismatch,
+            Progress_Try_Encrypt_Data_List,
+            Progress_Failed_Encrypt_Data_List,
+            Progress_Try_Delete_Server,
+            Progress_Failed_Delete_Server,
+            Progress_Try_Upload_Account,
+            Progress_Failed_Upload_Account,
         }
 
         /// <summary>
@@ -149,9 +169,30 @@ namespace trackID3TagSwitcher
             "ユーザー名に使用できない文字が含まれています。\r\n",
             "パスワードに使用できない文字が含まれています。\r\n",
             "ログインしました\r\n",
+            "ログインに失敗しました\r\n",
 
             "使用中のPC本体の情報の取得に失敗しました。\r\n",
             "このエラーが発生したことを本アプリの制作者にお問合せお願いいたします。\r\n",
+
+            "サーバーに接続中…",
+            "サーバーの接続に失敗",
+            "サーバーデータを取得中…",
+            "サーバーデータの取得に失敗",
+            "サーバーデータがありません",
+            "データリストを取得中…",
+            "データリストの取得に失敗",
+            "データを復号化しています…",
+            "データの復号化に失敗",
+            "アカウント情報を照会中…",
+            "アカウント情報の照会に失敗",
+            "パスワードが一致しません",
+            "登録したデバイスと一致しません",
+            "データを暗号化しています…",
+            "データの暗号化に失敗",
+            "サーバーへ更新リクエストを送信中…",
+            "サーバーのリクエスト送信に失敗",
+            "アカウント情報をアップロード中…",
+            "アカウント情報の反映に失敗",
         };
     }
 }

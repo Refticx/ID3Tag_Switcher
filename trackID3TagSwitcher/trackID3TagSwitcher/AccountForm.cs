@@ -19,6 +19,9 @@ namespace trackID3TagSwitcher
     {
         private MessageForm messageForm = new MessageForm( );    /* ダイアログ用フォームを作成しておく */
 
+        /* プログレスバー設定 */
+        private const int SERVER_FUNC_NUM = 9;
+
         /* サーバー設定 */
         private string m_serverUsername = "";
         private string m_serverPassword = "";
@@ -184,7 +187,7 @@ namespace trackID3TagSwitcher
             if ( isUnlockLicence )
             {
                 LockLogin( false );
-                SetLog( Color.LimeGreen , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Login_noticeBar] );
+                SetLog( this.lblAppLogText ,  Color.LimeGreen , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Login_noticeBar] );
             }
         }
 
@@ -525,6 +528,7 @@ namespace trackID3TagSwitcher
             /* ログイン試行 */
             try
             {
+                SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Server_Connect] );
                 m_userAsync = await Pastebin.LoginAsync( m_serverUsername , m_serverPassword );
             }
             /* ログインに失敗した場合 */
@@ -532,6 +536,7 @@ namespace trackID3TagSwitcher
             {
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Connect_Server] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Press_Reflesh] , MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
+                SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Server_Connect] );
                 return false;
             }
 
@@ -546,6 +551,8 @@ namespace trackID3TagSwitcher
             /* サーバーから3件ページを取得する */
             try
             {
+                SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Get_Server_List] );
+
                 foreach ( Paste paste in await m_userAsync.ListPastesAsync( 3 ) )
                 {
                     if ( paste.Title == m_serverPage )
@@ -556,9 +563,10 @@ namespace trackID3TagSwitcher
                         return true;
                     }
                 }
-
+                
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Connect_Server] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Press_Reflesh] , MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
+                SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Find_Server_List] );
                 return false;
             }
             /* 取得に失敗した場合 */
@@ -566,6 +574,7 @@ namespace trackID3TagSwitcher
             {
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Server_Setting] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Press_Reflesh] , MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
+                SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Server_Connect] );
                 return false;
             }
         }
@@ -585,6 +594,7 @@ namespace trackID3TagSwitcher
 
             try
             {
+                SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Get_Data_List] );
                 m_serverContent = await m_webClient.DownloadStringTaskAsync( m_uriAsync );
                 if ( m_serverContent.Contains( START_TXT ) )
                 {
@@ -612,9 +622,9 @@ namespace trackID3TagSwitcher
             }
             catch ( WebException exc )
             {
-                /* 確認ダイアログを表示 */
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Error_Get_Account_Info] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Error_To_Developer] + exc.ToString( ) , MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
+                SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Get_Data_List] );
             }
             return false;
         }
@@ -626,6 +636,7 @@ namespace trackID3TagSwitcher
         {
             try
             {
+                SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Decrypt_Data_List] );
                 m_decryptContent = "";
                 for ( int i = 0 ; i < m_serverContent.Length ; i++ )
                 {
@@ -644,6 +655,7 @@ namespace trackID3TagSwitcher
                                             ex.Message ,
                                             MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
+                SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Decrypt_Data_List] );
                 return false;
             }
         }
@@ -656,6 +668,7 @@ namespace trackID3TagSwitcher
             try
             {
                 isUnlockLicence = false;
+                SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Find_Account] );
 
                 /* 入力されたユーザー名が存在しないパターン */
                 if ( !m_decryptContent.Contains( this.box_user.Text + SPACE_PASS ) )
@@ -665,7 +678,10 @@ namespace trackID3TagSwitcher
                     if ( m_dResult == DialogResult.Yes )
                         return true;
                     else
+                    {
+                        SetLog( this.lbl_progressContent , Color.AliceBlue , "" );
                         return false;
+                    }
                 }
 
                 if ( m_sr != null )
@@ -690,11 +706,13 @@ namespace trackID3TagSwitcher
                                                             MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Login_pt2] ,
                                                             MessageForm.MODE_OK );
                                 messageForm.ShowDialog( );
+                                SetLog( this.lbl_progressContent , Color.AliceBlue , "" );
                                 return true;
                             }
                             /* 違うPCからのログインの場合 */
                             else
                             {
+                                SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Account_Device_Mismatch] );
                                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Match_MachineID] , MessageForm.MODE_OK );
                                 messageForm.ShowDialog( );
                                 return false;
@@ -703,6 +721,7 @@ namespace trackID3TagSwitcher
                         /* 入力されたユーザー名に対し、パスワードが一致しないパターン */
                         else
                         {
+                            SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Account_Password_Mismatch] );
                             messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Match_Password] , MessageForm.MODE_OK );
                             messageForm.ShowDialog( );
                             return false;
@@ -714,6 +733,7 @@ namespace trackID3TagSwitcher
             }
             catch ( Exception ex )
             {
+                SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Find_Account] );
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_Account_Info] +
                                             MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Error_To_Developer] +
                                             ex.Message ,
@@ -727,7 +747,10 @@ namespace trackID3TagSwitcher
             if ( m_dResult == DialogResult.Yes )
                 return true;
             else
+            {
+                SetLog( this.lbl_progressContent , Color.AliceBlue , "" );
                 return false;
+            }
         }
 
         /// <summary>
@@ -737,6 +760,7 @@ namespace trackID3TagSwitcher
         {
             try
             {
+                SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Encrypt_Data_List] );
                 m_decryptContent += "\r\n";
                 m_decryptContent += this.box_user.Text + SPACE_PASS;
                 m_decryptContent += this.box_pass.Text + SPACE_MCNID;
@@ -752,6 +776,7 @@ namespace trackID3TagSwitcher
             }
             catch ( Exception ex )
             {
+                SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Encrypt_Data_List] );
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_Account_Info] +
                                             MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Error_To_Developer] +
                                             ex.Message ,
@@ -768,11 +793,13 @@ namespace trackID3TagSwitcher
         {
             try
             {
+                SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Delete_Server] );
                 await m_userAsync.DeletePasteAsync( m_serverDelReqAsync );
                 return true;
             }
             catch ( PastebinAPI_nikibobi.PastebinException ex )
             {
+                SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Delete_Server] );
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Failed_Login] +
                                             MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Re_Login_After] +
                                             MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Case_To_Developer] ,
@@ -789,18 +816,13 @@ namespace trackID3TagSwitcher
         {
             try
             {
+                SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Upload_Account] );
                 await m_userAsync.CreatePasteAsync( m_encryptContent , m_serverPage , Language.None , Visibility.Unlisted , Expiration.Never );
-                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Login_pt1] +
-                                            this.box_user.Text +
-                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Register_pt2] ,
-                                            MessageForm.MODE_OK );
-                messageForm.ShowDialog( );
-
-                isUnlockLicence = true;
                 return true;
             }
             catch ( PastebinAPI_nikibobi.PastebinException ex )
             {
+                SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Upload_Account] );
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Failed_Login] +
                                             MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Re_Login_After] +
                                             MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Case_To_Developer] ,
@@ -871,10 +893,10 @@ namespace trackID3TagSwitcher
 
         #region 汎用型スクリプト
 
-        private void SetLog( Color cl , string log )
+        private void SetLog( Label lbl , Color cl , string log )
         {
-            this.lblAppLogText.ForeColor = cl;
-            this.lblAppLogText.Text = log;
+            lbl.ForeColor = cl;
+            lbl.Text = log;
         }
 
         #endregion
@@ -996,10 +1018,15 @@ namespace trackID3TagSwitcher
 
             LockLogin( false );
 
+            this.webProgressBar.Maximum = SERVER_FUNC_NUM;
+            this.webProgressBar.Value = 0;
+
             if ( await LoginThink( ) == false )
             {
                 LockLogin( true );
+                SetLog( this.lblAppLogText , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Failed_Login_noticeBar] );
             }
+            this.webProgressBar.Value = 0;
         }
 
         private async Task<bool> LoginThink( )
@@ -1008,31 +1035,37 @@ namespace trackID3TagSwitcher
             m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
                 return m_coroutine_flag;
+            this.webProgressBar.Value++;
 
             m_coroutine_task = LoginToPastebinAsync( );
             m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
                 return m_coroutine_flag;
+            this.webProgressBar.Value++;
 
             m_coroutine_task = GetListToPastebinAsync( );
             m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
                 return m_coroutine_flag;
+            this.webProgressBar.Value++;
 
             m_coroutine_task = GetHtmlAsync( );
             m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
                 return m_coroutine_flag;
+            this.webProgressBar.Value++;
 
             m_coroutine_task = DecryptHtmlAsync( );
             m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
                 return m_coroutine_flag;
+            this.webProgressBar.Value++;
 
             m_coroutine_task = AnalysisHtmlAsync( );
             m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
                 return m_coroutine_flag;
+            this.webProgressBar.Value++;
 
             /* アカウントが無いため作らなければいけない */
             if ( !isUnlockLicence )
@@ -1041,16 +1074,26 @@ namespace trackID3TagSwitcher
                 m_coroutine_flag = await m_coroutine_task;
                 if ( !m_coroutine_flag )
                     return m_coroutine_flag;
+                this.webProgressBar.Value++;
 
                 m_coroutine_task = DeleteHtmlAsync( );
                 m_coroutine_flag = await m_coroutine_task;
                 if ( !m_coroutine_flag )
                     return m_coroutine_flag;
+                this.webProgressBar.Value++;
 
                 m_coroutine_task = MakeHtmlAsync( );
                 m_coroutine_flag = await m_coroutine_task;
                 if ( !m_coroutine_flag )
                     return m_coroutine_flag;
+                this.webProgressBar.Value++;
+
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Login_pt1] +
+                                            this.box_user.Text +
+                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Register_pt2] ,
+                                            MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                isUnlockLicence = true;
             }
 
             LockLoginOnShowUI( );
