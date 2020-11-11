@@ -40,6 +40,9 @@
     <Reference Include="HtmlAgilityPack">
       <HintPath>.\HtmlAgilityPack.dll</HintPath>
     </Reference>
+    <Reference Include="MediaToolkit, Version=1.1.0.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MediaToolkit.1.1.0.1\lib\net40\MediaToolkit.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\WindowsAPICodePack-Core.1.1.1\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
     </Reference>
@@ -123,6 +126,12 @@
     <Compile Include="MessageForm.Designer.cs">
       <DependentUpon>MessageForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="MP3Compressor\AudioWriters.cs" />
+    <Compile Include="MP3Compressor\Lame.cs" />
+    <Compile Include="MP3Compressor\Mp3Writer.cs" />
+    <Compile Include="MP3Compressor\Mp3WriterConfig.cs" />
+    <Compile Include="MP3Compressor\WaveNative.cs" />
+    <Compile Include="MP3Compressor\WriterConfig.cs" />
     <Compile Include="MsgList.cs" />
     <Compile Include="PastebinAPI\Expiration.cs" />
     <Compile Include="PastebinAPI\Language.cs" />

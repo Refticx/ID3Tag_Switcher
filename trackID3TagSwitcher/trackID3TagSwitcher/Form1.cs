@@ -12,6 +12,8 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Threading;
 using System.Net;
 using NAudio.Wave;
+using MediaToolkit.Model;
+using MediaToolkit;
 
 namespace trackID3TagSwitcher
 {
