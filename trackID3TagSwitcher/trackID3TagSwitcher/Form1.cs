@@ -28,6 +28,9 @@ namespace trackID3TagSwitcher
         private const string VERSION_INFO_URL = "https://chaoticbootstrage.wixsite.com/scene/idtool-ver";   /* アプリ更新があるかを確認するページ */
         private const string CURRENT_VERSION = "1.20";                                                       /* 現在のアプリのバージョン */
 
+        /* マルチスレッド */
+        private SynchronizationContext _mainContext;            /* asyncのサブスレッドからメインUIスレッドに処理を戻すための変数 */
+
         private string trackcbl = "";                           /* trackinfo.cblから読み込んだ文字列全体を格納する変数 */
         private string[,] TrackID3Tag;                          /* trackinfo.cblから読み込んだ各ID3 Tag情報を記憶する二次元配列 */
         private string currentAlbumReleaseTitle = "";           /* 現在読み込んでいるアルバムのリリースタイトル */
@@ -797,8 +800,19 @@ namespace trackID3TagSwitcher
                 File.Move(f.FullName , f.DirectoryName + "\\" + num + TrackID3Tag[track, nameNum] + ".mp3" );
                 file.Dispose( );
                 track++;
+
+                //await Task.Run( ( ) => Thread.Sleep( 1 ) );
             }
-            
+
+            /* UI上のオブジェクトを操作するためメインスレッドで処理させる */
+            _mainContext.Post( _ => OnUI_SwitchAlbumType( ) , null );
+        }
+
+        /// <summary>
+        /// UI上のアルバムタイプの表示を切り替える
+        /// </summary>
+        private void OnUI_SwitchAlbumType( )
+        {
             if ( !this.isTypeFYS )
             {
                 this.lblCurrentText.Text = "For You Sounds方式";
@@ -821,7 +835,6 @@ namespace trackID3TagSwitcher
                 this.lblArrow2.Visible = true;
                 this.isTypeFYS = false;
             }
-
         }
 
         private void RewriteCBL( )
@@ -856,7 +869,7 @@ namespace trackID3TagSwitcher
             sw.Close();
         }
 
-        private void BtnSwitcher_Click(object sender, EventArgs e)
+        private async void BtnSwitcher_Click(object sender, EventArgs e)
         {
             if ( !canStartSwitcher )
             {
@@ -879,8 +892,8 @@ namespace trackID3TagSwitcher
                     this.btnLoadAlbum.Enabled = false;
                     this.btnOpenTrackInfoPage.Enabled = false;
                     this.btnExit.Enabled = false;
-                    
-                    StartTypeSwitch( );
+
+                    await Task.Run( ( ) => StartTypeSwitch( ) );
                     RewriteCBL( );
 
                     SetLog(Color.LimeGreen, MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Convert_Song_ID3]);
@@ -979,6 +992,12 @@ namespace trackID3TagSwitcher
             /* 使用不可能な文字があるかチェックできるようにするための初期化 */
             invalidChars = System.IO.Path.GetInvalidFileNameChars();
             invalidReplase = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
+
+            _mainContext = SynchronizationContext.Current;
+            /*
+            coroutineExitButton = new Thread( new ThreadStart( OnFX_btn_Exit ) );
+            coroutineExitButton.Start( );
+            */
         }
 
         private void BtnExit_Click(object sender, EventArgs e)
