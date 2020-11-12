@@ -74,12 +74,22 @@ namespace trackID3TagSwitcher
         private const int FOOTER_Y          = (APP_HEIGHT - 20);
         private const int FOOTER_LINE_Y     = (FOOTER_Y - 2);
         private const int EXIT_X            = (APP_WIDTH - 28);
+        private const int ACCOUNT_X         = (APP_WIDTH - 120);
 
         private const int APP_BIG_WIDTH     = 760;
         private const int APP_BIG_HEIGHT    = (APP_BIG_WIDTH - 60);
         private const int FOOTER_BIG_Y      = (APP_BIG_HEIGHT - 20);
         private const int FOOTER_LINE_BIG_Y = (FOOTER_BIG_Y - 2);
         private const int EXIT_BIG_X        = (APP_BIG_WIDTH - 28);
+        private const int ACCOUNT_BIG_X     = (APP_BIG_WIDTH - 120);
+
+        /* 音源合成 */
+        private Thread coroutineVocalPlus;     /* ボーカル合成用スレッド */
+
+        private const int RGB_MAX = 255;
+        private const int RGB_MIN = 0;
+        private bool isEnterExitBtn = false;    /* 閉じるボタンのカーソル状態 */
+        private Thread coroutineExitButton;     /* 閉じるボタンのアニメーションスレッド */
 
         #region 汎用型スクリプト
 
@@ -1420,13 +1430,16 @@ namespace trackID3TagSwitcher
             int footerLineY = FOOTER_LINE_Y;
             int footerY     = FOOTER_Y;
             int exitX       = EXIT_X;
-            int vol         = 12;
+            int accountX    = ACCOUNT_X;
+            int volX        = 12;
+            int volY        = 10;
             int page2X      = SUB_AREA_HIDE_X;
             int plusX       = 60;
 
             /* アニメーションでレイアウトが重くならないように */
             this.pnlPage1.SuspendLayout();
             this.btnExit.SuspendLayout();
+            this.btn_loginForm.SuspendLayout();
             this.pnlAppFooter.SuspendLayout();
             this.pnlAppFooterLine.SuspendLayout();
 
@@ -1438,18 +1451,21 @@ namespace trackID3TagSwitcher
             {
                 this.pnlPage1.Location = new Point( i, this.pnlPage1.Location.Y);
 
-                size += vol;
+                size += volX;
                 this.ClientSize = new System.Drawing.Size((size + plusX), size);
 
-                exitX += vol;
+                exitX += volX;
                 this.btnExit.Location = new Point( (exitX + plusX), this.btnExit.Location.Y);
-                
-                footerY += vol;
-                footerLineY += vol;
+
+                accountX += volX;
+                this.btn_loginForm.Location = new Point( ( accountX + plusX ) , this.btn_loginForm.Location.Y );
+
+                footerY += volY;
+                footerLineY += volY;
                 this.pnlAppFooter.Location = new Point(this.pnlAppFooter.Location.X, footerY);
                 this.pnlAppFooterLine.Location = new Point(this.pnlAppFooterLine.Location.X, footerLineY);
 
-                page2X -= vol;
+                page2X -= volX;
                 this.pnlTrackInfo.Location = new Point(page2X, this.pnlTrackInfo.Location.Y);
 
                 await Task.Run(() => Thread.Sleep(10));
@@ -1462,6 +1478,7 @@ namespace trackID3TagSwitcher
             this.pnlPage1.Location          = new Point(MAIN_AREA_HIDE_X    , MAIN_AREA_Y);
             this.ClientSize                 = new Size( APP_BIG_WIDTH       , APP_BIG_HEIGHT);
             this.btnExit.Location           = new Point(EXIT_BIG_X          , EXIT_Y);
+            this.btn_loginForm.Location     = new Point(ACCOUNT_BIG_X       , EXIT_Y);
             this.pnlAppFooter.Location      = new Point(DESIGN_DEF_X        , FOOTER_BIG_Y);
             this.pnlAppFooterLine.Location  = new Point(DESIGN_DEF_X        , FOOTER_LINE_BIG_Y);
             this.pnlTrackInfo.Location      = new Point(DESIGN_DEF_X        , MAIN_AREA_Y);
@@ -1470,6 +1487,7 @@ namespace trackID3TagSwitcher
             /* レイアウトのロック解除 */
             this.pnlPage1.ResumeLayout();
             this.btnExit.ResumeLayout();
+            this.btn_loginForm.ResumeLayout();
             this.pnlAppFooter.ResumeLayout();
             this.pnlAppFooterLine.ResumeLayout();
             //this.lblAppTitle.Text = "(" + this.ClientSize.Width + " , " + this.ClientSize.Height + ")";
@@ -1483,30 +1501,36 @@ namespace trackID3TagSwitcher
             int footerLineY = FOOTER_LINE_BIG_Y;
             int footerY     = FOOTER_BIG_Y;
             int exitX       = EXIT_BIG_X;
-            int vol         = 12;
+            int accountX    = ACCOUNT_BIG_X;
+            int volX        = 12;
+            int volY        = 10;
             int page2X      = DESIGN_DEF_X;
-            int plusX       = 60;
+            int plusX       = 69;
 
             this.pnlPage1.SuspendLayout();
             this.btnExit.SuspendLayout();
+            this.btn_loginForm.SuspendLayout();
             this.pnlAppFooter.SuspendLayout();
             this.pnlAppFooterLine.SuspendLayout();
             for (int i = st; i < ed; i += 20)
             {
                 this.pnlPage1.Location = new Point(i, this.pnlPage1.Location.Y);
 
-                size -= vol;
+                size -= volX;
                 this.ClientSize = new System.Drawing.Size( (size + plusX), size);
 
-                exitX -= vol;
+                exitX -= volX;
                 this.btnExit.Location = new Point((exitX + plusX), this.btnExit.Location.Y);
 
-                footerY -= vol;
-                footerLineY -= vol;
+                accountX -= volX;
+                this.btn_loginForm.Location = new Point( ( accountX + plusX ) , this.btn_loginForm.Location.Y );
+
+                footerY -= volY;
+                footerLineY -= volY;
                 this.pnlAppFooter.Location = new Point(this.pnlAppFooter.Location.X, footerY);
                 this.pnlAppFooterLine.Location = new Point(this.pnlAppFooterLine.Location.X, footerLineY);
 
-                page2X += vol;
+                page2X += volX;
                 this.pnlTrackInfo.Location = new Point(page2X, this.pnlTrackInfo.Location.Y);
 
                 await Task.Run(() => Thread.Sleep(10));
@@ -1516,6 +1540,7 @@ namespace trackID3TagSwitcher
             this.pnlPage1.Location          = new Point(DESIGN_DEF_X    , MAIN_AREA_Y);
             this.ClientSize                 = new Size( APP_WIDTH       , APP_HEIGHT);
             this.btnExit.Location           = new Point(EXIT_X          , EXIT_Y);
+            this.btn_loginForm.Location     = new Point(ACCOUNT_X       , EXIT_Y);
             this.pnlAppFooter.Location      = new Point(DESIGN_DEF_X    , FOOTER_Y);
             this.pnlAppFooterLine.Location  = new Point(DESIGN_DEF_X    , FOOTER_LINE_Y);
             this.pnlTrackInfo.Location      = new Point(SUB_AREA_HIDE_X , MAIN_AREA_Y);
@@ -1523,6 +1548,7 @@ namespace trackID3TagSwitcher
             
             this.pnlPage1.ResumeLayout();
             this.btnExit.ResumeLayout();
+            this.btn_loginForm.ResumeLayout();
             this.pnlAppFooter.ResumeLayout();
             this.pnlAppFooterLine.ResumeLayout();
         }
@@ -1899,6 +1925,229 @@ namespace trackID3TagSwitcher
 
         #endregion
 
+        #region 波形合成
+
+        private IWavePlayer waveOutDevice;
+        private WaveMixerStream32 mixer;
+        private string melodyOnly = "";
+        private string vocalOnly = "";
+        WaveFileReader[] reader = new WaveFileReader[2];
+        WaveOffsetStream[] offsetStream = new WaveOffsetStream[2];
+        WaveChannel32[] channelSteam = new WaveChannel32[2];
+
+        private void StartVocalPlus( )
+        {
+            /*
+             * coroutineExitButton = new Thread( new ThreadStart( OnFX_btn_Exit ) );
+            coroutineExitButton.Start( );
+            */
+        }
+
+
+        private async void button1_Click_1( object sender , EventArgs e )
+        {
+            //OpenFileDialogクラスのインスタンスを作成
+            OpenFileDialog ofd = new OpenFileDialog( );
+
+            //はじめのファイル名を指定する
+            //はじめに「ファイル名」で表示される文字列を指定する
+            ofd.FileName = "default.html";
+            //はじめに表示されるフォルダを指定する
+            //指定しない（空の文字列）の時は、現在のディレクトリが表示される
+            ofd.InitialDirectory = @"C:\";
+            //[ファイルの種類]に表示される選択肢を指定する
+            //指定しないとすべてのファイルが表示される
+            ofd.Filter = "HTMLファイル(*.html;*.htm)|*.html;*.htm|すべてのファイル(*.*)|*.*";
+            //[ファイルの種類]ではじめに選択されるものを指定する
+            //2番目の「すべてのファイル」が選択されているようにする
+            ofd.FilterIndex = 2;
+            //タイトルを設定する
+            ofd.Title = "開くファイルを選択してください";
+            //ダイアログボックスを閉じる前に現在のディレクトリを復元するようにする
+            ofd.RestoreDirectory = true;
+            //存在しないファイルの名前が指定されたとき警告を表示する
+            //デフォルトでTrueなので指定する必要はない
+            ofd.CheckFileExists = true;
+            //存在しないパスが指定されたとき警告を表示する
+            //デフォルトでTrueなので指定する必要はない
+            ofd.CheckPathExists = true;
+
+            //ダイアログを表示する
+            if ( ofd.ShowDialog( ) == DialogResult.OK )
+            {
+                //OKボタンがクリックされたとき、選択されたファイル名を表示する
+                melodyOnly = ofd.FileName;
+                MessageBox.Show( melodyOnly );
+            }
+
+            //ダイアログを表示する
+            if ( ofd.ShowDialog( ) == DialogResult.OK )
+            {
+                //OKボタンがクリックされたとき、選択されたファイル名を表示する
+                vocalOnly = ofd.FileName;
+                MessageBox.Show( vocalOnly );
+            }
+
+            if ( (melodyOnly.Length != 0) && ( vocalOnly.Length != 0 ) )
+                await Task.Run( ( ) => TestConvertMp3( ) );
+        }
+
+        private void TestConvertMp3( )
+        {
+
+            string dir = Path.GetDirectoryName( vocalOnly );
+            string fileNameNotExt = System.IO.Path.GetFileNameWithoutExtension( vocalOnly );
+
+            using ( var reader1 = new AudioFileReader( melodyOnly ) )
+            using ( var reader2 = new AudioFileReader( vocalOnly ) )
+            {
+                if ( File.Exists( dir + "/_resample" ) )
+                {
+                    File.Delete( dir + "/_resample" );
+                }
+                if ( File.Exists( dir + "/" + fileNameNotExt + "_mixed.mp3" ) )
+                {
+                    File.Delete( dir + "/" + fileNameNotExt + "_mixed.mp3" );
+                }
+
+                var mixer = new NAudio.Wave.SampleProviders.MixingSampleProvider( new[] { reader1 , reader2 } );
+                //WaveFileWriter.CreateWaveFile( dir + "/_resample" , mixer.ToWaveProvider( ) );
+                WaveFileWriter.CreateWaveFile16( dir + "/_resample" , mixer );
+                //WaveFileReader reader = new WaveFileReader( "myfile.wav" );
+
+                //WaveStream waveStream = WaveFormatConversionStream.CreatePcmStream( new Mp3FileReader( inputStream ) );
+                //byte[] bytes = new byte[waveStream.Length];
+                //SaveWaveToMp3( dir + "/" , "_resample" , fileNameNotExt + "_mixed.mp3" );
+                /* */
+                byte[] wav = File.ReadAllBytes( dir + "/_resample" );
+                byte[] mp3 = WavToMP3( wav );
+                System.IO.FileStream fs = new System.IO.FileStream( dir + "/" + fileNameNotExt + "_mixed.mp3" , System.IO.FileMode.Create , System.IO.FileAccess.Write );
+                fs.Write( mp3 , 0 , mp3.Length );
+                fs.Close( );
+
+                File.Delete( dir + "/_resample" );
+
+                MessageBox.Show( dir + "/" + fileNameNotExt + "_mixed.mp3" );
+            }
+        }
+
+        private void TwoWaveMix( )
+        {
+            //OpenFileDialogクラスのインスタンスを作成
+            OpenFileDialog ofd = new OpenFileDialog( );
+
+            //はじめのファイル名を指定する
+            //はじめに「ファイル名」で表示される文字列を指定する
+            ofd.FileName = "default.html";
+            //はじめに表示されるフォルダを指定する
+            //指定しない（空の文字列）の時は、現在のディレクトリが表示される
+            ofd.InitialDirectory = @"C:\";
+            //[ファイルの種類]に表示される選択肢を指定する
+            //指定しないとすべてのファイルが表示される
+            ofd.Filter = "HTMLファイル(*.html;*.htm)|*.html;*.htm|すべてのファイル(*.*)|*.*";
+            //[ファイルの種類]ではじめに選択されるものを指定する
+            //2番目の「すべてのファイル」が選択されているようにする
+            ofd.FilterIndex = 2;
+            //タイトルを設定する
+            ofd.Title = "開くファイルを選択してください";
+            //ダイアログボックスを閉じる前に現在のディレクトリを復元するようにする
+            ofd.RestoreDirectory = true;
+            //存在しないファイルの名前が指定されたとき警告を表示する
+            //デフォルトでTrueなので指定する必要はない
+            ofd.CheckFileExists = true;
+            //存在しないパスが指定されたとき警告を表示する
+            //デフォルトでTrueなので指定する必要はない
+            ofd.CheckPathExists = true;
+
+            //ダイアログを表示する
+            if ( ofd.ShowDialog( ) == DialogResult.OK )
+            {
+                //OKボタンがクリックされたとき、選択されたファイル名を表示する
+                melodyOnly = ofd.FileName;
+            }
+
+            //ダイアログを表示する
+            if ( ofd.ShowDialog( ) == DialogResult.OK )
+            {
+                //OKボタンがクリックされたとき、選択されたファイル名を表示する
+                vocalOnly = ofd.FileName;
+            }
+
+            //Setup the Mixer
+            mixer = new WaveMixerStream32( );
+
+            mixer.AutoStop = false;
+
+            if ( waveOutDevice == null )
+
+            {
+                waveOutDevice = new AsioOut( );
+
+                waveOutDevice.Init( mixer );
+                waveOutDevice.Play( );
+
+            }
+
+            reader[0] = new WaveFileReader( melodyOnly );
+            offsetStream[0] = new WaveOffsetStream( reader[0] );
+            channelSteam[0] = new WaveChannel32( offsetStream[0] );
+
+            reader[1] = new WaveFileReader( vocalOnly );
+            offsetStream[1] = new WaveOffsetStream( reader[1] );
+            channelSteam[1] = new WaveChannel32( offsetStream[1] );
+
+            // You only need to do this once per stream
+
+            mixer.AddInputStream( channelSteam[0] );
+            mixer.AddInputStream( channelSteam[1] );
+
+            // sampleLoaded[position] = openFileDialog.FileName;
+        }
+
+        private void SaveWaveToMp3( string dir , string wav , string mp3 )
+        {
+            var inputFile = new MediaFile { Filename = dir + wav };
+            var outputFile = new MediaFile { Filename = dir + mp3 };
+            MediaToolkit.Options.ConversionOptions opt = new MediaToolkit.Options.ConversionOptions( );
+            opt.AudioSampleRate = MediaToolkit.Options.AudioSampleRate.Hz48000;
+
+            using ( var engine = new Engine( ) )
+            {
+                engine.Convert( inputFile , outputFile , opt );
+            }
+        }
+
+        public static Byte[] WavToMP3( byte[] wavFile )
+        {
+            using ( MemoryStream source = new MemoryStream( wavFile ) )
+            using ( NAudio.Wave.WaveFileReader rdr = new NAudio.Wave.WaveFileReader( source ) )
+            {
+                WaveLib.WaveFormat fmt = new WaveLib.WaveFormat( rdr.WaveFormat.SampleRate , rdr.WaveFormat.BitsPerSample , rdr.WaveFormat.Channels );
+
+                // convert to MP3 at 96kbit/sec...
+                Yeti.Lame.BE_CONFIG conf = new Yeti.Lame.BE_CONFIG( fmt , /* ((uint)fmt.wBitsPerSample * 10) */ 320 );
+
+                // Allocate a 1-second buffer
+                int blen = rdr.WaveFormat.AverageBytesPerSecond;
+                byte[] buffer = new byte[blen];
+
+                // Do conversion
+                using ( MemoryStream output = new MemoryStream( ) )
+                {
+                    Yeti.MMedia.Mp3.Mp3Writer mp3 = new Yeti.MMedia.Mp3.Mp3Writer( output , fmt , conf );
+
+                    int readCount;
+                    while ( ( readCount = rdr.Read( buffer , 0 , blen ) ) > 0 )
+                        mp3.Write( buffer , 0 , readCount );
+                    mp3.Close( );
+
+                    return output.ToArray( );
+                }
+            }
+        }
+
+        #endregion
+
         private void loginSetting_Click( object sender , EventArgs e )
         {
             if ( loginForm.IsDisposed )
@@ -1907,5 +2156,51 @@ namespace trackID3TagSwitcher
             }
             loginForm.Show( );
         }
+
+        /*
+        private void OnFX_btn_Exit( )
+        {
+            int r = RGB_MAX;
+            int g = RGB_MAX;
+            int b = RGB_MAX;
+
+            bool r_r = false;
+            bool g_r = false;
+            bool b_r = false;
+
+            while ( true )
+            {
+                if ( !this.isEnterExitBtn )
+                {
+                    if ( (RGB_MIN < r) && (r < RGB_MAX ) )
+                    {
+                        if ( !r_r )
+                            r -= 1;
+                        else
+                            r += 1;
+
+                        if ( r <= RGB_MIN )
+                        {
+                            r = RGB_MIN;
+                            r_r = true;
+                        }
+                        else if ( RGB_MAX <= r )
+                        {
+                            r = RGB_MAX;
+                            r_r = true;
+                        }
+                    }
+                }
+                Invoke( new labelnaiyo( SetColor_btn_Exit ) , r );
+                Thread.Sleep( 1 );
+            }
+        }
+
+        delegate void labelnaiyo( int naiyo );
+        private void SetColor_btn_Exit( int r )
+        {
+            this.btn_Exit.Image
+        }
+        */
     }
 }

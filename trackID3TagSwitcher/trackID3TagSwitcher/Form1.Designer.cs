@@ -34,7 +34,7 @@
             this.btnLoadAlbum = new System.Windows.Forms.Button();
             this.btnSwitcher = new System.Windows.Forms.Button();
             this.pnlAppHeader = new System.Windows.Forms.Panel();
-            this.loginSetting = new System.Windows.Forms.Button();
+            this.btn_loginForm = new System.Windows.Forms.Button();
             this.btnExit = new System.Windows.Forms.Button();
             this.lblAppTitle = new System.Windows.Forms.Label();
             this.pnlAppHeaderLine = new System.Windows.Forms.Panel();
@@ -101,6 +101,7 @@
             this.boxEx1 = new System.Windows.Forms.TextBox();
             this.lblARNName = new System.Windows.Forms.Label();
             this.tipIsDot = new System.Windows.Forms.ToolTip(this.components);
+            this.button1 = new System.Windows.Forms.Button();
             this.pnlAppHeader.SuspendLayout();
             this.pnlAppFooter.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imgCurrentMode)).BeginInit();
@@ -145,7 +146,7 @@
             this.btnSwitcher.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSwitcher.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.btnSwitcher.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.btnSwitcher.Location = new System.Drawing.Point(213, 342);
+            this.btnSwitcher.Location = new System.Drawing.Point(213, 350);
             this.btnSwitcher.Name = "btnSwitcher";
             this.btnSwitcher.Size = new System.Drawing.Size(126, 35);
             this.btnSwitcher.TabIndex = 3;
@@ -157,7 +158,8 @@
             // pnlAppHeader
             // 
             this.pnlAppHeader.BackColor = System.Drawing.Color.SteelBlue;
-            this.pnlAppHeader.Controls.Add(this.loginSetting);
+            this.pnlAppHeader.Controls.Add(this.button1);
+            this.pnlAppHeader.Controls.Add(this.btn_loginForm);
             this.pnlAppHeader.Controls.Add(this.btnExit);
             this.pnlAppHeader.Controls.Add(this.lblAppTitle);
             this.pnlAppHeader.Location = new System.Drawing.Point(0, 0);
@@ -167,19 +169,19 @@
             this.pnlAppHeader.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PnlAppHeader_MouseDown);
             this.pnlAppHeader.MouseMove += new System.Windows.Forms.MouseEventHandler(this.PnlAppHeader_MouseMove);
             // 
-            // loginSetting
+            // btn_loginForm
             // 
-            this.loginSetting.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.loginSetting.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.loginSetting.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.loginSetting.ForeColor = System.Drawing.Color.Crimson;
-            this.loginSetting.Location = new System.Drawing.Point(330, 3);
-            this.loginSetting.Name = "loginSetting";
-            this.loginSetting.Size = new System.Drawing.Size(25, 25);
-            this.loginSetting.TabIndex = 10;
-            this.loginSetting.Text = "X";
-            this.loginSetting.UseVisualStyleBackColor = false;
-            this.loginSetting.Click += new System.EventHandler(this.loginSetting_Click);
+            this.btn_loginForm.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.btn_loginForm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_loginForm.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
+            this.btn_loginForm.ForeColor = System.Drawing.Color.MediumBlue;
+            this.btn_loginForm.Location = new System.Drawing.Point(280, 3);
+            this.btn_loginForm.Name = "btn_loginForm";
+            this.btn_loginForm.Size = new System.Drawing.Size(70, 25);
+            this.btn_loginForm.TabIndex = 10;
+            this.btn_loginForm.Text = "アカウント";
+            this.btn_loginForm.UseVisualStyleBackColor = false;
+            this.btn_loginForm.Click += new System.EventHandler(this.loginSetting_Click);
             // 
             // btnExit
             // 
@@ -445,7 +447,7 @@
             this.btnClearCache.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClearCache.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.btnClearCache.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.btnClearCache.Location = new System.Drawing.Point(345, 342);
+            this.btnClearCache.Location = new System.Drawing.Point(345, 350);
             this.btnClearCache.Name = "btnClearCache";
             this.btnClearCache.Size = new System.Drawing.Size(51, 35);
             this.btnClearCache.TabIndex = 25;
@@ -588,7 +590,7 @@
             this.isReplaceRegisterWord.CheckState = System.Windows.Forms.CheckState.Checked;
             this.isReplaceRegisterWord.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
             this.isReplaceRegisterWord.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.isReplaceRegisterWord.Location = new System.Drawing.Point(6, 358);
+            this.isReplaceRegisterWord.Location = new System.Drawing.Point(6, 368);
             this.isReplaceRegisterWord.Name = "isReplaceRegisterWord";
             this.isReplaceRegisterWord.Size = new System.Drawing.Size(191, 19);
             this.isReplaceRegisterWord.TabIndex = 35;
@@ -1060,6 +1062,20 @@
             this.tipIsDot.InitialDelay = 100;
             this.tipIsDot.ReshowDelay = 100;
             // 
+            // button1
+            // 
+            this.button1.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button1.ForeColor = System.Drawing.Color.Crimson;
+            this.button1.Location = new System.Drawing.Point(245, 3);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(29, 25);
+            this.button1.TabIndex = 11;
+            this.button1.Text = "X";
+            this.button1.UseVisualStyleBackColor = false;
+            this.button1.Click += new System.EventHandler(this.button1_Click_1);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1166,7 +1182,8 @@
         private System.Windows.Forms.CheckBox autoSearchFile;
         private System.Windows.Forms.Label lblTrackCount;
         private System.Windows.Forms.CheckBox isReplaceRegisterWord;
-        private System.Windows.Forms.Button loginSetting;
+        private System.Windows.Forms.Button btn_loginForm;
+        private System.Windows.Forms.Button button1;
     }
 }
 
