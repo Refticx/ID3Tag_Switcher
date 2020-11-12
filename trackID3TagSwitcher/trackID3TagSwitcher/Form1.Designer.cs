@@ -34,6 +34,7 @@
             this.btnLoadAlbum = new System.Windows.Forms.Button();
             this.btnSwitcher = new System.Windows.Forms.Button();
             this.pnlAppHeader = new System.Windows.Forms.Panel();
+            this.button1 = new System.Windows.Forms.Button();
             this.btn_loginForm = new System.Windows.Forms.Button();
             this.btnExit = new System.Windows.Forms.Button();
             this.lblAppTitle = new System.Windows.Forms.Label();
@@ -101,7 +102,7 @@
             this.boxEx1 = new System.Windows.Forms.TextBox();
             this.lblARNName = new System.Windows.Forms.Label();
             this.tipIsDot = new System.Windows.Forms.ToolTip(this.components);
-            this.button1 = new System.Windows.Forms.Button();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.pnlAppHeader.SuspendLayout();
             this.pnlAppFooter.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imgCurrentMode)).BeginInit();
@@ -168,6 +169,20 @@
             this.pnlAppHeader.TabIndex = 7;
             this.pnlAppHeader.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PnlAppHeader_MouseDown);
             this.pnlAppHeader.MouseMove += new System.Windows.Forms.MouseEventHandler(this.PnlAppHeader_MouseMove);
+            // 
+            // button1
+            // 
+            this.button1.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button1.ForeColor = System.Drawing.Color.Crimson;
+            this.button1.Location = new System.Drawing.Point(245, 3);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(29, 25);
+            this.button1.TabIndex = 11;
+            this.button1.Text = "X";
+            this.button1.UseVisualStyleBackColor = false;
+            this.button1.Click += new System.EventHandler(this.button1_Click_1);
             // 
             // btn_loginForm
             // 
@@ -550,6 +565,7 @@
             // pnlPage1
             // 
             this.pnlPage1.BackColor = System.Drawing.Color.MidnightBlue;
+            this.pnlPage1.Controls.Add(this.checkBox1);
             this.pnlPage1.Controls.Add(this.isReplaceRegisterWord);
             this.pnlPage1.Controls.Add(this.lblTrackCount);
             this.pnlPage1.Controls.Add(this.autoSearchFile);
@@ -1062,19 +1078,20 @@
             this.tipIsDot.InitialDelay = 100;
             this.tipIsDot.ReshowDelay = 100;
             // 
-            // button1
+            // checkBox1
             // 
-            this.button1.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button1.ForeColor = System.Drawing.Color.Crimson;
-            this.button1.Location = new System.Drawing.Point(245, 3);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(29, 25);
-            this.button1.TabIndex = 11;
-            this.button1.Text = "X";
-            this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.button1_Click_1);
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Checked = true;
+            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
+            this.checkBox1.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.checkBox1.Location = new System.Drawing.Point(6, 343);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(191, 19);
+            this.checkBox1.TabIndex = 36;
+            this.checkBox1.Text = "使用不可能な文字は毎回確認";
+            this.tipIsDot.SetToolTip(this.checkBox1, "有効にすると、変換時に「/ * ?」などのシステム予約文字が含まれている場合は毎回置き換え方法を確認します。\r\n無効の場合は、確認を取らず空白に置き換えます。");
+            this.checkBox1.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -1184,6 +1201,7 @@
         private System.Windows.Forms.CheckBox isReplaceRegisterWord;
         private System.Windows.Forms.Button btn_loginForm;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
 

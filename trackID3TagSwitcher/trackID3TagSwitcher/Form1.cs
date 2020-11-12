@@ -12,8 +12,11 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Threading;
 using System.Net;
 using NAudio.Wave;
+using NAudio.Flac;
 using MediaToolkit.Model;
 using MediaToolkit;
+using CUETools.Codecs;
+using CUETools.Codecs.FLAKE;
 
 namespace trackID3TagSwitcher
 {
@@ -1927,7 +1930,7 @@ namespace trackID3TagSwitcher
 
         #region 波形合成
 
-        private IWavePlayer waveOutDevice;
+        private NAudio.Wave.IWavePlayer waveOutDevice;
         private WaveMixerStream32 mixer;
         private string melodyOnly = "";
         private string vocalOnly = "";
@@ -1989,14 +1992,31 @@ namespace trackID3TagSwitcher
             }
 
             if ( (melodyOnly.Length != 0) && ( vocalOnly.Length != 0 ) )
-                await Task.Run( ( ) => TestConvertMp3( ) );
+                await Task.Run( ( ) => TestConvertFlac( ) );
         }
 
-        private void TestConvertMp3( )
+        private void TestConvertFlac( )
         {
 
             string dir = Path.GetDirectoryName( vocalOnly );
             string fileNameNotExt = System.IO.Path.GetFileNameWithoutExtension( vocalOnly );
+
+            using ( var rd1 = new FlacReader( melodyOnly ) )
+            using ( var rd2 = new FlacReader( vocalOnly ) )
+            {
+                if ( File.Exists( dir + "/_resample" ) )
+                {
+                    File.Delete( dir + "/_resample" );
+                }
+                if ( File.Exists( dir + "/" + fileNameNotExt + "_mixed.flac" ) )
+                {
+                    File.Delete( dir + "/" + fileNameNotExt + "_mixed.flac" );
+                }
+
+                var mixer = new NAudio.Wave.SampleProviders.MixingSampleProvider( new[] { rd1 , rd2 } );
+                WaveFileWriter.CreateWaveFile16( dir + "/_resample" , mixer );
+            }
+
 
             using ( var reader1 = new AudioFileReader( melodyOnly ) )
             using ( var reader2 = new AudioFileReader( vocalOnly ) )
@@ -2005,9 +2025,9 @@ namespace trackID3TagSwitcher
                 {
                     File.Delete( dir + "/_resample" );
                 }
-                if ( File.Exists( dir + "/" + fileNameNotExt + "_mixed.mp3" ) )
+                if ( File.Exists( dir + "/" + fileNameNotExt + "_mixed.flac" ) )
                 {
-                    File.Delete( dir + "/" + fileNameNotExt + "_mixed.mp3" );
+                    File.Delete( dir + "/" + fileNameNotExt + "_mixed.flac" );
                 }
 
                 var mixer = new NAudio.Wave.SampleProviders.MixingSampleProvider( new[] { reader1 , reader2 } );
@@ -2017,17 +2037,33 @@ namespace trackID3TagSwitcher
 
                 //WaveStream waveStream = WaveFormatConversionStream.CreatePcmStream( new Mp3FileReader( inputStream ) );
                 //byte[] bytes = new byte[waveStream.Length];
-                //SaveWaveToMp3( dir + "/" , "_resample" , fileNameNotExt + "_mixed.mp3" );
+                // SaveWaveToMp3( dir + "/" , "_resample" , fileNameNotExt + "_mixed.flac" );
                 /* */
-                byte[] wav = File.ReadAllBytes( dir + "/_resample" );
-                byte[] mp3 = WavToMP3( wav );
+                //byte[] wav = File.ReadAllBytes( dir + "/_resample" );
+                /*byte[] mp3 = WavToMP3( wav );
                 System.IO.FileStream fs = new System.IO.FileStream( dir + "/" + fileNameNotExt + "_mixed.mp3" , System.IO.FileMode.Create , System.IO.FileAccess.Write );
                 fs.Write( mp3 , 0 , mp3.Length );
+                fs.Close( );*/
+
+                //WaveFileReader wavFile = new WaveFileReader( dir + "/_resample" );
+                System.IO.FileStream fs = new System.IO.FileStream( dir + "/_resample" , System.IO.FileMode.Open , System.IO.FileAccess.ReadWrite );
+                IAudioSource audioSource = new WAVReader( null , fs );
+                AudioBuffer buff = new AudioBuffer( audioSource , 0x10000 );
+                FlakeWriter fw = new FlakeWriter( dir + "/" + fileNameNotExt + "_mixed.flac" , audioSource.PCM );
+                
+                fw.CompressionLevel = 8;
+                while ( audioSource.Read( buff , -1 ) != 0 )
+                {
+                    fw.Write( buff );
+                }
+                fw.Close( );
+                fw.Dispose( );
                 fs.Close( );
+                fs.Dispose( );
 
                 File.Delete( dir + "/_resample" );
 
-                MessageBox.Show( dir + "/" + fileNameNotExt + "_mixed.mp3" );
+                MessageBox.Show( dir + "/" + fileNameNotExt + "_mixed.flac" );
             }
         }
 
@@ -2113,7 +2149,7 @@ namespace trackID3TagSwitcher
 
             using ( var engine = new Engine( ) )
             {
-                engine.Convert( inputFile , outputFile , opt );
+                engine.Convert( inputFile , outputFile /* , opt */ );
             }
         }
 
