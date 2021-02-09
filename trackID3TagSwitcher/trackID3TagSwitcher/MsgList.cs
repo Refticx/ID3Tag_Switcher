@@ -46,6 +46,8 @@ namespace trackID3TagSwitcher
             Select_Replace_Way,
             Target_Word,
 
+            Not_Load_Album_Number,
+
             /* ========== ここからLogin Form用 ========== */
 
             Not_Connect_Network,
@@ -53,7 +55,7 @@ namespace trackID3TagSwitcher
             Not_Get_ServerInfo,
             Not_Connect_Server,
             Irregular_Server_Setting,
-            Plz_Press_Reflesh,
+            Plz_Re_Download_App,
 
             Error_Get_Account_Info,
             Plz_Send_Error_To_Developer,
@@ -74,10 +76,13 @@ namespace trackID3TagSwitcher
             Cannot_Use_Password,
             Success_Login_noticeBar,
             Failed_Login_noticeBar,
+            Failed_Login_Already_Loggedin,
 
             Error_Get_MachineID,
             Plz_Tell_Case_To_Developer,
 
+            Progress_Try_Clear_Args,
+            Progress_Failed_Clear_Args,
             Progress_Try_Server_Connect,
             Progress_Failed_Server_Connect,
             Progress_Try_Get_Server_List,
@@ -91,12 +96,19 @@ namespace trackID3TagSwitcher
             Progress_Failed_Find_Account,
             Progress_Failed_Account_Password_Mismatch,
             Progress_Failed_Account_Device_Mismatch,
+            Progress_Try_Add_My_Info_To_Data_List,
+            Progress_Failed_Add_My_Info_To_Data_List,
             Progress_Try_Encrypt_Data_List,
             Progress_Failed_Encrypt_Data_List,
             Progress_Try_Delete_Server,
             Progress_Failed_Delete_Server,
             Progress_Try_Upload_Account,
             Progress_Failed_Upload_Account,
+            Progress_Try_Find_Login_Status,
+            Progress_Failed_Login_Status_Already_Hacked,
+            Progress_Failed_Login_Status,
+            Progress_Try_Add_My_Login_To_Data_List,
+            Progress_Failed_Add_My_Login_To_Data_List,
         }
 
         /// <summary>
@@ -120,7 +132,7 @@ namespace trackID3TagSwitcher
             "再度ファイルパスをご確認ください。",
             "楽曲が見つかりません。",
 
-            "想定外のエラーが発生しました。\r\n今後の本ソフトウェア安定性向上のため、製作者にスクリーンショットを添えてご報告お願いします。\r\n\r\n",
+            "想定外のエラーが発生しました。\r\n今後の本ソフトウェア安定性向上のため、製作者にスクリーンショットを添えてご報告お願いします。\r\n\r\n_______________\r\n",
             "変換中の音源ファイルを、他のアプリケーションが使用中のため、処理を続行できません。\r\nWindows Media PlayerやiTunesなど、アクセスしている可能性のあるアプリを閉じてから再度変換を行ってください。\r\n\r\n--以下Windowsエラーコード--\r\n",
 
             "取得されたアートワークの確認です。\r\n",
@@ -141,6 +153,8 @@ namespace trackID3TagSwitcher
             "ユーザー設定により空白か全角文字に置き換えられます。\r\n",
             "「はい」の場合は空白に、「いいえ」の場合は全角に置き換え実行します。\r\n\r\n",
             "対象文字：",
+
+            "アルバムナンバーを読み込めていません。\r\n再度アルバムをロードし直してください。\r\n",
             
             /* ========== ここからLogin Form用 ========== */
 
@@ -149,7 +163,7 @@ namespace trackID3TagSwitcher
             "サーバーの設定を確認できませんでした。\r\n",
             "サーバーに接続できませんでした。\r\n",
             "サーバー設定が間違っている可能性があります。\r\n",
-            "更新ボタンを押してください。\r\nもし症状が治らない場合は、アプリケーションをダウンロードし直してください。",
+            "もし症状が治らない場合は、アプリケーションをダウンロードし直してください。\r\n",
 
             "アカウント情報の取得中にエラーが発生しました。\r\n",
             "下記エラーコードをコピーし、本アプリの制作者にご送信お願いいたします。\r\n\r\n_______________\r\n",
@@ -165,15 +179,23 @@ namespace trackID3TagSwitcher
             "既にアカウント【　",
             "　】にログイン済みです。\r\n",
             "アカウントのログインに失敗しました\r\n",
-            "　】の登録、及びログインが完了しました。\r\n",
+            "　】の登録が完了しました。\r\n",
             "ユーザー名に使用できない文字が含まれています。\r\n",
             "パスワードに使用できない文字が含まれています。\r\n",
             "ログインしました\r\n",
             "ログインに失敗しました\r\n",
+            "このアカウントのサーバー上のログイン状態が一致しません。\r\n" + 
+                "アプリケーションの強制終了の履歴が確認できなかったため、アカウントのハッキングを受けた可能性があります。\r\n" +
+                "至急開発者にご連絡お願い致します。\r\n\r\n" + 
+                "_______________\r\n" +
+                "【連絡時に必要な情報】\r\n" + 
+                "・ユーザー名\r\n",
 
             "使用中のPC本体の情報の取得に失敗しました。\r\n",
             "このエラーが発生したことを本アプリの制作者にお問合せお願いいたします。\r\n",
 
+            "キャッシュを削除中…",
+            "キャッシュの削除に失敗",
             "サーバーに接続中…",
             "サーバーの接続に失敗",
             "サーバーデータを取得中…",
@@ -187,12 +209,19 @@ namespace trackID3TagSwitcher
             "アカウント情報の照会に失敗",
             "パスワードが一致しません",
             "登録したデバイスと一致しません",
+            "アカウント情報を挿入中…",
+            "アカウント情報の挿入に失敗",
             "データを暗号化しています…",
             "データの暗号化に失敗",
             "サーバーへ更新リクエストを送信中…",
             "サーバーのリクエスト送信に失敗",
             "アカウント情報をアップロード中…",
             "アカウント情報の反映に失敗",
+            "ログイン状態を取得中…",
+            "ログイン情報が一致しません",
+            "ログイン状態の取得に失敗",
+            "ログイン情報を挿入中…",
+            "ログイン情報の挿入に失敗",
         };
     }
 }
