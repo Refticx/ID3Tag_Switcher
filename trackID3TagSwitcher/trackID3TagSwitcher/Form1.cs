@@ -29,10 +29,21 @@ namespace trackID3TagSwitcher
 
         private const string APP_DOWNLOAD_URL = "https://chaoticbootstrage.wixsite.com/scene/id3-tool";     /* アプリ更新があった時に開かせるURL */
         private const string VERSION_INFO_URL = "https://chaoticbootstrage.wixsite.com/scene/idtool-ver";   /* アプリ更新があるかを確認するページ */
+        private const string ALBUM_LICENSE_URL = "https://chaoticbootstrage.wixsite.com/scene/idtool-ver";   /* 変換するアルバムのサウンドレイヤーの権限を確認するページ */
         private const string CURRENT_VERSION = "1.20";                                                       /* 現在のアプリのバージョン */
 
         /* マルチスレッド */
         private SynchronizationContext _mainContext;            /* asyncのサブスレッドからメインUIスレッドに処理を戻すための変数 */
+
+        /* アプリケーション終了状態 */
+        public enum ExitStatus
+        {
+            Launching,
+            Running,
+            Closing,
+            ForceClosed,
+        }
+        public static ExitStatus isExitStatus = ExitStatus.Launching;
 
         public enum ConvertExt
         {
@@ -97,10 +108,35 @@ namespace trackID3TagSwitcher
         /* 音源合成 */
         private Thread coroutineVocalPlus;     /* ボーカル合成用スレッド */
 
+        /* アルバムライセンサー */
+        private enum AlbumLicense
+        {
+            Non_License,
+            Need_License,
+        }
+        private Task<bool> m_coroutine_task_bool;
+        private Task<string> m_coroutine_task_str;
+        private bool m_coroutine_flag = false;
+        private string m_coroutine_text = String.Empty;
+        private WebClient m_webClient;
+        private Uri m_uriAsync;
+        private string m_serverContent = String.Empty;
+        private string m_startText = String.Empty;
+        private string m_endText = String.Empty;
+        private int m_startPos = 0;
+        private int m_endPos = 0;
+        private int m_length = 0;
+        private AlbumLicense m_currLicense;
+
+        /// <summary>
+        /// アカウントリストのページの暗号化の際の移動オフセット量
+        /// </summary>
+        private const int ENCRYPT_SHIFT_SIZE_LICENSE_PAGE = 4;
+
         private const int RGB_MAX = 255;
         private const int RGB_MIN = 0;
-        private bool isEnterExitBtn = false;    /* 閉じるボタンのカーソル状態 */
-        private Thread coroutineExitButton;     /* 閉じるボタンのアニメーションスレッド */
+        private bool isEnterExitBtn = false;
+        private Thread coroutineExitButton;
 
         #region 汎用型スクリプト
 
@@ -1011,6 +1047,9 @@ namespace trackID3TagSwitcher
 
             LoadSetting();
 
+            /* Exit StatusをRunningに変更するためセーブを掛ける */
+            SaveSetting( launch: true );
+
             /* 座標初期化 */
             this.pnlPage1.Location          = new Point(DESIGN_DEF_X, MAIN_AREA_Y);
             this.ClientSize                 = new Size(APP_WIDTH, APP_HEIGHT);
@@ -1028,11 +1067,32 @@ namespace trackID3TagSwitcher
             coroutineExitButton = new Thread( new ThreadStart( OnFX_btn_Exit ) );
             coroutineExitButton.Start( );
             */
+
+#if DEBUG
+            this.debugTextUI.Location = new System.Drawing.Point( 411 , 3 );
+            this.debugTextUI.Visible = true;
+#endif
         }
 
-        private void BtnExit_Click(object sender, EventArgs e)
+        private async void BtnExit_Click(object sender, EventArgs e)
         {
-            SaveSetting();
+            this.Hide( );
+
+            if ( AccountForm.isUnlockLicence )
+            {
+                Task<bool> m_coroutine_task;
+                if ( loginForm.IsDisposed )
+                {
+                    loginForm = new AccountForm( );
+                }
+                loginForm.Show( );
+                m_coroutine_task = loginForm.Logout( );
+                await m_coroutine_task;
+                loginForm.Close( );
+            }
+
+            SaveSetting( launch: false );
+
             this.Close();
         }
 
@@ -1108,6 +1168,23 @@ namespace trackID3TagSwitcher
                             this.isReplaceRegisterWord.Checked = false;
                         }
                     }
+                    target = "App_Exit:";
+                    if ( line.Contains( target ) )
+                    {
+                        if ( line.Contains( ExitStatus.Launching.ToString( ) ) )
+                        {
+                            isExitStatus = ExitStatus.Running;
+                        }
+                        else if ( line.Contains( ExitStatus.Closing.ToString( ) ) )
+                        {
+                            isExitStatus = ExitStatus.Running;
+                        }
+                        else if ( line.Contains( ExitStatus.Running.ToString( ) ) )
+                        {
+                            MessageBox.Show( "ForceClosed" );
+                            isExitStatus = ExitStatus.ForceClosed;
+                        }
+                    }
                     target = "Convert_Ext:";
                     if ( line.Contains( target ) )
                     {
@@ -1133,29 +1210,38 @@ namespace trackID3TagSwitcher
             }
             else
             {
-                SaveSetting( );
+                SaveSetting( launch: true );
             }
         }
 
-        private void SaveSetting( )
+        private void SaveSetting( bool launch )
         {
             string path = Application.StartupPath + "\\item\\config.cbl";
             string text = "";
 
             text = "Jacket_Name:" + this.boxArtworkName.Text + "\r\n";
             text += "Track_Folder:" + this.boxTrackFolder.Text + "\r\n";
+
             if ( this.chkIsDot.Checked)
                 text += "Is_Dot:" + "1\r\n";
             else
                 text += "Is_Dot:" + "0\r\n";
+
             if (this.autoSearchFile.Checked)
                 text += "Is_AutoSearch:" + "1\r\n";
             else
                 text += "Is_AutoSearch:" + "0\r\n";
+
             if (this.isReplaceRegisterWord.Checked)
                 text += "Is_ReplaceRegisterWord:" + "1\r\n";
             else
                 text += "Is_ReplaceRegisterWord:" + "0\r\n";
+
+            text += "App_Exit:";
+            if ( launch )
+                text += ExitStatus.Running.ToString( ) + "\r\n";
+            else
+                text += ExitStatus.Closing.ToString( ) + "\r\n";
 
             text += "Convert_Ext:";
             text += m_convertExt.ToString( ) + "\r\n";
@@ -2233,6 +2319,15 @@ namespace trackID3TagSwitcher
             }
             loginForm.Show( );
         }
+
+#if DEBUG
+        DebugText debugUI = new DebugText( );
+        private void debugTextUI_Click( object sender , EventArgs e )
+        {
+            debugUI.Show( );
+        }
+
+#endif
 
         /*
         private void OnFX_btn_Exit( )
