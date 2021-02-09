@@ -34,6 +34,13 @@ namespace trackID3TagSwitcher
         /* マルチスレッド */
         private SynchronizationContext _mainContext;            /* asyncのサブスレッドからメインUIスレッドに処理を戻すための変数 */
 
+        public enum ConvertExt
+        {
+            flac,
+            mp3,
+            wav,
+        }
+
         private string trackcbl = "";                           /* trackinfo.cblから読み込んだ文字列全体を格納する変数 */
         private string[,] TrackID3Tag;                          /* trackinfo.cblから読み込んだ各ID3 Tag情報を記憶する二次元配列 */
         private string currentAlbumReleaseTitle = "";           /* 現在読み込んでいるアルバムのリリースタイトル */
@@ -50,6 +57,7 @@ namespace trackID3TagSwitcher
         private AccountForm loginForm = new AccountForm( );     /* ログイン用フォームを作成しておく */
         private char[] invalidChars;                            /* 設定中の文字列内に、使用不可能な文字があるかチェックするための変数 */
         private string invalidReplase;                          /* 設定中の文字列内に、使用不可能な文字があっ他場合に、置き換えするための変数 */
+        private ConvertExt m_convertExt;                        /* タグ設定、サウンドレイヤー対象の音源の拡張子 */
 
         /* 配列参照時の要素数 */
         private const int ARN_NAME = 0;
@@ -154,6 +162,15 @@ namespace trackID3TagSwitcher
         #endregion
 
         #region アルバム読み込み
+
+        #region 対象拡張子変更
+
+        private void cmbbx_convertExt_SelectedIndexChanged( object sender , EventArgs e )
+        {
+            m_convertExt = (ConvertExt)this.cmbbx_convertExt.SelectedIndex;
+        }
+
+        #endregion
 
         #region 各読み込みスクリプト
 
@@ -353,11 +370,11 @@ namespace trackID3TagSwitcher
                     /* 指定ディレクトリ以下のファイルを総取得 */
                     string[] allFiles = System.IO.Directory.GetFiles(path, "*", System.IO.SearchOption.AllDirectories);
 
-                    /* mp3ファイルのみを取得 */
+                    /* ユーザー設定の拡張子のファイルのみを取得 */
                     string[] songs;
-                    songs = allFiles.Where(s => s.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase)).ToArray();
+                    songs = allFiles.Where(s => s.EndsWith("." + m_convertExt.ToString() , StringComparison.OrdinalIgnoreCase)).ToArray();
 
-                    /* mp3ファイルがあるかどうか */
+                    /* 音源ファイルがあるかどうか */
                     if (songs.Length != 0)
                     {
                         /* 格納先ディレクトリを取得 */
@@ -403,7 +420,7 @@ namespace trackID3TagSwitcher
                     }
 
                     DirectoryInfo di = new DirectoryInfo(this.tracksPath);
-                    FileInfo[] songs = di.GetFiles("*.mp3", SearchOption.AllDirectories);
+                    FileInfo[] songs = di.GetFiles( "." + m_convertExt.ToString( ) , SearchOption.AllDirectories);
 
                     /* mp3ファイルがあるかどうか */
                     if (songs.Length != 0)
@@ -610,7 +627,7 @@ namespace trackID3TagSwitcher
                     this.imgCurrentAlbumArtwork.Visible = false;
                 }
 
-                /* 一度曲保存先にあるmp3を全部取得し、何曲あるか確認する */
+                /* 一度曲保存先にある音源を全部取得し、何曲あるか確認する */
                 ret = GetMaxTrack( path);
                 if (!ret)
                 {
@@ -758,7 +775,7 @@ namespace trackID3TagSwitcher
 
             /* 楽曲をすべて取得し、名前順にソートする */
             DirectoryInfo di = new DirectoryInfo(this.tracksPath);
-            FileInfo[] files = di.GetFiles("*.mp3", SearchOption.AllDirectories);
+            FileInfo[] files = di.GetFiles("*." + m_convertExt.ToString() , SearchOption.AllDirectories);
             Array.Sort(files, (x, y) => StringComparer.OrdinalIgnoreCase.Compare(x.Name, y.Name));
 
             /*
@@ -810,7 +827,7 @@ namespace trackID3TagSwitcher
                 /* システム予約文字が含まれているかの確認 */
                 TrackID3Tag[track, nameNum] = CheckRegisterWord( TrackID3Tag[track, nameNum] );
                 
-                File.Move(f.FullName , f.DirectoryName + "\\" + num + TrackID3Tag[track, nameNum] + ".mp3" );
+                File.Move(f.FullName , f.DirectoryName + "\\" + num + TrackID3Tag[track, nameNum] + "." + m_convertExt.ToString( ) );
                 file.Dispose( );
                 track++;
 
@@ -1091,6 +1108,27 @@ namespace trackID3TagSwitcher
                             this.isReplaceRegisterWord.Checked = false;
                         }
                     }
+                    target = "Convert_Ext:";
+                    if ( line.Contains( target ) )
+                    {
+                        if ( line.Contains( ConvertExt.flac.ToString( ) ) )
+                        {
+                            m_convertExt = ConvertExt.flac;
+                        }
+                        else if ( line.Contains( ConvertExt.mp3.ToString( ) ) )
+                        {
+                            m_convertExt = ConvertExt.mp3;
+                        }
+                        else if ( line.Contains( ConvertExt.wav.ToString( ) ) )
+                        {
+                            m_convertExt = ConvertExt.wav;
+                        }
+                        else
+                        {
+                            m_convertExt = ConvertExt.flac;
+                        }
+                        this.cmbbx_convertExt.SelectedIndex = (int)m_convertExt;
+                    }
                 }
             }
             else
@@ -1118,6 +1156,9 @@ namespace trackID3TagSwitcher
                 text += "Is_ReplaceRegisterWord:" + "1\r\n";
             else
                 text += "Is_ReplaceRegisterWord:" + "0\r\n";
+
+            text += "Convert_Ext:";
+            text += m_convertExt.ToString( ) + "\r\n";
 
             StreamWriter sw = new StreamWriter(path, false);
             sw.Write(text);
@@ -1883,7 +1924,7 @@ namespace trackID3TagSwitcher
             {
                 if (i < 9) zero = "0";
                 else zero = "";
-                text += zero + (i + 1) + ". " + this.boxTracks[i, ARN_NAME].Text + ".mp3\r\n";
+                text += zero + (i + 1) + ". " + this.boxTracks[i, ARN_NAME].Text + "." + m_convertExt.ToString( ) + "\r\n";
             }
             text += "===============\r\n";
             text += "【FYS式表示名】\r\n";
@@ -1901,7 +1942,7 @@ namespace trackID3TagSwitcher
                 if (this.boxTracks[i, CUSTOM].Text != "")
                 {
                     /* カスタム名入っていたので()内に優先入力 */
-                    text += this.boxTracks[i, CUSTOM].Text + ").mp3\r\n";
+                    text += this.boxTracks[i, CUSTOM].Text + ")." + m_convertExt.ToString( ) + "\r\n";
                 }
                 else
                 {
@@ -1920,7 +1961,7 @@ namespace trackID3TagSwitcher
                     text += this.boxTracks[i, GENRE].Text;
 
                     /* Bootleg) */
-                    text += " " + this.boxLastWord.Text + ").mp3\r\n";
+                    text += " " + this.boxLastWord.Text + ")." + m_convertExt.ToString( ) + "\r\n";
                 }
             }
             MessageBox.Show(text, "【表示名の確認】");

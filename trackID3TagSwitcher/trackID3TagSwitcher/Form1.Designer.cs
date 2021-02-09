@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            this.debugTextUI = new System.Windows.Forms.Button();
             this.boxAlbumPath = new System.Windows.Forms.TextBox();
             this.btnLoadAlbum = new System.Windows.Forms.Button();
             this.btnSwitcher = new System.Windows.Forms.Button();
@@ -65,6 +66,8 @@
             this.chkIsDot = new System.Windows.Forms.CheckBox();
             this.btnOpenTrackInfoPage = new System.Windows.Forms.Button();
             this.pnlPage1 = new System.Windows.Forms.Panel();
+            this.cmbbx_convertExt = new System.Windows.Forms.ComboBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.isReplaceRegisterWord = new System.Windows.Forms.CheckBox();
             this.lblTrackCount = new System.Windows.Forms.Label();
             this.autoSearchFile = new System.Windows.Forms.CheckBox();
@@ -102,7 +105,6 @@
             this.boxEx1 = new System.Windows.Forms.TextBox();
             this.lblARNName = new System.Windows.Forms.Label();
             this.tipIsDot = new System.Windows.Forms.ToolTip(this.components);
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.pnlAppHeader.SuspendLayout();
             this.pnlAppFooter.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imgCurrentMode)).BeginInit();
@@ -111,6 +113,21 @@
             this.pnlPage1.SuspendLayout();
             this.pnlTrackInfo.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // debugTextUI
+            // 
+            this.debugTextUI.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.debugTextUI.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.debugTextUI.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.debugTextUI.ForeColor = System.Drawing.Color.DarkGreen;
+            this.debugTextUI.Location = new System.Drawing.Point(4110, 3);
+            this.debugTextUI.Name = "debugTextUI";
+            this.debugTextUI.Size = new System.Drawing.Size(29, 25);
+            this.debugTextUI.TabIndex = 12;
+            this.debugTextUI.Text = "DEBUG";
+            this.debugTextUI.UseVisualStyleBackColor = false;
+            this.debugTextUI.Visible = false;
+            this.debugTextUI.Click += new System.EventHandler(this.debugTextUI_Click);
             // 
             // boxAlbumPath
             // 
@@ -159,6 +176,7 @@
             // pnlAppHeader
             // 
             this.pnlAppHeader.BackColor = System.Drawing.Color.SteelBlue;
+            this.pnlAppHeader.Controls.Add(this.debugTextUI);
             this.pnlAppHeader.Controls.Add(this.button1);
             this.pnlAppHeader.Controls.Add(this.btn_loginForm);
             this.pnlAppHeader.Controls.Add(this.btnExit);
@@ -317,7 +335,7 @@
             this.lblNextTitle.BackColor = System.Drawing.Color.Transparent;
             this.lblNextTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.lblNextTitle.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblNextTitle.Location = new System.Drawing.Point(340, 215);
+            this.lblNextTitle.Location = new System.Drawing.Point(169, 215);
             this.lblNextTitle.Name = "lblNextTitle";
             this.lblNextTitle.Size = new System.Drawing.Size(46, 15);
             this.lblNextTitle.TabIndex = 14;
@@ -340,7 +358,7 @@
             // imgNextMode
             // 
             this.imgNextMode.BackColor = System.Drawing.Color.Transparent;
-            this.imgNextMode.Location = new System.Drawing.Point(311, 233);
+            this.imgNextMode.Location = new System.Drawing.Point(140, 233);
             this.imgNextMode.Name = "imgNextMode";
             this.imgNextMode.Size = new System.Drawing.Size(75, 75);
             this.imgNextMode.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -356,7 +374,7 @@
             this.lblCurrentText.ForeColor = System.Drawing.SystemColors.ButtonFace;
             this.lblCurrentText.Location = new System.Drawing.Point(3, 309);
             this.lblCurrentText.Name = "lblCurrentText";
-            this.lblCurrentText.Size = new System.Drawing.Size(138, 21);
+            this.lblCurrentText.Size = new System.Drawing.Size(78, 21);
             this.lblCurrentText.TabIndex = 17;
             this.lblCurrentText.Text = "arn";
             this.lblCurrentText.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -369,9 +387,9 @@
             this.lblNextText.BackColor = System.Drawing.Color.Transparent;
             this.lblNextText.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.lblNextText.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblNextText.Location = new System.Drawing.Point(246, 311);
+            this.lblNextText.Location = new System.Drawing.Point(140, 311);
             this.lblNextText.Name = "lblNextText";
-            this.lblNextText.Size = new System.Drawing.Size(140, 19);
+            this.lblNextText.Size = new System.Drawing.Size(75, 19);
             this.lblNextText.TabIndex = 18;
             this.lblNextText.Text = "fys";
             this.lblNextText.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -447,7 +465,7 @@
             this.lblArrow2.BackColor = System.Drawing.Color.Transparent;
             this.lblArrow2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.lblArrow2.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblArrow2.Location = new System.Drawing.Point(187, 261);
+            this.lblArrow2.Location = new System.Drawing.Point(100, 261);
             this.lblArrow2.Name = "lblArrow2";
             this.lblArrow2.Size = new System.Drawing.Size(20, 15);
             this.lblArrow2.TabIndex = 24;
@@ -565,6 +583,7 @@
             // pnlPage1
             // 
             this.pnlPage1.BackColor = System.Drawing.Color.MidnightBlue;
+            this.pnlPage1.Controls.Add(this.cmbbx_convertExt);
             this.pnlPage1.Controls.Add(this.checkBox1);
             this.pnlPage1.Controls.Add(this.isReplaceRegisterWord);
             this.pnlPage1.Controls.Add(this.lblTrackCount);
@@ -592,12 +611,40 @@
             this.pnlPage1.Controls.Add(this.imgCurrentAlbumArtwork);
             this.pnlPage1.Controls.Add(this.lblTrackFolder);
             this.pnlPage1.Controls.Add(this.pnlAppLine1);
-            this.pnlPage1.Location = new System.Drawing.Point(294, 100);
+            this.pnlPage1.Location = new System.Drawing.Point(23, 21);
             this.pnlPage1.Name = "pnlPage1";
-            this.pnlPage1.Size = new System.Drawing.Size(400, 400);
+            this.pnlPage1.Size = new System.Drawing.Size(550, 600);
             this.pnlPage1.TabIndex = 33;
             this.pnlPage1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnlPage1_MouseDown);
             this.pnlPage1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnlPage1_MouseMove);
+            // 
+            // cmbbx_convertExt
+            // 
+            this.cmbbx_convertExt.FormattingEnabled = true;
+            this.cmbbx_convertExt.Items.AddRange(new object[] {
+            "flac",
+            "mp3",
+            "wav"});
+            this.cmbbx_convertExt.Location = new System.Drawing.Point(285, 233);
+            this.cmbbx_convertExt.Name = "cmbbx_convertExt";
+            this.cmbbx_convertExt.Size = new System.Drawing.Size(64, 20);
+            this.cmbbx_convertExt.TabIndex = 37;
+            this.cmbbx_convertExt.SelectedIndexChanged += new System.EventHandler(this.cmbbx_convertExt_SelectedIndexChanged);
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Checked = true;
+            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
+            this.checkBox1.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.checkBox1.Location = new System.Drawing.Point(6, 343);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(191, 19);
+            this.checkBox1.TabIndex = 36;
+            this.checkBox1.Text = "使用不可能な文字は毎回確認";
+            this.tipIsDot.SetToolTip(this.checkBox1, "有効にすると、変換時に「/ * ?」などのシステム予約文字が含まれている場合は毎回置き換え方法を確認します。\r\n無効の場合は、確認を取らず空白に置き換えます。");
+            this.checkBox1.UseVisualStyleBackColor = true;
             // 
             // isReplaceRegisterWord
             // 
@@ -651,6 +698,7 @@
             this.pnlTrackInfo.Controls.Add(this.lblCustom);
             this.pnlTrackInfo.Controls.Add(this.chkIsDot);
             this.pnlTrackInfo.Controls.Add(this.boxEx9);
+            this.pnlTrackInfo.Controls.Add(this.pnlPage1);
             this.pnlTrackInfo.Controls.Add(this.boxLastWord);
             this.pnlTrackInfo.Controls.Add(this.label1);
             this.pnlTrackInfo.Controls.Add(this.chkIsXXs);
@@ -1078,21 +1126,6 @@
             this.tipIsDot.InitialDelay = 100;
             this.tipIsDot.ReshowDelay = 100;
             // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Checked = true;
-            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.checkBox1.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.checkBox1.Location = new System.Drawing.Point(6, 343);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(191, 19);
-            this.checkBox1.TabIndex = 36;
-            this.checkBox1.Text = "使用不可能な文字は毎回確認";
-            this.tipIsDot.SetToolTip(this.checkBox1, "有効にすると、変換時に「/ * ?」などのシステム予約文字が含まれている場合は毎回置き換え方法を確認します。\r\n無効の場合は、確認を取らず空白に置き換えます。");
-            this.checkBox1.UseVisualStyleBackColor = true;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1103,7 +1136,6 @@
             this.Controls.Add(this.pnlAppFooter);
             this.Controls.Add(this.pnlAppHeaderLine);
             this.Controls.Add(this.pnlAppHeader);
-            this.Controls.Add(this.pnlPage1);
             this.Controls.Add(this.pnlTrackInfo);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -1127,7 +1159,7 @@
 
         }
 
-        #endregion
+#endregion
 
         private System.Windows.Forms.TextBox boxAlbumPath;
         private System.Windows.Forms.Button btnLoadAlbum;
@@ -1202,6 +1234,10 @@
         private System.Windows.Forms.Button btn_loginForm;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.ComboBox cmbbx_convertExt;
+#if DEBUG
+        private System.Windows.Forms.Button debugTextUI;
+#endif
     }
 }
 
