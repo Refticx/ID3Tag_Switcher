@@ -30,30 +30,27 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.debugTextUI = new System.Windows.Forms.Button();
             this.boxAlbumPath = new System.Windows.Forms.TextBox();
             this.btnLoadAlbum = new System.Windows.Forms.Button();
             this.btnSwitcher = new System.Windows.Forms.Button();
             this.pnlAppHeader = new System.Windows.Forms.Panel();
-            this.button1 = new System.Windows.Forms.Button();
-            this.btn_loginForm = new System.Windows.Forms.Button();
+            this.img_btn_setting = new System.Windows.Forms.PictureBox();
+            this.img_btn_account = new System.Windows.Forms.PictureBox();
             this.btnExit = new System.Windows.Forms.Button();
             this.lblAppTitle = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
             this.pnlAppHeaderLine = new System.Windows.Forms.Panel();
             this.pnlAppFooter = new System.Windows.Forms.Panel();
             this.lblAppLogText = new System.Windows.Forms.Label();
             this.lblAppLogTitle = new System.Windows.Forms.Label();
             this.pnlAppFooterLine = new System.Windows.Forms.Panel();
             this.lblAlbumTitle = new System.Windows.Forms.Label();
-            this.lblCurrentTitle = new System.Windows.Forms.Label();
-            this.lblNextTitle = new System.Windows.Forms.Label();
-            this.imgCurrentMode = new System.Windows.Forms.PictureBox();
-            this.imgNextMode = new System.Windows.Forms.PictureBox();
+            this.lbl_currTagType = new System.Windows.Forms.Label();
+            this.lbl_currWavesType = new System.Windows.Forms.Label();
             this.lblCurrentText = new System.Windows.Forms.Label();
             this.lblNextText = new System.Windows.Forms.Label();
             this.pnlAppLine1 = new System.Windows.Forms.Panel();
             this.pnlAppLine2 = new System.Windows.Forms.Panel();
-            this.imgCurrentAlbumArtwork = new System.Windows.Forms.PictureBox();
             this.lblID3TagTitle = new System.Windows.Forms.Label();
             this.lblID3TagNumber = new System.Windows.Forms.Label();
             this.lblArrow2 = new System.Windows.Forms.Label();
@@ -66,11 +63,31 @@
             this.chkIsDot = new System.Windows.Forms.CheckBox();
             this.btnOpenTrackInfoPage = new System.Windows.Forms.Button();
             this.pnlPage1 = new System.Windows.Forms.Panel();
-            this.cmbbx_convertExt = new System.Windows.Forms.ComboBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.pnl_settings = new System.Windows.Forms.Panel();
+            this.lbl_title_settings_execConv = new System.Windows.Forms.Label();
+            this.lbl_opt_settings_albumSearch_ext = new System.Windows.Forms.Label();
+            this.pnl_line_setting_albumSearch = new System.Windows.Forms.Panel();
+            this.lbl_title_settings_albumSearch = new System.Windows.Forms.Label();
+            this.lbl_title_header_settings = new System.Windows.Forms.Label();
+            this.pnl_line_setting_header = new System.Windows.Forms.Panel();
             this.isReplaceRegisterWord = new System.Windows.Forms.CheckBox();
-            this.lblTrackCount = new System.Windows.Forms.Label();
             this.autoSearchFile = new System.Windows.Forms.CheckBox();
+            this.cmbbx_convertExt = new System.Windows.Forms.ComboBox();
+            this.pnl_albumSearch = new System.Windows.Forms.Panel();
+            this.lbl_title_albumSearch = new System.Windows.Forms.Label();
+            this.pnl_execConvert = new System.Windows.Forms.Panel();
+            this.lbl_title_execConvert = new System.Windows.Forms.Label();
+            this.pnl_AppLine4 = new System.Windows.Forms.Panel();
+            this.pnl_currLoadInfo = new System.Windows.Forms.Panel();
+            this.lbl_title_currLoadInfo = new System.Windows.Forms.Label();
+            this.imgCurrentAlbumArtwork = new System.Windows.Forms.PictureBox();
+            this.lblTrackCount = new System.Windows.Forms.Label();
+            this.pnl_currTagType = new System.Windows.Forms.Panel();
+            this.lbl_title_currTagType = new System.Windows.Forms.Label();
+            this.btn_loginForm = new System.Windows.Forms.Button();
+            this.pnl_AppLine3 = new System.Windows.Forms.Panel();
+            this.imgCurrentMode = new System.Windows.Forms.PictureBox();
+            this.imgNextMode = new System.Windows.Forms.PictureBox();
             this.pnlTrackInfo = new System.Windows.Forms.Panel();
             this.btnShowCurrentTrackName = new System.Windows.Forms.Button();
             this.lblCustom = new System.Windows.Forms.Label();
@@ -106,37 +123,29 @@
             this.lblARNName = new System.Windows.Forms.Label();
             this.tipIsDot = new System.Windows.Forms.ToolTip(this.components);
             this.pnlAppHeader.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.img_btn_setting)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.img_btn_account)).BeginInit();
             this.pnlAppFooter.SuspendLayout();
+            this.pnlPage1.SuspendLayout();
+            this.pnl_settings.SuspendLayout();
+            this.pnl_albumSearch.SuspendLayout();
+            this.pnl_execConvert.SuspendLayout();
+            this.pnl_currLoadInfo.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.imgCurrentAlbumArtwork)).BeginInit();
+            this.pnl_currTagType.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imgCurrentMode)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imgNextMode)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.imgCurrentAlbumArtwork)).BeginInit();
-            this.pnlPage1.SuspendLayout();
             this.pnlTrackInfo.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // debugTextUI
-            // 
-            this.debugTextUI.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.debugTextUI.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.debugTextUI.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.debugTextUI.ForeColor = System.Drawing.Color.DarkGreen;
-            this.debugTextUI.Location = new System.Drawing.Point(4110, 3);
-            this.debugTextUI.Name = "debugTextUI";
-            this.debugTextUI.Size = new System.Drawing.Size(29, 25);
-            this.debugTextUI.TabIndex = 12;
-            this.debugTextUI.Text = "DEBUG";
-            this.debugTextUI.UseVisualStyleBackColor = false;
-            this.debugTextUI.Visible = false;
-            this.debugTextUI.Click += new System.EventHandler(this.debugTextUI_Click);
             // 
             // boxAlbumPath
             // 
             this.boxAlbumPath.Enabled = false;
             this.boxAlbumPath.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.boxAlbumPath.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.boxAlbumPath.Location = new System.Drawing.Point(80, 54);
+            this.boxAlbumPath.Location = new System.Drawing.Point(100, 97);
             this.boxAlbumPath.Name = "boxAlbumPath";
-            this.boxAlbumPath.Size = new System.Drawing.Size(234, 21);
+            this.boxAlbumPath.Size = new System.Drawing.Size(270, 21);
             this.boxAlbumPath.TabIndex = 0;
             // 
             // btnLoadAlbum
@@ -146,9 +155,9 @@
             this.btnLoadAlbum.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLoadAlbum.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
             this.btnLoadAlbum.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.btnLoadAlbum.Location = new System.Drawing.Point(330, 52);
+            this.btnLoadAlbum.Location = new System.Drawing.Point(440, 83);
             this.btnLoadAlbum.Name = "btnLoadAlbum";
-            this.btnLoadAlbum.Size = new System.Drawing.Size(66, 25);
+            this.btnLoadAlbum.Size = new System.Drawing.Size(100, 35);
             this.btnLoadAlbum.TabIndex = 2;
             this.btnLoadAlbum.Text = "読み込む";
             this.tipIsDot.SetToolTip(this.btnLoadAlbum, "ここに直接アルバムのドラッグ&ドロップも可能です。");
@@ -164,9 +173,9 @@
             this.btnSwitcher.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSwitcher.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.btnSwitcher.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.btnSwitcher.Location = new System.Drawing.Point(213, 350);
+            this.btnSwitcher.Location = new System.Drawing.Point(133, 49);
             this.btnSwitcher.Name = "btnSwitcher";
-            this.btnSwitcher.Size = new System.Drawing.Size(126, 35);
+            this.btnSwitcher.Size = new System.Drawing.Size(140, 35);
             this.btnSwitcher.TabIndex = 3;
             this.btnSwitcher.Text = "変換";
             this.tipIsDot.SetToolTip(this.btnSwitcher, "trackinfo.cblの情報に基づいて、ARN形式かFYS形式に変換します。");
@@ -176,9 +185,8 @@
             // pnlAppHeader
             // 
             this.pnlAppHeader.BackColor = System.Drawing.Color.SteelBlue;
-            this.pnlAppHeader.Controls.Add(this.debugTextUI);
-            this.pnlAppHeader.Controls.Add(this.button1);
-            this.pnlAppHeader.Controls.Add(this.btn_loginForm);
+            this.pnlAppHeader.Controls.Add(this.img_btn_setting);
+            this.pnlAppHeader.Controls.Add(this.img_btn_account);
             this.pnlAppHeader.Controls.Add(this.btnExit);
             this.pnlAppHeader.Controls.Add(this.lblAppTitle);
             this.pnlAppHeader.Location = new System.Drawing.Point(0, 0);
@@ -188,33 +196,29 @@
             this.pnlAppHeader.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PnlAppHeader_MouseDown);
             this.pnlAppHeader.MouseMove += new System.Windows.Forms.MouseEventHandler(this.PnlAppHeader_MouseMove);
             // 
-            // button1
+            // img_btn_setting
             // 
-            this.button1.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button1.ForeColor = System.Drawing.Color.Crimson;
-            this.button1.Location = new System.Drawing.Point(245, 3);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(29, 25);
-            this.button1.TabIndex = 11;
-            this.button1.Text = "X";
-            this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.button1_Click_1);
+            this.img_btn_setting.BackColor = System.Drawing.Color.Transparent;
+            this.img_btn_setting.Image = global::trackID3TagSwitcher.Properties.Resources.icon_setting;
+            this.img_btn_setting.Location = new System.Drawing.Point(440, 3);
+            this.img_btn_setting.Name = "img_btn_setting";
+            this.img_btn_setting.Size = new System.Drawing.Size(25, 25);
+            this.img_btn_setting.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.img_btn_setting.TabIndex = 36;
+            this.img_btn_setting.TabStop = false;
+            this.img_btn_setting.Click += new System.EventHandler(this.img_btn_setting_Click);
             // 
-            // btn_loginForm
+            // img_btn_account
             // 
-            this.btn_loginForm.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.btn_loginForm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_loginForm.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.btn_loginForm.ForeColor = System.Drawing.Color.MediumBlue;
-            this.btn_loginForm.Location = new System.Drawing.Point(280, 3);
-            this.btn_loginForm.Name = "btn_loginForm";
-            this.btn_loginForm.Size = new System.Drawing.Size(70, 25);
-            this.btn_loginForm.TabIndex = 10;
-            this.btn_loginForm.Text = "アカウント";
-            this.btn_loginForm.UseVisualStyleBackColor = false;
-            this.btn_loginForm.Click += new System.EventHandler(this.loginSetting_Click);
+            this.img_btn_account.BackColor = System.Drawing.Color.Transparent;
+            this.img_btn_account.Image = global::trackID3TagSwitcher.Properties.Resources.icon_user;
+            this.img_btn_account.Location = new System.Drawing.Point(480, 3);
+            this.img_btn_account.Name = "img_btn_account";
+            this.img_btn_account.Size = new System.Drawing.Size(25, 25);
+            this.img_btn_account.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.img_btn_account.TabIndex = 35;
+            this.img_btn_account.TabStop = false;
+            this.img_btn_account.Click += new System.EventHandler(this.img_btn_account_Click);
             // 
             // btnExit
             // 
@@ -222,7 +226,7 @@
             this.btnExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnExit.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnExit.ForeColor = System.Drawing.Color.Crimson;
-            this.btnExit.Location = new System.Drawing.Point(372, 3);
+            this.btnExit.Location = new System.Drawing.Point(520, 3);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(25, 25);
             this.btnExit.TabIndex = 9;
@@ -242,6 +246,21 @@
             this.lblAppTitle.Text = "Track [ID3 Tag] Switcher";
             this.lblAppTitle.MouseDown += new System.Windows.Forms.MouseEventHandler(this.LblAppTitle_MouseDown);
             this.lblAppTitle.MouseMove += new System.Windows.Forms.MouseEventHandler(this.LblAppTitle_MouseMove);
+            // 
+            // button1
+            // 
+            this.button1.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button1.ForeColor = System.Drawing.Color.Crimson;
+            this.button1.Location = new System.Drawing.Point(507, 10);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(29, 25);
+            this.button1.TabIndex = 11;
+            this.button1.Text = "X";
+            this.button1.UseVisualStyleBackColor = false;
+            this.button1.Visible = false;
+            this.button1.Click += new System.EventHandler(this.button1_Click_1);
             // 
             // pnlAppHeaderLine
             // 
@@ -307,7 +326,7 @@
             this.lblAlbumTitle.BackColor = System.Drawing.Color.Transparent;
             this.lblAlbumTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.lblAlbumTitle.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblAlbumTitle.Location = new System.Drawing.Point(3, 57);
+            this.lblAlbumTitle.Location = new System.Drawing.Point(10, 100);
             this.lblAlbumTitle.Name = "lblAlbumTitle";
             this.lblAlbumTitle.Size = new System.Drawing.Size(50, 15);
             this.lblAlbumTitle.TabIndex = 11;
@@ -315,64 +334,42 @@
             this.lblAlbumTitle.MouseDown += new System.Windows.Forms.MouseEventHandler(this.LblAlbumTitle_MouseDown);
             this.lblAlbumTitle.MouseMove += new System.Windows.Forms.MouseEventHandler(this.LblAlbumTitle_MouseMove);
             // 
-            // lblCurrentTitle
+            // lbl_currTagType
             // 
-            this.lblCurrentTitle.AutoSize = true;
-            this.lblCurrentTitle.BackColor = System.Drawing.Color.Transparent;
-            this.lblCurrentTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblCurrentTitle.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblCurrentTitle.Location = new System.Drawing.Point(3, 215);
-            this.lblCurrentTitle.Name = "lblCurrentTitle";
-            this.lblCurrentTitle.Size = new System.Drawing.Size(33, 15);
-            this.lblCurrentTitle.TabIndex = 12;
-            this.lblCurrentTitle.Text = "現在";
-            this.lblCurrentTitle.MouseDown += new System.Windows.Forms.MouseEventHandler(this.LblCurrentTitle_MouseDown);
-            this.lblCurrentTitle.MouseMove += new System.Windows.Forms.MouseEventHandler(this.LblCurrentTitle_MouseMove);
+            this.lbl_currTagType.AutoSize = true;
+            this.lbl_currTagType.BackColor = System.Drawing.Color.Transparent;
+            this.lbl_currTagType.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lbl_currTagType.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.lbl_currTagType.Location = new System.Drawing.Point(130, 40);
+            this.lbl_currTagType.Name = "lbl_currTagType";
+            this.lbl_currTagType.Size = new System.Drawing.Size(55, 15);
+            this.lbl_currTagType.TabIndex = 12;
+            this.lbl_currTagType.Text = "ID3タグ：";
+            this.lbl_currTagType.Visible = false;
+            this.lbl_currTagType.MouseDown += new System.Windows.Forms.MouseEventHandler(this.LblCurrentTitle_MouseDown);
+            this.lbl_currTagType.MouseMove += new System.Windows.Forms.MouseEventHandler(this.LblCurrentTitle_MouseMove);
             // 
-            // lblNextTitle
+            // lbl_currWavesType
             // 
-            this.lblNextTitle.AutoSize = true;
-            this.lblNextTitle.BackColor = System.Drawing.Color.Transparent;
-            this.lblNextTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblNextTitle.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblNextTitle.Location = new System.Drawing.Point(169, 215);
-            this.lblNextTitle.Name = "lblNextTitle";
-            this.lblNextTitle.Size = new System.Drawing.Size(46, 15);
-            this.lblNextTitle.TabIndex = 14;
-            this.lblNextTitle.Text = "変換後";
-            this.lblNextTitle.MouseDown += new System.Windows.Forms.MouseEventHandler(this.LblNextTitle_MouseDown);
-            this.lblNextTitle.MouseMove += new System.Windows.Forms.MouseEventHandler(this.LblNextTitle_MouseMove);
-            // 
-            // imgCurrentMode
-            // 
-            this.imgCurrentMode.BackColor = System.Drawing.Color.Transparent;
-            this.imgCurrentMode.Location = new System.Drawing.Point(6, 231);
-            this.imgCurrentMode.Name = "imgCurrentMode";
-            this.imgCurrentMode.Size = new System.Drawing.Size(75, 75);
-            this.imgCurrentMode.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.imgCurrentMode.TabIndex = 15;
-            this.imgCurrentMode.TabStop = false;
-            this.imgCurrentMode.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ImgCurrentMode_MouseDown);
-            this.imgCurrentMode.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ImgCurrentMode_MouseMove);
-            // 
-            // imgNextMode
-            // 
-            this.imgNextMode.BackColor = System.Drawing.Color.Transparent;
-            this.imgNextMode.Location = new System.Drawing.Point(140, 233);
-            this.imgNextMode.Name = "imgNextMode";
-            this.imgNextMode.Size = new System.Drawing.Size(75, 75);
-            this.imgNextMode.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.imgNextMode.TabIndex = 16;
-            this.imgNextMode.TabStop = false;
-            this.imgNextMode.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ImgNextMode_MouseDown);
-            this.imgNextMode.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ImgNextMode_MouseMove);
+            this.lbl_currWavesType.AutoSize = true;
+            this.lbl_currWavesType.BackColor = System.Drawing.Color.Transparent;
+            this.lbl_currWavesType.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lbl_currWavesType.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.lbl_currWavesType.Location = new System.Drawing.Point(130, 70);
+            this.lbl_currWavesType.Name = "lbl_currWavesType";
+            this.lbl_currWavesType.Size = new System.Drawing.Size(40, 15);
+            this.lbl_currWavesType.TabIndex = 14;
+            this.lbl_currWavesType.Text = "波形：";
+            this.lbl_currWavesType.Visible = false;
+            this.lbl_currWavesType.MouseDown += new System.Windows.Forms.MouseEventHandler(this.LblNextTitle_MouseDown);
+            this.lbl_currWavesType.MouseMove += new System.Windows.Forms.MouseEventHandler(this.LblNextTitle_MouseMove);
             // 
             // lblCurrentText
             // 
             this.lblCurrentText.BackColor = System.Drawing.Color.Transparent;
             this.lblCurrentText.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.lblCurrentText.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblCurrentText.Location = new System.Drawing.Point(3, 309);
+            this.lblCurrentText.Location = new System.Drawing.Point(380, 83);
             this.lblCurrentText.Name = "lblCurrentText";
             this.lblCurrentText.Size = new System.Drawing.Size(78, 21);
             this.lblCurrentText.TabIndex = 17;
@@ -387,7 +384,7 @@
             this.lblNextText.BackColor = System.Drawing.Color.Transparent;
             this.lblNextText.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.lblNextText.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblNextText.Location = new System.Drawing.Point(140, 311);
+            this.lblNextText.Location = new System.Drawing.Point(408, 77);
             this.lblNextText.Name = "lblNextText";
             this.lblNextText.Size = new System.Drawing.Size(75, 19);
             this.lblNextText.TabIndex = 18;
@@ -400,9 +397,9 @@
             // pnlAppLine1
             // 
             this.pnlAppLine1.BackColor = System.Drawing.Color.Gold;
-            this.pnlAppLine1.Location = new System.Drawing.Point(0, 106);
+            this.pnlAppLine1.Location = new System.Drawing.Point(0, 123);
             this.pnlAppLine1.Name = "pnlAppLine1";
-            this.pnlAppLine1.Size = new System.Drawing.Size(400, 2);
+            this.pnlAppLine1.Size = new System.Drawing.Size(550, 2);
             this.pnlAppLine1.TabIndex = 19;
             this.pnlAppLine1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PnlAppLine1_MouseDown);
             this.pnlAppLine1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.PnlAppLine1_MouseMove);
@@ -410,24 +407,12 @@
             // pnlAppLine2
             // 
             this.pnlAppLine2.BackColor = System.Drawing.Color.Gold;
-            this.pnlAppLine2.Location = new System.Drawing.Point(0, 211);
+            this.pnlAppLine2.Location = new System.Drawing.Point(0, 123);
             this.pnlAppLine2.Name = "pnlAppLine2";
-            this.pnlAppLine2.Size = new System.Drawing.Size(400, 2);
+            this.pnlAppLine2.Size = new System.Drawing.Size(550, 2);
             this.pnlAppLine2.TabIndex = 20;
             this.pnlAppLine2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PnlAppLine2_MouseDown);
             this.pnlAppLine2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.PnlAppLine2_MouseMove);
-            // 
-            // imgCurrentAlbumArtwork
-            // 
-            this.imgCurrentAlbumArtwork.BackColor = System.Drawing.Color.Transparent;
-            this.imgCurrentAlbumArtwork.Location = new System.Drawing.Point(5, 111);
-            this.imgCurrentAlbumArtwork.Name = "imgCurrentAlbumArtwork";
-            this.imgCurrentAlbumArtwork.Size = new System.Drawing.Size(95, 95);
-            this.imgCurrentAlbumArtwork.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.imgCurrentAlbumArtwork.TabIndex = 21;
-            this.imgCurrentAlbumArtwork.TabStop = false;
-            this.imgCurrentAlbumArtwork.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ImgCurrentAlbumArtwork_MouseDown);
-            this.imgCurrentAlbumArtwork.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ImgCurrentAlbumArtwork_MouseMove);
             // 
             // lblID3TagTitle
             // 
@@ -435,7 +420,7 @@
             this.lblID3TagTitle.BackColor = System.Drawing.Color.Transparent;
             this.lblID3TagTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.lblID3TagTitle.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblID3TagTitle.Location = new System.Drawing.Point(106, 111);
+            this.lblID3TagTitle.Location = new System.Drawing.Point(130, 10);
             this.lblID3TagTitle.Name = "lblID3TagTitle";
             this.lblID3TagTitle.Size = new System.Drawing.Size(70, 15);
             this.lblID3TagTitle.TabIndex = 22;
@@ -450,7 +435,7 @@
             this.lblID3TagNumber.BackColor = System.Drawing.Color.Transparent;
             this.lblID3TagNumber.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.lblID3TagNumber.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblID3TagNumber.Location = new System.Drawing.Point(106, 132);
+            this.lblID3TagNumber.Location = new System.Drawing.Point(130, 40);
             this.lblID3TagNumber.Name = "lblID3TagNumber";
             this.lblID3TagNumber.Size = new System.Drawing.Size(94, 15);
             this.lblID3TagNumber.TabIndex = 23;
@@ -465,7 +450,7 @@
             this.lblArrow2.BackColor = System.Drawing.Color.Transparent;
             this.lblArrow2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.lblArrow2.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblArrow2.Location = new System.Drawing.Point(100, 261);
+            this.lblArrow2.Location = new System.Drawing.Point(438, 38);
             this.lblArrow2.Name = "lblArrow2";
             this.lblArrow2.Size = new System.Drawing.Size(20, 15);
             this.lblArrow2.TabIndex = 24;
@@ -480,11 +465,11 @@
             this.btnClearCache.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClearCache.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.btnClearCache.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.btnClearCache.Location = new System.Drawing.Point(345, 350);
+            this.btnClearCache.Location = new System.Drawing.Point(318, 49);
             this.btnClearCache.Name = "btnClearCache";
-            this.btnClearCache.Size = new System.Drawing.Size(51, 35);
+            this.btnClearCache.Size = new System.Drawing.Size(140, 35);
             this.btnClearCache.TabIndex = 25;
-            this.btnClearCache.Text = "クリア";
+            this.btnClearCache.Text = "ロード結果をクリア";
             this.tipIsDot.SetToolTip(this.btnClearCache, "読み込んだアルバム情報をアプリ上から消去します。");
             this.btnClearCache.UseVisualStyleBackColor = false;
             this.btnClearCache.Click += new System.EventHandler(this.BtnClearCache_Click);
@@ -495,7 +480,7 @@
             this.lblArtworkTitle.BackColor = System.Drawing.Color.Transparent;
             this.lblArtworkTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.lblArtworkTitle.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblArtworkTitle.Location = new System.Drawing.Point(3, 6);
+            this.lblArtworkTitle.Location = new System.Drawing.Point(10, 40);
             this.lblArtworkTitle.Name = "lblArtworkTitle";
             this.lblArtworkTitle.Size = new System.Drawing.Size(67, 15);
             this.lblArtworkTitle.TabIndex = 26;
@@ -506,9 +491,9 @@
             // boxArtworkName
             // 
             this.boxArtworkName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.boxArtworkName.Location = new System.Drawing.Point(80, 3);
+            this.boxArtworkName.Location = new System.Drawing.Point(100, 37);
             this.boxArtworkName.Name = "boxArtworkName";
-            this.boxArtworkName.Size = new System.Drawing.Size(234, 21);
+            this.boxArtworkName.Size = new System.Drawing.Size(270, 21);
             this.boxArtworkName.TabIndex = 27;
             this.boxArtworkName.Text = "\\\\Jacket\\\\artwork.jpg";
             // 
@@ -518,7 +503,7 @@
             this.lblTrackFolder.BackColor = System.Drawing.Color.Transparent;
             this.lblTrackFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.lblTrackFolder.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblTrackFolder.Location = new System.Drawing.Point(3, 32);
+            this.lblTrackFolder.Location = new System.Drawing.Point(10, 70);
             this.lblTrackFolder.Name = "lblTrackFolder";
             this.lblTrackFolder.Size = new System.Drawing.Size(46, 15);
             this.lblTrackFolder.TabIndex = 28;
@@ -529,9 +514,9 @@
             // boxTrackFolder
             // 
             this.boxTrackFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.boxTrackFolder.Location = new System.Drawing.Point(80, 29);
+            this.boxTrackFolder.Location = new System.Drawing.Point(100, 67);
             this.boxTrackFolder.Name = "boxTrackFolder";
-            this.boxTrackFolder.Size = new System.Drawing.Size(234, 21);
+            this.boxTrackFolder.Size = new System.Drawing.Size(270, 21);
             this.boxTrackFolder.TabIndex = 29;
             this.boxTrackFolder.Text = "\\\\Track";
             // 
@@ -541,7 +526,7 @@
             this.lblID3TagLabel.BackColor = System.Drawing.Color.Transparent;
             this.lblID3TagLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.lblID3TagLabel.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblID3TagLabel.Location = new System.Drawing.Point(106, 153);
+            this.lblID3TagLabel.Location = new System.Drawing.Point(130, 70);
             this.lblID3TagLabel.Name = "lblID3TagLabel";
             this.lblID3TagLabel.Size = new System.Drawing.Size(57, 15);
             this.lblID3TagLabel.TabIndex = 30;
@@ -571,9 +556,9 @@
             this.btnOpenTrackInfoPage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnOpenTrackInfoPage.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
             this.btnOpenTrackInfoPage.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.btnOpenTrackInfoPage.Location = new System.Drawing.Point(330, 3);
+            this.btnOpenTrackInfoPage.Location = new System.Drawing.Point(440, 37);
             this.btnOpenTrackInfoPage.Name = "btnOpenTrackInfoPage";
-            this.btnOpenTrackInfoPage.Size = new System.Drawing.Size(66, 42);
+            this.btnOpenTrackInfoPage.Size = new System.Drawing.Size(100, 35);
             this.btnOpenTrackInfoPage.TabIndex = 32;
             this.btnOpenTrackInfoPage.Text = "曲設定画面→";
             this.tipIsDot.SetToolTip(this.btnOpenTrackInfoPage, "各楽曲のID3 Tag編集画面に移動します。");
@@ -583,68 +568,112 @@
             // pnlPage1
             // 
             this.pnlPage1.BackColor = System.Drawing.Color.MidnightBlue;
-            this.pnlPage1.Controls.Add(this.cmbbx_convertExt);
-            this.pnlPage1.Controls.Add(this.checkBox1);
-            this.pnlPage1.Controls.Add(this.isReplaceRegisterWord);
-            this.pnlPage1.Controls.Add(this.lblTrackCount);
-            this.pnlPage1.Controls.Add(this.autoSearchFile);
-            this.pnlPage1.Controls.Add(this.lblArtworkTitle);
-            this.pnlPage1.Controls.Add(this.btnClearCache);
-            this.pnlPage1.Controls.Add(this.btnOpenTrackInfoPage);
-            this.pnlPage1.Controls.Add(this.lblID3TagLabel);
-            this.pnlPage1.Controls.Add(this.lblNextText);
-            this.pnlPage1.Controls.Add(this.lblArrow2);
-            this.pnlPage1.Controls.Add(this.btnSwitcher);
-            this.pnlPage1.Controls.Add(this.imgNextMode);
-            this.pnlPage1.Controls.Add(this.boxAlbumPath);
-            this.pnlPage1.Controls.Add(this.lblNextTitle);
-            this.pnlPage1.Controls.Add(this.pnlAppLine2);
-            this.pnlPage1.Controls.Add(this.lblCurrentText);
-            this.pnlPage1.Controls.Add(this.btnLoadAlbum);
-            this.pnlPage1.Controls.Add(this.lblAlbumTitle);
-            this.pnlPage1.Controls.Add(this.imgCurrentMode);
-            this.pnlPage1.Controls.Add(this.lblID3TagNumber);
-            this.pnlPage1.Controls.Add(this.boxTrackFolder);
-            this.pnlPage1.Controls.Add(this.lblCurrentTitle);
-            this.pnlPage1.Controls.Add(this.lblID3TagTitle);
-            this.pnlPage1.Controls.Add(this.boxArtworkName);
-            this.pnlPage1.Controls.Add(this.imgCurrentAlbumArtwork);
-            this.pnlPage1.Controls.Add(this.lblTrackFolder);
-            this.pnlPage1.Controls.Add(this.pnlAppLine1);
-            this.pnlPage1.Location = new System.Drawing.Point(23, 21);
+            this.pnlPage1.Controls.Add(this.pnl_settings);
+            this.pnlPage1.Controls.Add(this.pnl_albumSearch);
+            this.pnlPage1.Controls.Add(this.pnl_execConvert);
+            this.pnlPage1.Controls.Add(this.pnl_currLoadInfo);
+            this.pnlPage1.Controls.Add(this.pnl_currTagType);
+            this.pnlPage1.Location = new System.Drawing.Point(237, 82);
             this.pnlPage1.Name = "pnlPage1";
             this.pnlPage1.Size = new System.Drawing.Size(550, 600);
             this.pnlPage1.TabIndex = 33;
             this.pnlPage1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnlPage1_MouseDown);
             this.pnlPage1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnlPage1_MouseMove);
             // 
-            // cmbbx_convertExt
+            // pnl_settings
             // 
-            this.cmbbx_convertExt.FormattingEnabled = true;
-            this.cmbbx_convertExt.Items.AddRange(new object[] {
-            "flac",
-            "mp3",
-            "wav"});
-            this.cmbbx_convertExt.Location = new System.Drawing.Point(285, 233);
-            this.cmbbx_convertExt.Name = "cmbbx_convertExt";
-            this.cmbbx_convertExt.Size = new System.Drawing.Size(64, 20);
-            this.cmbbx_convertExt.TabIndex = 37;
-            this.cmbbx_convertExt.SelectedIndexChanged += new System.EventHandler(this.cmbbx_convertExt_SelectedIndexChanged);
+            this.pnl_settings.BackColor = System.Drawing.Color.LightSlateGray;
+            this.pnl_settings.Controls.Add(this.lbl_title_settings_execConv);
+            this.pnl_settings.Controls.Add(this.lbl_opt_settings_albumSearch_ext);
+            this.pnl_settings.Controls.Add(this.pnl_line_setting_albumSearch);
+            this.pnl_settings.Controls.Add(this.lbl_title_settings_albumSearch);
+            this.pnl_settings.Controls.Add(this.lbl_title_header_settings);
+            this.pnl_settings.Controls.Add(this.pnl_line_setting_header);
+            this.pnl_settings.Controls.Add(this.isReplaceRegisterWord);
+            this.pnl_settings.Controls.Add(this.autoSearchFile);
+            this.pnl_settings.Controls.Add(this.cmbbx_convertExt);
+            this.pnl_settings.Location = new System.Drawing.Point(0, 0);
+            this.pnl_settings.Name = "pnl_settings";
+            this.pnl_settings.Size = new System.Drawing.Size(300, 400);
+            this.pnl_settings.TabIndex = 35;
+            this.pnl_settings.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnl_settings_MouseDown);
+            this.pnl_settings.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnl_settings_MouseMove);
             // 
-            // checkBox1
+            // lbl_title_settings_execConv
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Checked = true;
-            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.checkBox1.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.checkBox1.Location = new System.Drawing.Point(6, 343);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(191, 19);
-            this.checkBox1.TabIndex = 36;
-            this.checkBox1.Text = "使用不可能な文字は毎回確認";
-            this.tipIsDot.SetToolTip(this.checkBox1, "有効にすると、変換時に「/ * ?」などのシステム予約文字が含まれている場合は毎回置き換え方法を確認します。\r\n無効の場合は、確認を取らず空白に置き換えます。");
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.lbl_title_settings_execConv.AutoSize = true;
+            this.lbl_title_settings_execConv.BackColor = System.Drawing.Color.Transparent;
+            this.lbl_title_settings_execConv.Font = new System.Drawing.Font("BIZ UDPゴシック", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lbl_title_settings_execConv.ForeColor = System.Drawing.SystemColors.Info;
+            this.lbl_title_settings_execConv.Location = new System.Drawing.Point(10, 200);
+            this.lbl_title_settings_execConv.Name = "lbl_title_settings_execConv";
+            this.lbl_title_settings_execConv.Size = new System.Drawing.Size(104, 16);
+            this.lbl_title_settings_execConv.TabIndex = 41;
+            this.lbl_title_settings_execConv.Text = "◆変換を実行";
+            this.lbl_title_settings_execConv.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lbl_title_settings_execConv_MouseDown);
+            this.lbl_title_settings_execConv.MouseMove += new System.Windows.Forms.MouseEventHandler(this.lbl_title_settings_execConv_MouseMove);
+            // 
+            // lbl_opt_settings_albumSearch_ext
+            // 
+            this.lbl_opt_settings_albumSearch_ext.AutoSize = true;
+            this.lbl_opt_settings_albumSearch_ext.BackColor = System.Drawing.Color.Transparent;
+            this.lbl_opt_settings_albumSearch_ext.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lbl_opt_settings_albumSearch_ext.ForeColor = System.Drawing.SystemColors.InfoText;
+            this.lbl_opt_settings_albumSearch_ext.Location = new System.Drawing.Point(10, 130);
+            this.lbl_opt_settings_albumSearch_ext.Name = "lbl_opt_settings_albumSearch_ext";
+            this.lbl_opt_settings_albumSearch_ext.Size = new System.Drawing.Size(116, 15);
+            this.lbl_opt_settings_albumSearch_ext.TabIndex = 40;
+            this.lbl_opt_settings_albumSearch_ext.Text = "検索対象の拡張子：";
+            this.lbl_opt_settings_albumSearch_ext.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lbl_opt_settings_albumSearch_ext_MouseDown);
+            this.lbl_opt_settings_albumSearch_ext.MouseMove += new System.Windows.Forms.MouseEventHandler(this.lbl_opt_settings_albumSearch_ext_MouseMove);
+            // 
+            // pnl_line_setting_albumSearch
+            // 
+            this.pnl_line_setting_albumSearch.BackColor = System.Drawing.Color.Gold;
+            this.pnl_line_setting_albumSearch.Location = new System.Drawing.Point(0, 170);
+            this.pnl_line_setting_albumSearch.Name = "pnl_line_setting_albumSearch";
+            this.pnl_line_setting_albumSearch.Size = new System.Drawing.Size(300, 2);
+            this.pnl_line_setting_albumSearch.TabIndex = 39;
+            this.pnl_line_setting_albumSearch.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnl_line_setting_albumSearch_MouseDown);
+            this.pnl_line_setting_albumSearch.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnl_line_setting_albumSearch_MouseMove);
+            // 
+            // lbl_title_settings_albumSearch
+            // 
+            this.lbl_title_settings_albumSearch.AutoSize = true;
+            this.lbl_title_settings_albumSearch.BackColor = System.Drawing.Color.Transparent;
+            this.lbl_title_settings_albumSearch.Font = new System.Drawing.Font("BIZ UDPゴシック", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lbl_title_settings_albumSearch.ForeColor = System.Drawing.SystemColors.Info;
+            this.lbl_title_settings_albumSearch.Location = new System.Drawing.Point(10, 70);
+            this.lbl_title_settings_albumSearch.Name = "lbl_title_settings_albumSearch";
+            this.lbl_title_settings_albumSearch.Size = new System.Drawing.Size(118, 16);
+            this.lbl_title_settings_albumSearch.TabIndex = 38;
+            this.lbl_title_settings_albumSearch.Text = "◆アルバム検索";
+            this.lbl_title_settings_albumSearch.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lbl_title_settings_albumSearch_MouseDown);
+            this.lbl_title_settings_albumSearch.MouseMove += new System.Windows.Forms.MouseEventHandler(this.lbl_title_settings_albumSearch_MouseMove);
+            // 
+            // lbl_title_header_settings
+            // 
+            this.lbl_title_header_settings.AutoSize = true;
+            this.lbl_title_header_settings.BackColor = System.Drawing.Color.Transparent;
+            this.lbl_title_header_settings.Font = new System.Drawing.Font("BIZ UDPゴシック", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lbl_title_header_settings.ForeColor = System.Drawing.SystemColors.Info;
+            this.lbl_title_header_settings.Location = new System.Drawing.Point(10, 10);
+            this.lbl_title_header_settings.Name = "lbl_title_header_settings";
+            this.lbl_title_header_settings.Size = new System.Drawing.Size(56, 16);
+            this.lbl_title_header_settings.TabIndex = 34;
+            this.lbl_title_header_settings.Text = "【設定】";
+            this.lbl_title_header_settings.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lbl_title_header_settings_MouseDown);
+            this.lbl_title_header_settings.MouseMove += new System.Windows.Forms.MouseEventHandler(this.lbl_title_header_settings_MouseMove);
+            // 
+            // pnl_line_setting_header
+            // 
+            this.pnl_line_setting_header.BackColor = System.Drawing.Color.MediumSeaGreen;
+            this.pnl_line_setting_header.Location = new System.Drawing.Point(0, 40);
+            this.pnl_line_setting_header.Name = "pnl_line_setting_header";
+            this.pnl_line_setting_header.Size = new System.Drawing.Size(300, 2);
+            this.pnl_line_setting_header.TabIndex = 21;
+            this.pnl_line_setting_header.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnl_line_setting_header_MouseDown);
+            this.pnl_line_setting_header.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnl_line_setting_header_MouseMove);
             // 
             // isReplaceRegisterWord
             // 
@@ -652,8 +681,8 @@
             this.isReplaceRegisterWord.Checked = true;
             this.isReplaceRegisterWord.CheckState = System.Windows.Forms.CheckState.Checked;
             this.isReplaceRegisterWord.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.isReplaceRegisterWord.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.isReplaceRegisterWord.Location = new System.Drawing.Point(6, 368);
+            this.isReplaceRegisterWord.ForeColor = System.Drawing.SystemColors.InfoText;
+            this.isReplaceRegisterWord.Location = new System.Drawing.Point(10, 230);
             this.isReplaceRegisterWord.Name = "isReplaceRegisterWord";
             this.isReplaceRegisterWord.Size = new System.Drawing.Size(191, 19);
             this.isReplaceRegisterWord.TabIndex = 35;
@@ -661,27 +690,14 @@
             this.tipIsDot.SetToolTip(this.isReplaceRegisterWord, "有効にすると、変換時に「/ * ?」などのシステム予約文字が含まれている場合は毎回置き換え方法を確認します。\r\n無効の場合は、確認を取らず空白に置き換えます。");
             this.isReplaceRegisterWord.UseVisualStyleBackColor = true;
             // 
-            // lblTrackCount
-            // 
-            this.lblTrackCount.AutoSize = true;
-            this.lblTrackCount.BackColor = System.Drawing.Color.Transparent;
-            this.lblTrackCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblTrackCount.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblTrackCount.Location = new System.Drawing.Point(106, 174);
-            this.lblTrackCount.Name = "lblTrackCount";
-            this.lblTrackCount.Size = new System.Drawing.Size(40, 15);
-            this.lblTrackCount.TabIndex = 34;
-            this.lblTrackCount.Text = "曲数：";
-            this.lblTrackCount.Visible = false;
-            // 
             // autoSearchFile
             // 
             this.autoSearchFile.AutoSize = true;
             this.autoSearchFile.Checked = true;
             this.autoSearchFile.CheckState = System.Windows.Forms.CheckState.Checked;
             this.autoSearchFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.autoSearchFile.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.autoSearchFile.Location = new System.Drawing.Point(6, 81);
+            this.autoSearchFile.ForeColor = System.Drawing.SystemColors.InfoText;
+            this.autoSearchFile.Location = new System.Drawing.Point(10, 100);
             this.autoSearchFile.Name = "autoSearchFile";
             this.autoSearchFile.Size = new System.Drawing.Size(173, 19);
             this.autoSearchFile.TabIndex = 33;
@@ -690,6 +706,230 @@
         "象：mp3, jpeg, jpg, png）");
             this.autoSearchFile.UseVisualStyleBackColor = true;
             this.autoSearchFile.CheckedChanged += new System.EventHandler(this.autoSearchFile_CheckedChanged);
+            // 
+            // cmbbx_convertExt
+            // 
+            this.cmbbx_convertExt.FormattingEnabled = true;
+            this.cmbbx_convertExt.Items.AddRange(new object[] {
+            "flac",
+            "mp3",
+            "wav"});
+            this.cmbbx_convertExt.Location = new System.Drawing.Point(130, 128);
+            this.cmbbx_convertExt.Name = "cmbbx_convertExt";
+            this.cmbbx_convertExt.Size = new System.Drawing.Size(64, 20);
+            this.cmbbx_convertExt.TabIndex = 37;
+            this.cmbbx_convertExt.SelectedIndexChanged += new System.EventHandler(this.cmbbx_convertExt_SelectedIndexChanged);
+            // 
+            // pnl_albumSearch
+            // 
+            this.pnl_albumSearch.BackColor = System.Drawing.Color.MidnightBlue;
+            this.pnl_albumSearch.Controls.Add(this.lbl_title_albumSearch);
+            this.pnl_albumSearch.Controls.Add(this.lblArtworkTitle);
+            this.pnl_albumSearch.Controls.Add(this.lblTrackFolder);
+            this.pnl_albumSearch.Controls.Add(this.boxArtworkName);
+            this.pnl_albumSearch.Controls.Add(this.boxTrackFolder);
+            this.pnl_albumSearch.Controls.Add(this.lblAlbumTitle);
+            this.pnl_albumSearch.Controls.Add(this.btnLoadAlbum);
+            this.pnl_albumSearch.Controls.Add(this.boxAlbumPath);
+            this.pnl_albumSearch.Controls.Add(this.btnOpenTrackInfoPage);
+            this.pnl_albumSearch.Controls.Add(this.pnlAppLine1);
+            this.pnl_albumSearch.Location = new System.Drawing.Point(0, 0);
+            this.pnl_albumSearch.Name = "pnl_albumSearch";
+            this.pnl_albumSearch.Size = new System.Drawing.Size(550, 125);
+            this.pnl_albumSearch.TabIndex = 38;
+            this.pnl_albumSearch.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnl_albumSearch_MouseDown);
+            this.pnl_albumSearch.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnl_albumSearch_MouseMove);
+            // 
+            // lbl_title_albumSearch
+            // 
+            this.lbl_title_albumSearch.AutoSize = true;
+            this.lbl_title_albumSearch.BackColor = System.Drawing.Color.Transparent;
+            this.lbl_title_albumSearch.Font = new System.Drawing.Font("BIZ UDPゴシック", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lbl_title_albumSearch.ForeColor = System.Drawing.Color.LightPink;
+            this.lbl_title_albumSearch.Location = new System.Drawing.Point(10, 10);
+            this.lbl_title_albumSearch.Name = "lbl_title_albumSearch";
+            this.lbl_title_albumSearch.Size = new System.Drawing.Size(118, 16);
+            this.lbl_title_albumSearch.TabIndex = 33;
+            this.lbl_title_albumSearch.Text = "【アルバム検索】";
+            // 
+            // pnl_execConvert
+            // 
+            this.pnl_execConvert.BackColor = System.Drawing.Color.MidnightBlue;
+            this.pnl_execConvert.Controls.Add(this.lbl_title_execConvert);
+            this.pnl_execConvert.Controls.Add(this.pnl_AppLine4);
+            this.pnl_execConvert.Controls.Add(this.btnSwitcher);
+            this.pnl_execConvert.Controls.Add(this.btnClearCache);
+            this.pnl_execConvert.Location = new System.Drawing.Point(0, 377);
+            this.pnl_execConvert.Name = "pnl_execConvert";
+            this.pnl_execConvert.Size = new System.Drawing.Size(550, 125);
+            this.pnl_execConvert.TabIndex = 41;
+            this.pnl_execConvert.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnl_execConvert_MouseDown);
+            this.pnl_execConvert.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnl_execConvert_MouseMove);
+            // 
+            // lbl_title_execConvert
+            // 
+            this.lbl_title_execConvert.AutoSize = true;
+            this.lbl_title_execConvert.BackColor = System.Drawing.Color.Transparent;
+            this.lbl_title_execConvert.Font = new System.Drawing.Font("BIZ UDPゴシック", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lbl_title_execConvert.ForeColor = System.Drawing.Color.LightPink;
+            this.lbl_title_execConvert.Location = new System.Drawing.Point(10, 10);
+            this.lbl_title_execConvert.Name = "lbl_title_execConvert";
+            this.lbl_title_execConvert.Size = new System.Drawing.Size(104, 16);
+            this.lbl_title_execConvert.TabIndex = 33;
+            this.lbl_title_execConvert.Text = "【変換を実行】";
+            this.lbl_title_execConvert.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lbl_title_execConvert_MouseDown);
+            this.lbl_title_execConvert.MouseMove += new System.Windows.Forms.MouseEventHandler(this.lbl_title_execConvert_MouseMove);
+            // 
+            // pnl_AppLine4
+            // 
+            this.pnl_AppLine4.BackColor = System.Drawing.Color.Gold;
+            this.pnl_AppLine4.Location = new System.Drawing.Point(0, 123);
+            this.pnl_AppLine4.Name = "pnl_AppLine4";
+            this.pnl_AppLine4.Size = new System.Drawing.Size(550, 2);
+            this.pnl_AppLine4.TabIndex = 20;
+            this.pnl_AppLine4.Visible = false;
+            // 
+            // pnl_currLoadInfo
+            // 
+            this.pnl_currLoadInfo.BackColor = System.Drawing.Color.MidnightBlue;
+            this.pnl_currLoadInfo.Controls.Add(this.lbl_title_currLoadInfo);
+            this.pnl_currLoadInfo.Controls.Add(this.pnlAppLine2);
+            this.pnl_currLoadInfo.Controls.Add(this.imgCurrentAlbumArtwork);
+            this.pnl_currLoadInfo.Controls.Add(this.lblID3TagTitle);
+            this.pnl_currLoadInfo.Controls.Add(this.lblID3TagNumber);
+            this.pnl_currLoadInfo.Controls.Add(this.lblTrackCount);
+            this.pnl_currLoadInfo.Controls.Add(this.lblID3TagLabel);
+            this.pnl_currLoadInfo.Location = new System.Drawing.Point(0, 126);
+            this.pnl_currLoadInfo.Name = "pnl_currLoadInfo";
+            this.pnl_currLoadInfo.Size = new System.Drawing.Size(550, 125);
+            this.pnl_currLoadInfo.TabIndex = 39;
+            this.pnl_currLoadInfo.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnl_currLoadInfo_MouseDown);
+            this.pnl_currLoadInfo.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnl_currLoadInfo_MouseMove);
+            // 
+            // lbl_title_currLoadInfo
+            // 
+            this.lbl_title_currLoadInfo.AutoSize = true;
+            this.lbl_title_currLoadInfo.BackColor = System.Drawing.Color.Transparent;
+            this.lbl_title_currLoadInfo.Font = new System.Drawing.Font("BIZ UDPゴシック", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lbl_title_currLoadInfo.ForeColor = System.Drawing.Color.LightPink;
+            this.lbl_title_currLoadInfo.Location = new System.Drawing.Point(10, 10);
+            this.lbl_title_currLoadInfo.Name = "lbl_title_currLoadInfo";
+            this.lbl_title_currLoadInfo.Size = new System.Drawing.Size(99, 16);
+            this.lbl_title_currLoadInfo.TabIndex = 33;
+            this.lbl_title_currLoadInfo.Text = "【ロード結果】";
+            this.lbl_title_currLoadInfo.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lbl_title_currLoadInfo_MouseDown);
+            this.lbl_title_currLoadInfo.MouseMove += new System.Windows.Forms.MouseEventHandler(this.lbl_title_currLoadInfo_MouseMove);
+            // 
+            // imgCurrentAlbumArtwork
+            // 
+            this.imgCurrentAlbumArtwork.BackColor = System.Drawing.Color.Transparent;
+            this.imgCurrentAlbumArtwork.Location = new System.Drawing.Point(10, 40);
+            this.imgCurrentAlbumArtwork.Name = "imgCurrentAlbumArtwork";
+            this.imgCurrentAlbumArtwork.Size = new System.Drawing.Size(75, 75);
+            this.imgCurrentAlbumArtwork.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.imgCurrentAlbumArtwork.TabIndex = 21;
+            this.imgCurrentAlbumArtwork.TabStop = false;
+            this.imgCurrentAlbumArtwork.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ImgCurrentAlbumArtwork_MouseDown);
+            this.imgCurrentAlbumArtwork.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ImgCurrentAlbumArtwork_MouseMove);
+            // 
+            // lblTrackCount
+            // 
+            this.lblTrackCount.AutoSize = true;
+            this.lblTrackCount.BackColor = System.Drawing.Color.Transparent;
+            this.lblTrackCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblTrackCount.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.lblTrackCount.Location = new System.Drawing.Point(130, 100);
+            this.lblTrackCount.Name = "lblTrackCount";
+            this.lblTrackCount.Size = new System.Drawing.Size(40, 15);
+            this.lblTrackCount.TabIndex = 34;
+            this.lblTrackCount.Text = "曲数：";
+            this.lblTrackCount.Visible = false;
+            // 
+            // pnl_currTagType
+            // 
+            this.pnl_currTagType.BackColor = System.Drawing.Color.MidnightBlue;
+            this.pnl_currTagType.Controls.Add(this.lbl_title_currTagType);
+            this.pnl_currTagType.Controls.Add(this.btn_loginForm);
+            this.pnl_currTagType.Controls.Add(this.button1);
+            this.pnl_currTagType.Controls.Add(this.pnl_AppLine3);
+            this.pnl_currTagType.Controls.Add(this.imgCurrentMode);
+            this.pnl_currTagType.Controls.Add(this.lbl_currTagType);
+            this.pnl_currTagType.Controls.Add(this.lblCurrentText);
+            this.pnl_currTagType.Controls.Add(this.lbl_currWavesType);
+            this.pnl_currTagType.Controls.Add(this.imgNextMode);
+            this.pnl_currTagType.Controls.Add(this.lblArrow2);
+            this.pnl_currTagType.Controls.Add(this.lblNextText);
+            this.pnl_currTagType.Location = new System.Drawing.Point(0, 252);
+            this.pnl_currTagType.Name = "pnl_currTagType";
+            this.pnl_currTagType.Size = new System.Drawing.Size(550, 125);
+            this.pnl_currTagType.TabIndex = 40;
+            this.pnl_currTagType.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnl_currTagType_MouseDown);
+            this.pnl_currTagType.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnl_currTagType_MouseMove);
+            // 
+            // lbl_title_currTagType
+            // 
+            this.lbl_title_currTagType.AutoSize = true;
+            this.lbl_title_currTagType.BackColor = System.Drawing.Color.Transparent;
+            this.lbl_title_currTagType.Font = new System.Drawing.Font("BIZ UDPゴシック", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lbl_title_currTagType.ForeColor = System.Drawing.Color.LightPink;
+            this.lbl_title_currTagType.Location = new System.Drawing.Point(10, 10);
+            this.lbl_title_currTagType.Name = "lbl_title_currTagType";
+            this.lbl_title_currTagType.Size = new System.Drawing.Size(116, 16);
+            this.lbl_title_currTagType.TabIndex = 33;
+            this.lbl_title_currTagType.Text = "【現在のモード】";
+            this.lbl_title_currTagType.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lbl_title_currTagType_MouseDown);
+            this.lbl_title_currTagType.MouseMove += new System.Windows.Forms.MouseEventHandler(this.lbl_title_currTagType_MouseMove);
+            // 
+            // btn_loginForm
+            // 
+            this.btn_loginForm.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.btn_loginForm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_loginForm.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
+            this.btn_loginForm.ForeColor = System.Drawing.Color.MediumBlue;
+            this.btn_loginForm.Image = global::trackID3TagSwitcher.Properties.Resources.icon_user;
+            this.btn_loginForm.Location = new System.Drawing.Point(464, 49);
+            this.btn_loginForm.Name = "btn_loginForm";
+            this.btn_loginForm.Size = new System.Drawing.Size(70, 25);
+            this.btn_loginForm.TabIndex = 10;
+            this.btn_loginForm.Text = "アカウント";
+            this.btn_loginForm.UseVisualStyleBackColor = false;
+            this.btn_loginForm.Visible = false;
+            this.btn_loginForm.Click += new System.EventHandler(this.loginSetting_Click);
+            // 
+            // pnl_AppLine3
+            // 
+            this.pnl_AppLine3.BackColor = System.Drawing.Color.Gold;
+            this.pnl_AppLine3.Location = new System.Drawing.Point(0, 123);
+            this.pnl_AppLine3.Name = "pnl_AppLine3";
+            this.pnl_AppLine3.Size = new System.Drawing.Size(550, 2);
+            this.pnl_AppLine3.TabIndex = 20;
+            this.pnl_AppLine3.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnl_AppLine3_MouseDown);
+            this.pnl_AppLine3.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnl_AppLine3_MouseMove);
+            // 
+            // imgCurrentMode
+            // 
+            this.imgCurrentMode.BackColor = System.Drawing.Color.Transparent;
+            this.imgCurrentMode.Location = new System.Drawing.Point(10, 40);
+            this.imgCurrentMode.Name = "imgCurrentMode";
+            this.imgCurrentMode.Size = new System.Drawing.Size(75, 75);
+            this.imgCurrentMode.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.imgCurrentMode.TabIndex = 15;
+            this.imgCurrentMode.TabStop = false;
+            this.imgCurrentMode.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ImgCurrentMode_MouseDown);
+            this.imgCurrentMode.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ImgCurrentMode_MouseMove);
+            // 
+            // imgNextMode
+            // 
+            this.imgNextMode.BackColor = System.Drawing.Color.Transparent;
+            this.imgNextMode.Location = new System.Drawing.Point(356, 5);
+            this.imgNextMode.Name = "imgNextMode";
+            this.imgNextMode.Size = new System.Drawing.Size(75, 75);
+            this.imgNextMode.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.imgNextMode.TabIndex = 16;
+            this.imgNextMode.TabStop = false;
+            this.imgNextMode.Visible = false;
+            this.imgNextMode.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ImgNextMode_MouseDown);
+            this.imgNextMode.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ImgNextMode_MouseMove);
             // 
             // pnlTrackInfo
             // 
@@ -1146,13 +1386,24 @@
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseMove);
             this.pnlAppHeader.ResumeLayout(false);
             this.pnlAppHeader.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.img_btn_setting)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.img_btn_account)).EndInit();
             this.pnlAppFooter.ResumeLayout(false);
             this.pnlAppFooter.PerformLayout();
+            this.pnlPage1.ResumeLayout(false);
+            this.pnl_settings.ResumeLayout(false);
+            this.pnl_settings.PerformLayout();
+            this.pnl_albumSearch.ResumeLayout(false);
+            this.pnl_albumSearch.PerformLayout();
+            this.pnl_execConvert.ResumeLayout(false);
+            this.pnl_execConvert.PerformLayout();
+            this.pnl_currLoadInfo.ResumeLayout(false);
+            this.pnl_currLoadInfo.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.imgCurrentAlbumArtwork)).EndInit();
+            this.pnl_currTagType.ResumeLayout(false);
+            this.pnl_currTagType.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imgCurrentMode)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.imgNextMode)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.imgCurrentAlbumArtwork)).EndInit();
-            this.pnlPage1.ResumeLayout(false);
-            this.pnlPage1.PerformLayout();
             this.pnlTrackInfo.ResumeLayout(false);
             this.pnlTrackInfo.PerformLayout();
             this.ResumeLayout(false);
@@ -1173,8 +1424,8 @@
         private System.Windows.Forms.Panel pnlAppFooterLine;
         private System.Windows.Forms.Label lblAppLogText;
         private System.Windows.Forms.Label lblAlbumTitle;
-        private System.Windows.Forms.Label lblCurrentTitle;
-        private System.Windows.Forms.Label lblNextTitle;
+        private System.Windows.Forms.Label lbl_currTagType;
+        private System.Windows.Forms.Label lbl_currWavesType;
         private System.Windows.Forms.PictureBox imgCurrentMode;
         private System.Windows.Forms.PictureBox imgNextMode;
         private System.Windows.Forms.Label lblCurrentText;
@@ -1233,11 +1484,29 @@
         private System.Windows.Forms.CheckBox isReplaceRegisterWord;
         private System.Windows.Forms.Button btn_loginForm;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.ComboBox cmbbx_convertExt;
 #if DEBUG
         private System.Windows.Forms.Button debugTextUI;
 #endif
+        private System.Windows.Forms.Panel pnl_albumSearch;
+        private System.Windows.Forms.Label lbl_title_albumSearch;
+        private System.Windows.Forms.Panel pnl_currLoadInfo;
+        private System.Windows.Forms.Label lbl_title_currLoadInfo;
+        private System.Windows.Forms.Panel pnl_currTagType;
+        private System.Windows.Forms.Label lbl_title_currTagType;
+        private System.Windows.Forms.Panel pnl_AppLine3;
+        private System.Windows.Forms.Panel pnl_execConvert;
+        private System.Windows.Forms.Label lbl_title_execConvert;
+        private System.Windows.Forms.Panel pnl_AppLine4;
+        private System.Windows.Forms.PictureBox img_btn_account;
+        private System.Windows.Forms.PictureBox img_btn_setting;
+        private System.Windows.Forms.Panel pnl_settings;
+        private System.Windows.Forms.Label lbl_title_settings_execConv;
+        private System.Windows.Forms.Label lbl_opt_settings_albumSearch_ext;
+        private System.Windows.Forms.Panel pnl_line_setting_albumSearch;
+        private System.Windows.Forms.Label lbl_title_settings_albumSearch;
+        private System.Windows.Forms.Label lbl_title_header_settings;
+        private System.Windows.Forms.Panel pnl_line_setting_header;
     }
 }
 

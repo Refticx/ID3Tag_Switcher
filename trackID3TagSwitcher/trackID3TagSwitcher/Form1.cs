@@ -85,25 +85,42 @@ namespace trackID3TagSwitcher
         private const int MAX_TAG = 9;      /* 設定する項目数、ここを変更すると曲情報画面の横ボックス数を変更できる */
 
         /* デザイナーサイズ */
-        private const int EXIT_Y            = 3;
-        private const int DESIGN_DEF_X      = 0;
-        private const int MAIN_AREA_Y       = 32;
-        private const int MAIN_AREA_HIDE_X  = -500;
-        private const int SUB_AREA_HIDE_X   = 300;
+        private const int EXIT_Y                            = 3;
+        private const int DESIGN_DEF_X                      = 0;
+        private const int DESIGN_DEF_Y                      = 0;
+        private const int MAIN_AREA_Y                       = 32;
+        private const int MAIN_AREA_HIDE_X                  = -(APP_WIDTH + 20);
+        private const int SUB_AREA_HIDE_X                   = (APP_WIDTH + 10);
+        private const int LINE_HEIGHT                       = 2;
+        private const int CURR_INFO_AREA_Y                  = (DESIGN_DEF_Y + 126);
+        private const int CURR_ID3_AREA_Y                   = (CURR_INFO_AREA_Y + 126);
+        private const int EXEC_CONV_AREA_Y                  = (CURR_ID3_AREA_Y + 126);
 
-        private const int APP_WIDTH         = 400;
-        private const int APP_HEIGHT        = (APP_WIDTH + 40);
-        private const int FOOTER_Y          = (APP_HEIGHT - 20);
-        private const int FOOTER_LINE_Y     = (FOOTER_Y - 2);
-        private const int EXIT_X            = (APP_WIDTH - 28);
-        private const int ACCOUNT_X         = (APP_WIDTH - 120);
+        /* 設定パネル */
+        private const int SETTING_AREA_HEIGHT               = 400;
+        private const int SETTING_AREA_HIDE_Y               = (DESIGN_DEF_Y - (SETTING_AREA_HEIGHT + 20));
 
-        private const int APP_BIG_WIDTH     = 760;
-        private const int APP_BIG_HEIGHT    = (APP_BIG_WIDTH - 60);
-        private const int FOOTER_BIG_Y      = (APP_BIG_HEIGHT - 20);
-        private const int FOOTER_LINE_BIG_Y = (FOOTER_BIG_Y - 2);
-        private const int EXIT_BIG_X        = (APP_BIG_WIDTH - 28);
-        private const int ACCOUNT_BIG_X     = (APP_BIG_WIDTH - 120);
+        private const int APP_WIDTH                         = 550;
+        private const int APP_HEIGHT                        = (APP_WIDTH + 50);
+        private const int FOOTER_Y                          = (APP_HEIGHT - 20);
+        private const int FOOTER_LINE_Y                     = (FOOTER_Y - 2);
+        private const int HEADERT_BTN_EXIT_X                = (APP_WIDTH - 28);
+        private const int HEADERT_BTN_ACCOUNT_X             = (HEADERT_BTN_EXIT_X - 40);
+        private const int HEADERT_BTN_SETTING_X             = (HEADERT_BTN_ACCOUNT_X - 40);
+        private const int HEADERT_BTN_EXIT_MOVE_X           = (APP_WIDTH - 90);
+        private const int HEADERT_BTN_ACCOUNT_MOVE_X        = (HEADERT_BTN_EXIT_MOVE_X - 40);
+        private const int HEADERT_BTN_SETTING_MOVE_X        = (HEADERT_BTN_ACCOUNT_MOVE_X - 40);
+
+        private const int APP_BIG_WIDTH                     = 760;
+        private const int APP_BIG_HEIGHT                    = (APP_BIG_WIDTH - 60);
+        private const int FOOTER_BIG_Y                      = (APP_BIG_HEIGHT - 20);
+        private const int FOOTER_LINE_BIG_Y                 = (FOOTER_BIG_Y - 2);
+        private const int HEADERT_BTN_EXIT_BIG_X            = (APP_BIG_WIDTH - 28);
+        private const int HEADERT_BTN_ACCOUNT_BIG_X         = (HEADERT_BTN_EXIT_BIG_X - 40);
+        private const int HEADERT_BTN_SETTING_BIG_X         = (HEADERT_BTN_ACCOUNT_BIG_X - 40);
+        private const int HEADERT_BTN_EXIT_MOVE_BIG_X       = (APP_BIG_WIDTH - 90);
+        private const int HEADERT_BTN_ACCOUNT_MOVE_BIG_X    = (HEADERT_BTN_EXIT_MOVE_BIG_X - 40);
+        private const int HEADERT_BTN_SETTING_MOVE_BIG_X    = (HEADERT_BTN_ACCOUNT_MOVE_BIG_X - 40);
 
         /* 音源合成 */
         private Thread coroutineVocalPlus;     /* ボーカル合成用スレッド */
@@ -138,6 +155,11 @@ namespace trackID3TagSwitcher
         private bool isEnterExitBtn = false;
         private Thread coroutineExitButton;
 
+        /* 設定パネル */
+        private bool m_settings_open = false;
+        private bool m_settings_running = false;
+
+
         #region 汎用型スクリプト
 
         /// <summary>
@@ -154,14 +176,20 @@ namespace trackID3TagSwitcher
             this.lblID3TagLabel.Visible = false;
             this.imgCurrentAlbumArtwork.ImageLocation = "";
             this.imgCurrentAlbumArtwork.Visible = false;
+            /*
             this.lblCurrentText.Text = "";
             this.lblCurrentText.Visible = false;
             this.lblNextText.Text = "";
             this.lblNextText.Visible = false;
-            this.imgCurrentMode.ImageLocation = "";
-            this.imgCurrentMode.Visible = false;
             this.imgNextMode.ImageLocation = "";
             this.imgNextMode.Visible = false;
+            */
+            this.lbl_currTagType.Text = "";
+            this.lbl_currTagType.Visible = false;
+            this.lbl_currWavesType.Text = "";
+            this.lbl_currWavesType.Visible = false;
+            this.imgCurrentMode.ImageLocation = "";
+            this.imgCurrentMode.Visible = false;
             this.lblArrow2.Visible = false;
             this.isTypeFYS = false;
             this.canStartSwitcher = false;
@@ -190,11 +218,112 @@ namespace trackID3TagSwitcher
             this.lblAppLogText.Text = log;
         }
 
-        private void BtnClearCache_Click(object sender, EventArgs e)
+        private async void BtnClearCache_Click(object sender, EventArgs e)
         {
+            await SlideOutPanels( );
             ClearCache();
             SetLog(Color.LimeGreen, MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.CLEAR_LOAD_DATA]);
         }
+
+        private async Task SlideOutPanels( )
+        {
+            bool loop = true;
+            int fast = 30;
+            int medium = fast - 5;
+            int lower = medium - 10;
+
+            while ( loop )
+            {
+                if ( ( this.pnl_currLoadInfo.Location.X - fast ) > MAIN_AREA_HIDE_X )
+                    this.pnl_currLoadInfo.Location = new Point( this.pnl_currLoadInfo.Location.X - fast , CURR_INFO_AREA_Y );
+                else
+                    this.pnl_currLoadInfo.Location = new Point( MAIN_AREA_HIDE_X , CURR_INFO_AREA_Y );
+
+                if ( ( this.pnl_currTagType.Location.X - medium ) > MAIN_AREA_HIDE_X )
+                    this.pnl_currTagType.Location = new Point( this.pnl_currTagType.Location.X - medium , CURR_ID3_AREA_Y );
+                else
+                    this.pnl_currTagType.Location = new Point( MAIN_AREA_HIDE_X , CURR_ID3_AREA_Y );
+
+                if ( ( this.pnl_execConvert.Location.X - lower ) > MAIN_AREA_HIDE_X )
+                    this.pnl_execConvert.Location = new Point( this.pnl_execConvert.Location.X - lower , EXEC_CONV_AREA_Y );
+                else
+                    this.pnl_execConvert.Location = new Point( MAIN_AREA_HIDE_X , EXEC_CONV_AREA_Y );
+
+                if ( ( this.pnl_currLoadInfo.Location.X == MAIN_AREA_HIDE_X ) && ( this.pnl_currTagType.Location.X == MAIN_AREA_HIDE_X ) && ( this.pnl_execConvert.Location.X == MAIN_AREA_HIDE_X ) )
+                    loop = false;
+
+                await Task.Delay( 1 );
+            }
+        }
+
+        #endregion
+
+        #region 設定パネル
+
+        private async void img_btn_setting_Click( object sender , EventArgs e )
+        {
+            /* アニメーション実行中は重複処理させない */
+            if ( m_settings_running )
+                return;
+
+            if ( !m_settings_open )
+            {
+                this.pnl_albumSearch.Enabled = false;
+                this.pnl_currLoadInfo.Enabled = false;
+                this.pnl_currTagType.Enabled = false;
+                this.pnl_execConvert.Enabled = false;
+                await SlideInSettingPanels( );
+            }
+            else
+            {
+                await SlideOutSettingPanels( );
+                this.pnl_albumSearch.Enabled = true;
+                this.pnl_currLoadInfo.Enabled = true;
+                this.pnl_currTagType.Enabled = true;
+                this.pnl_execConvert.Enabled = true;
+            }
+        }
+
+        private async Task SlideInSettingPanels( )
+        {
+            m_settings_running = true;
+            int speed = 20;
+
+            while ( m_settings_running )
+            {
+                if ( ( this.pnl_settings.Location.Y + speed ) < DESIGN_DEF_Y )
+                    this.pnl_settings.Location = new Point( DESIGN_DEF_X , this.pnl_settings.Location.Y + speed );
+                else
+                {
+                    this.pnl_settings.Location = new Point( DESIGN_DEF_X , DESIGN_DEF_Y );
+                    m_settings_open = true;
+                    m_settings_running = false;
+                }
+
+                await Task.Delay( 1 );
+            }
+        }
+
+        private async Task SlideOutSettingPanels( )
+        {
+            m_settings_running = true;
+            int speed = 20;
+
+            while ( m_settings_running )
+            {
+                if ( ( this.pnl_settings.Location.Y - speed ) > SETTING_AREA_HIDE_Y )
+                    this.pnl_settings.Location = new Point( DESIGN_DEF_X , this.pnl_settings.Location.Y - speed );
+                else
+                {
+                    this.pnl_settings.Location = new Point( DESIGN_DEF_X , SETTING_AREA_HIDE_Y );
+                    m_settings_open = false;
+                    m_settings_running = false;
+                }
+
+                await Task.Delay( 1 );
+            }
+        }
+
         #endregion
 
         #region アルバム読み込み
@@ -376,23 +505,35 @@ namespace trackID3TagSwitcher
         {
             if (!this.isTypeFYS)
             {
+                this.imgCurrentMode.ImageLocation = Application.StartupPath + "\\item\\arn.jpg";
+                this.lbl_currTagType.Text = "ID3：A-Remix Nation方式";
+                /*
                 this.lblCurrentText.Text = "A-Remix Nation方式";
                 this.lblNextText.Text = "For You Sounds方式";
                 this.imgCurrentMode.ImageLocation = Application.StartupPath + "\\item\\arn.jpg";
                 this.imgNextMode.ImageLocation = Application.StartupPath + "\\item\\fys.jpg";
+                */
             }
             else
             {
+                this.imgCurrentMode.ImageLocation = Application.StartupPath + "\\item\\fys.jpg";
+                this.lbl_currTagType.Text = "ID3：For You Sounds方式";
+                /*
                 this.lblCurrentText.Text = "For You Sounds方式";
                 this.lblNextText.Text = "A-Remix Nation方式";
                 this.imgCurrentMode.ImageLocation = Application.StartupPath + "\\item\\fys.jpg";
                 this.imgNextMode.ImageLocation = Application.StartupPath + "\\item\\arn.jpg";
+                */
             }
+            this.imgCurrentMode.Visible = true;
+            this.lbl_currTagType.Visible = true;
+            /*
             this.lblCurrentText.Visible = true;
             this.lblNextText.Visible = true;
             this.lblArrow2.Visible = true;
             this.imgCurrentMode.Visible = true;
             this.imgNextMode.Visible = true;
+            */
         }
         private bool GetMaxTrack( string path )
         {
@@ -644,7 +785,37 @@ namespace trackID3TagSwitcher
                 }
             }
         }
-        private void CheckAlbumConfig( string path )
+        private async Task SlideInPanels( )
+        {
+            bool loop = true;
+            int fast = 30;
+            int medium = fast - 5;
+            int lower = medium - 10;
+
+            while ( loop )
+            {
+                if ( ( this.pnl_currLoadInfo.Location.X + fast ) < DESIGN_DEF_X )
+                    this.pnl_currLoadInfo.Location = new Point( this.pnl_currLoadInfo.Location.X + fast , CURR_INFO_AREA_Y);
+                else
+                    this.pnl_currLoadInfo.Location = new Point( DESIGN_DEF_X , CURR_INFO_AREA_Y );
+
+                if ( ( this.pnl_currTagType.Location.X + medium ) < DESIGN_DEF_X )
+                    this.pnl_currTagType.Location = new Point( this.pnl_currTagType.Location.X + medium , CURR_ID3_AREA_Y );
+                else
+                    this.pnl_currTagType.Location = new Point( DESIGN_DEF_X , CURR_ID3_AREA_Y );
+
+                if ( ( this.pnl_execConvert.Location.X + lower ) < DESIGN_DEF_X )
+                    this.pnl_execConvert.Location = new Point( this.pnl_execConvert.Location.X + lower , EXEC_CONV_AREA_Y );
+                else
+                    this.pnl_execConvert.Location = new Point( DESIGN_DEF_X , EXEC_CONV_AREA_Y );
+
+                if ( ( this.pnl_currLoadInfo.Location.X == DESIGN_DEF_X ) && ( this.pnl_currTagType.Location.X == DESIGN_DEF_X ) && ( this.pnl_execConvert.Location.X == DESIGN_DEF_X ) )
+                    loop = false;
+
+                await Task.Delay( 1 );
+            }
+        }
+        private async Task CheckAlbumConfig( string path )
         {
             string file = path + "\\trackinfo.cbl";
             bool ret = true;
@@ -700,7 +871,10 @@ namespace trackID3TagSwitcher
 
                 /* ID3リスト作成ページの各ボックスを初期化 */
                 DeleteAnotherBoxes();
-                
+
+                /* 各種パネルの表示アニメーション */
+                await SlideInPanels( );
+
                 SetLog(Color.LimeGreen, MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Load_Album]);
                 this.boxAlbumPath.Text = path;
                 this.canStartSwitcher = true;
@@ -738,7 +912,7 @@ namespace trackID3TagSwitcher
             }
         }
 
-        private void btnLoadAlbum_DragDrop(object sender, DragEventArgs e)
+        private async void btnLoadAlbum_DragDrop(object sender, DragEventArgs e)
         {
             // 実際にデータを取り出す
             var data = e.Data.GetData(DataFormats.FileDrop, true) as string[];
@@ -748,14 +922,15 @@ namespace trackID3TagSwitcher
             {
                 foreach (var filePath in data)
                 {
-                    CheckAlbumConfig(filePath);
+                    await CheckAlbumConfig( filePath );
+                    break;
                 }
             }
         }
 
         #endregion
 
-        private void BtnLoadAlbum_Click(object sender, EventArgs e)
+        private async void BtnLoadAlbum_Click(object sender, EventArgs e)
         {
             var dialog = new CommonOpenFileDialog("アルバムを選択してください。");
             // フォルダ選択モード
@@ -763,7 +938,8 @@ namespace trackID3TagSwitcher
 
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                CheckAlbumConfig(dialog.FileName);
+                
+                await CheckAlbumConfig( dialog.FileName );
             }
             else
             {
@@ -881,6 +1057,10 @@ namespace trackID3TagSwitcher
         {
             if ( !this.isTypeFYS )
             {
+                this.imgCurrentMode.ImageLocation = Application.StartupPath + "\\item\\fys.jpg";
+                this.lbl_currTagType.Text = "ID3タグ：For You Sounds方式";
+                this.isTypeFYS = true;
+                /*
                 this.lblCurrentText.Text = "For You Sounds方式";
                 this.lblNextText.Text = "A-Remix Nation方式";
                 this.imgCurrentMode.ImageLocation = Application.StartupPath + "\\item\\fys.jpg";
@@ -889,9 +1069,14 @@ namespace trackID3TagSwitcher
                 this.lblNextText.Visible = true;
                 this.lblArrow2.Visible = true;
                 this.isTypeFYS = true;
+                */
             }
             else
             {
+                this.imgCurrentMode.ImageLocation = Application.StartupPath + "\\item\\arn.jpg";
+                this.lbl_currTagType.Text = "ID3タグ：A-Remix Nation方式";
+                this.isTypeFYS = false;
+                /*
                 this.lblCurrentText.Text = "A-Remix Nation方式";
                 this.lblNextText.Text = "For You Sounds方式";
                 this.imgCurrentMode.ImageLocation = Application.StartupPath + "\\item\\arn.jpg";
@@ -900,6 +1085,7 @@ namespace trackID3TagSwitcher
                 this.lblNextText.Visible = true;
                 this.lblArrow2.Visible = true;
                 this.isTypeFYS = false;
+                */
             }
         }
 
@@ -1051,15 +1237,22 @@ namespace trackID3TagSwitcher
             SaveSetting( launch: true );
 
             /* 座標初期化 */
-            this.pnlPage1.Location          = new Point(DESIGN_DEF_X, MAIN_AREA_Y);
+            this.pnlPage1.Location          = new Point(DESIGN_DEF_X, DESIGN_DEF_Y);
             this.ClientSize                 = new Size(APP_WIDTH, APP_HEIGHT);
             this.pnlAppFooterLine.Location  = new Point(DESIGN_DEF_X, FOOTER_LINE_Y);
             this.pnlAppFooter.Location      = new Point(DESIGN_DEF_X, FOOTER_Y);
-            this.pnlTrackInfo.Location      = new Point(SUB_AREA_HIDE_X, MAIN_AREA_Y);
+            this.pnlAppLine1.Size           = new Size(APP_WIDTH, LINE_HEIGHT);
+            this.pnlAppLine2.Size           = new Size(APP_WIDTH, LINE_HEIGHT);
+            this.pnlTrackInfo.Location      = new Point(DESIGN_DEF_X, MAIN_AREA_Y);
+            this.pnl_currLoadInfo.Location  = new Point(MAIN_AREA_HIDE_X, CURR_INFO_AREA_Y);
+            this.pnl_currTagType.Location   = new Point(MAIN_AREA_HIDE_X, CURR_ID3_AREA_Y);
+            this.pnl_execConvert.Location   = new Point(MAIN_AREA_HIDE_X , EXEC_CONV_AREA_Y);
+            this.pnl_settings.Location      = new Point(DESIGN_DEF_X , SETTING_AREA_HIDE_Y);
             SetupTrackInfoPanel();
+            
 
-            /* 使用不可能な文字があるかチェックできるようにするための初期化 */
-            invalidChars = System.IO.Path.GetInvalidFileNameChars();
+/* 使用不可能な文字があるかチェックできるようにするための初期化 */
+invalidChars = System.IO.Path.GetInvalidFileNameChars();
             invalidReplase = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
 
             _mainContext = SynchronizationContext.Current;
@@ -1275,8 +1468,66 @@ namespace trackID3TagSwitcher
                 this.Top += e.Y - mousePoint.Y;
             }
         }
-        
+
+
+
+
         #region クリック時
+
+
+        private void pnl_settings_MouseDown( object sender , MouseEventArgs e )
+        {
+            getMousePos( e );
+        }
+        private void lbl_title_header_settings_MouseDown( object sender , MouseEventArgs e )
+        {
+            getMousePos( e );
+        }
+        private void pnl_line_setting_header_MouseDown( object sender , MouseEventArgs e )
+        {
+            getMousePos( e );
+        }
+        private void lbl_title_settings_albumSearch_MouseDown( object sender , MouseEventArgs e )
+        {
+            getMousePos( e );
+        }
+        private void lbl_opt_settings_albumSearch_ext_MouseDown( object sender , MouseEventArgs e )
+        {
+            getMousePos( e );
+        }
+        private void pnl_line_setting_albumSearch_MouseDown( object sender , MouseEventArgs e )
+        {
+            getMousePos( e );
+        }
+        private void lbl_title_settings_execConv_MouseDown( object sender , MouseEventArgs e )
+        {
+            getMousePos( e );
+        }
+
+        private void lbl_title_currLoadInfo_MouseDown( object sender , MouseEventArgs e )
+        {
+            getMousePos( e );
+        }
+
+        private void pnl_AppLine3_MouseDown( object sender , MouseEventArgs e )
+        {
+            getMousePos( e );
+        }
+
+        private void lbl_title_currTagType_MouseDown( object sender , MouseEventArgs e )
+        {
+            getMousePos( e );
+        }
+
+        private void lbl_title_execConvert_MouseDown( object sender , MouseEventArgs e )
+        {
+            getMousePos( e );
+        }
+
+        private void pnl_execConvert_MouseDown( object sender , MouseEventArgs e )
+        {
+            getMousePos( e );
+        }
 
         private void lblID3TagLabel_MouseDown(object sender, MouseEventArgs e)
         {
@@ -1406,11 +1657,107 @@ namespace trackID3TagSwitcher
         {
             getMousePos(e);
         }
+        private void pnl_currLoadInfo_MouseDown( object sender , MouseEventArgs e )
+        {
+            getMousePos( e );
+        }
+
+        private void pnl_currTagType_MouseDown( object sender , MouseEventArgs e )
+        {
+            getMousePos( e );
+        }
+
+        private void pnl_albumSearch_MouseDown( object sender , MouseEventArgs e )
+        {
+            getMousePos( e );
+        }
 
         #endregion
 
         #region ドラッグ時
-        
+
+
+
+        private void pnl_settings_MouseMove( object sender , MouseEventArgs e )
+        {
+            moveWindow( e );
+        }
+
+
+        private void lbl_title_header_settings_MouseMove( object sender , MouseEventArgs e )
+        {
+            moveWindow( e );
+        }
+
+
+        private void pnl_line_setting_header_MouseMove( object sender , MouseEventArgs e )
+        {
+            moveWindow( e );
+        }
+
+
+        private void lbl_title_settings_albumSearch_MouseMove( object sender , MouseEventArgs e )
+        {
+            moveWindow( e );
+        }
+
+
+        private void lbl_opt_settings_albumSearch_ext_MouseMove( object sender , MouseEventArgs e )
+        {
+            moveWindow( e );
+        }
+
+
+        private void pnl_line_setting_albumSearch_MouseMove( object sender , MouseEventArgs e )
+        {
+            moveWindow( e );
+        }
+
+
+        private void lbl_title_settings_execConv_MouseMove( object sender , MouseEventArgs e )
+        {
+            moveWindow( e );
+        }
+        private void lbl_title_currLoadInfo_MouseMove( object sender , MouseEventArgs e )
+        {
+            moveWindow( e );
+        }
+
+        private void pnl_AppLine3_MouseMove( object sender , MouseEventArgs e )
+        {
+            moveWindow( e );
+        }
+
+        private void lbl_title_currTagType_MouseMove( object sender , MouseEventArgs e )
+        {
+            moveWindow( e );
+        }
+
+        private void lbl_title_execConvert_MouseMove( object sender , MouseEventArgs e )
+        {
+            moveWindow( e );
+        }
+
+        private void pnl_execConvert_MouseMove( object sender , MouseEventArgs e )
+        {
+            moveWindow( e );
+        }
+
+        private void pnl_currLoadInfo_MouseMove( object sender , MouseEventArgs e )
+        {
+            moveWindow( e );
+        }
+
+        private void pnl_currTagType_MouseMove( object sender , MouseEventArgs e )
+        {
+            moveWindow( e );
+        }
+
+        private void pnl_albumSearch_MouseMove( object sender , MouseEventArgs e )
+        {
+            moveWindow( e );
+        }
+
         private void lblID3TagLabel_MouseMove(object sender, MouseEventArgs e)
         {
             moveWindow(e);
@@ -1556,20 +1903,23 @@ namespace trackID3TagSwitcher
             /* 移動先、計算量定義 */
             int st          = DESIGN_DEF_X;
             int ed          = MAIN_AREA_HIDE_X;
-            int size        = APP_WIDTH;
+            int width       = APP_WIDTH;
+            int height      = APP_HEIGHT;
             int footerLineY = FOOTER_LINE_Y;
             int footerY     = FOOTER_Y;
-            int exitX       = EXIT_X;
-            int accountX    = ACCOUNT_X;
-            int volX        = 12;
-            int volY        = 10;
+            int exitX       = HEADERT_BTN_EXIT_MOVE_X;
+            int accountX    = HEADERT_BTN_ACCOUNT_MOVE_X;
+            int settingX    = HEADERT_BTN_SETTING_MOVE_X;
+            int volX        = 7;
+            int volY        = 3;
             int page2X      = SUB_AREA_HIDE_X;
             int plusX       = 60;
 
             /* アニメーションでレイアウトが重くならないように */
             this.pnlPage1.SuspendLayout();
             this.btnExit.SuspendLayout();
-            this.btn_loginForm.SuspendLayout();
+            this.img_btn_account.SuspendLayout();
+            this.img_btn_setting.SuspendLayout( );
             this.pnlAppFooter.SuspendLayout();
             this.pnlAppFooterLine.SuspendLayout();
 
@@ -1581,22 +1931,26 @@ namespace trackID3TagSwitcher
             {
                 this.pnlPage1.Location = new Point( i, this.pnlPage1.Location.Y);
 
-                size += volX;
-                this.ClientSize = new System.Drawing.Size((size + plusX), size);
+                width += volX;
+                height += volY;
+                this.ClientSize = new System.Drawing.Size( width , height );
 
                 exitX += volX;
                 this.btnExit.Location = new Point( (exitX + plusX), this.btnExit.Location.Y);
 
                 accountX += volX;
-                this.btn_loginForm.Location = new Point( ( accountX + plusX ) , this.btn_loginForm.Location.Y );
+                this.img_btn_account.Location = new Point( ( accountX + plusX ) , this.img_btn_account.Location.Y );
+
+                settingX += volX;
+                this.img_btn_setting.Location = new Point( ( settingX + plusX ) , this.img_btn_setting.Location.Y );
 
                 footerY += volY;
                 footerLineY += volY;
                 this.pnlAppFooter.Location = new Point(this.pnlAppFooter.Location.X, footerY);
                 this.pnlAppFooterLine.Location = new Point(this.pnlAppFooterLine.Location.X, footerLineY);
 
-                page2X -= volX;
-                this.pnlTrackInfo.Location = new Point(page2X, this.pnlTrackInfo.Location.Y);
+                //page2X -= volX;
+                //this.pnlTrackInfo.Location = new Point(page2X, this.pnlTrackInfo.Location.Y);
 
                 await Task.Run(() => Thread.Sleep(10));
             }
@@ -1605,19 +1959,21 @@ namespace trackID3TagSwitcher
             VisibleBoxes(true);
 
             /* 固定位置に最終フレームで配置 */
-            this.pnlPage1.Location          = new Point(MAIN_AREA_HIDE_X    , MAIN_AREA_Y);
-            this.ClientSize                 = new Size( APP_BIG_WIDTH       , APP_BIG_HEIGHT);
-            this.btnExit.Location           = new Point(EXIT_BIG_X          , EXIT_Y);
-            this.btn_loginForm.Location     = new Point(ACCOUNT_BIG_X       , EXIT_Y);
-            this.pnlAppFooter.Location      = new Point(DESIGN_DEF_X        , FOOTER_BIG_Y);
-            this.pnlAppFooterLine.Location  = new Point(DESIGN_DEF_X        , FOOTER_LINE_BIG_Y);
-            this.pnlTrackInfo.Location      = new Point(DESIGN_DEF_X        , MAIN_AREA_Y);
+            this.pnlPage1.Location          = new Point(MAIN_AREA_HIDE_X            , DESIGN_DEF_Y);
+            this.ClientSize                 = new Size(APP_BIG_WIDTH                , APP_BIG_HEIGHT);
+            this.btnExit.Location           = new Point(HEADERT_BTN_EXIT_BIG_X      , EXIT_Y);
+            this.img_btn_account.Location   = new Point(HEADERT_BTN_ACCOUNT_BIG_X   , EXIT_Y);
+            this.img_btn_setting.Location   = new Point(HEADERT_BTN_SETTING_BIG_X   , EXIT_Y);
+            this.pnlAppFooter.Location      = new Point(DESIGN_DEF_X                , FOOTER_BIG_Y);
+            this.pnlAppFooterLine.Location  = new Point(DESIGN_DEF_X                , FOOTER_LINE_BIG_Y);
+            //this.pnlTrackInfo.Location      = new Point(DESIGN_DEF_X        , MAIN_AREA_Y);
             await Task.Run(() => Thread.Sleep(10));
 
             /* レイアウトのロック解除 */
             this.pnlPage1.ResumeLayout();
             this.btnExit.ResumeLayout();
-            this.btn_loginForm.ResumeLayout();
+            this.img_btn_account.ResumeLayout();
+            this.img_btn_setting.ResumeLayout( );
             this.pnlAppFooter.ResumeLayout();
             this.pnlAppFooterLine.ResumeLayout();
             //this.lblAppTitle.Text = "(" + this.ClientSize.Width + " , " + this.ClientSize.Height + ")";
@@ -1627,58 +1983,67 @@ namespace trackID3TagSwitcher
         {
             int st          = -500;
             int ed          = DESIGN_DEF_X;
-            int size        = APP_BIG_WIDTH;
+            int width       = APP_BIG_WIDTH;
+            int height      = APP_BIG_HEIGHT;
             int footerLineY = FOOTER_LINE_BIG_Y;
             int footerY     = FOOTER_BIG_Y;
-            int exitX       = EXIT_BIG_X;
-            int accountX    = ACCOUNT_BIG_X;
-            int volX        = 12;
-            int volY        = 10;
+            int exitX       = HEADERT_BTN_EXIT_MOVE_BIG_X;
+            int accountX    = HEADERT_BTN_ACCOUNT_MOVE_BIG_X;
+            int settingX    = HEADERT_BTN_SETTING_MOVE_BIG_X;
+            int volX        = 8;
+            int volY        = 4;
             int page2X      = DESIGN_DEF_X;
             int plusX       = 69;
 
             this.pnlPage1.SuspendLayout();
             this.btnExit.SuspendLayout();
-            this.btn_loginForm.SuspendLayout();
+            this.img_btn_account.SuspendLayout( );
+            this.img_btn_setting.SuspendLayout( );
             this.pnlAppFooter.SuspendLayout();
             this.pnlAppFooterLine.SuspendLayout();
             for (int i = st; i < ed; i += 20)
             {
                 this.pnlPage1.Location = new Point(i, this.pnlPage1.Location.Y);
 
-                size -= volX;
-                this.ClientSize = new System.Drawing.Size( (size + plusX), size);
+                width -= volX;
+                height -= volY;
+                this.ClientSize = new System.Drawing.Size( width , height );
 
                 exitX -= volX;
                 this.btnExit.Location = new Point((exitX + plusX), this.btnExit.Location.Y);
 
                 accountX -= volX;
-                this.btn_loginForm.Location = new Point( ( accountX + plusX ) , this.btn_loginForm.Location.Y );
+                this.img_btn_account.Location = new Point( ( accountX + plusX ) , this.img_btn_account.Location.Y );
+
+                settingX -= volX;
+                this.img_btn_setting.Location = new Point( ( settingX + plusX ) , this.img_btn_setting.Location.Y );
 
                 footerY -= volY;
                 footerLineY -= volY;
                 this.pnlAppFooter.Location = new Point(this.pnlAppFooter.Location.X, footerY);
                 this.pnlAppFooterLine.Location = new Point(this.pnlAppFooterLine.Location.X, footerLineY);
 
-                page2X += volX;
-                this.pnlTrackInfo.Location = new Point(page2X, this.pnlTrackInfo.Location.Y);
+                //page2X += volX;
+                //this.pnlTrackInfo.Location = new Point(page2X, this.pnlTrackInfo.Location.Y);
 
                 await Task.Run(() => Thread.Sleep(10));
             }
             
             /* 固定位置に最終フレームで配置 */
-            this.pnlPage1.Location          = new Point(DESIGN_DEF_X    , MAIN_AREA_Y);
-            this.ClientSize                 = new Size( APP_WIDTH       , APP_HEIGHT);
-            this.btnExit.Location           = new Point(EXIT_X          , EXIT_Y);
-            this.btn_loginForm.Location     = new Point(ACCOUNT_X       , EXIT_Y);
-            this.pnlAppFooter.Location      = new Point(DESIGN_DEF_X    , FOOTER_Y);
-            this.pnlAppFooterLine.Location  = new Point(DESIGN_DEF_X    , FOOTER_LINE_Y);
-            this.pnlTrackInfo.Location      = new Point(SUB_AREA_HIDE_X , MAIN_AREA_Y);
+            this.pnlPage1.Location          = new Point(DESIGN_DEF_X            , DESIGN_DEF_Y);
+            this.ClientSize                 = new Size(APP_WIDTH                , APP_HEIGHT);
+            this.btnExit.Location           = new Point(HEADERT_BTN_EXIT_X      , EXIT_Y);
+            this.img_btn_account.Location   = new Point(HEADERT_BTN_ACCOUNT_X   , EXIT_Y);
+            this.img_btn_setting.Location   = new Point(HEADERT_BTN_SETTING_X   , EXIT_Y);
+            this.pnlAppFooter.Location      = new Point(DESIGN_DEF_X            , FOOTER_Y);
+            this.pnlAppFooterLine.Location  = new Point(DESIGN_DEF_X            , FOOTER_LINE_Y);
+            //this.pnlTrackInfo.Location      = new Point(DESIGN_DEF_X    , MAIN_AREA_Y);
             await Task.Run(() => Thread.Sleep(10));
             
             this.pnlPage1.ResumeLayout();
             this.btnExit.ResumeLayout();
-            this.btn_loginForm.ResumeLayout();
+            this.img_btn_account.ResumeLayout( );
+            this.img_btn_setting.ResumeLayout( );
             this.pnlAppFooter.ResumeLayout();
             this.pnlAppFooterLine.ResumeLayout();
         }
@@ -2312,6 +2677,15 @@ namespace trackID3TagSwitcher
         #endregion
 
         private void loginSetting_Click( object sender , EventArgs e )
+        {
+            if ( loginForm.IsDisposed )
+            {
+                loginForm = new AccountForm( );
+            }
+            loginForm.Show( );
+        }
+
+        private void img_btn_account_Click( object sender , EventArgs e )
         {
             if ( loginForm.IsDisposed )
             {
