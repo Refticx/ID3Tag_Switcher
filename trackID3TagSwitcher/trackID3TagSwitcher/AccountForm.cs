@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using PastebinAPI_nikibobi;
+using System.Threading;
 
 namespace trackID3TagSwitcher
 {
@@ -20,14 +21,44 @@ namespace trackID3TagSwitcher
         private MessageForm messageForm = new MessageForm( );    /* ダイアログ用フォームを作成しておく */
 
         /* プログレスバー設定 */
-        private const int SERVER_FUNC_NUM = 9;
+        /// <summary>
+        /// プログレスバーに割り当てる、async処理内のファンクション数
+        /// </summary>
+        private const int SERVER_FUNC_NUM = 20;
 
-        /* サーバー設定 */
-        private string m_serverUsername = "";
-        private string m_serverPassword = "";
-        private string m_serverKey = "";
-        private string m_serverLoggedUser = "";
-        private string m_serverPage = "";
+        /* ==================== サーバー設定 ==================== */
+
+        /// <summary>
+        /// サーバーから取得するページの最大件数
+        /// </summary>
+        private const int SERVER_MAX_PAGE = 3;
+
+        /// <summary>
+        /// アカウントリストのページの暗号化の際の移動オフセット量
+        /// </summary>
+        private const int ENCRYPT_SHIFT_SIZE_ACC_PAGE = 2;
+
+        /// <summary>
+        /// サインインリストのページの暗号化の際の移動オフセット量
+        /// </summary>
+        private const int ENCRYPT_SHIFT_SIZE_SIGN_PAGE = 3;
+
+        /// <summary>
+        /// アカウントコンフィグファイルの暗号化の際の移動オフセット量
+        /// </summary>
+        private const int ENCRYPT_SHIFT_SIZE_CONFIG_FILE = 5;
+
+        /// <summary>
+        /// サーバーアカウントデータの暗号化の際の移動オフセット量
+        /// </summary>
+        private const int ENCRYPT_SHIFT_SIZE_SERVER_ACC = 6;
+
+        public static string m_serverUsername = "";
+        public static string m_serverPassword = "";
+        public static string m_serverKey = "";
+        public static string m_serverAccPage = "";
+        public static string m_serverSignPage = "";
+        public static string m_serverSettingInfo = "";
         private string m_machineId = "";
 
         /* 各関数処理用変数 */
@@ -36,15 +67,39 @@ namespace trackID3TagSwitcher
         private const string SPACE_PASS = "[+@]";
         private const string SPACE_MCNID = "[+=]";
         private const string SPACE_UNQID = "[+!]";
+        private const string SPACE_SIGN = "[+*]";
+        private const string STATUS_SIGNIN = "1";
+        private const string STATUS_SIGNOUT = "0";
+        private const string START_TXT_S_USER = "<s_user>";
+        private const string END_TXT_S_USER = "</s_user>";
+        private const string START_TXT_S_PASS = "<s_pass>";
+        private const string END_TXT_S_PASS = "</s_pass>";
+        private const string START_TXT_S_KEY = "<s_key>";
+        private const string END_TXT_S_KEY = "</s_key>";
+        private const string START_TXT_S_ACC_TITLE = "<s_acctitle>";
+        private const string END_TXT_S_ACC_TITLE = "</s_acctitle>";
+        private const string START_TXT_S_SIGN_TITLE = "<s_signtitle>";
+        private const string END_TXT_S_SIGN_TITLE = "</s_signtitle>";
+
+        /// <summary>
+        /// アカウントリスト内に自分のアカウントがあり、デバイス情報も一致しているかどうか
+        /// </summary>
+        public static bool isMatchMyAccount = false;
+
+        /// <summary>
+        /// ログインリスト内に自分のアカウントが無く、作成が必要な場合に建てるフラグ
+        /// </summary>
+        public static bool isNeedCreateStatus = false;
+
+        /// <summary>
+        /// ログインリスト内の自分のアカウントをログイン状態にした段階でネットワークライセンスを付与する
+        /// </summary>
+        public static bool isUnlockLicence = false;
 
         private Task<bool> m_coroutine_task;
         private bool m_coroutine_flag = false;
-        private PastebinAPI m_serverAPI;
-        private PasteLoginRequest m_serverLoginReq;
-        private PasteListRequest m_serverListReq;
-        private PasteData[] m_serverDatas;
-        private string m_serverUri = "";
-        private string m_serverReq = "";
+        private string m_serverAccPageUri = "";
+        private string m_serverAccPageReq = "";
         private string m_serverContent = "";
         private string m_decryptContent = "";
         private string m_encryptContent = "";
@@ -55,14 +110,16 @@ namespace trackID3TagSwitcher
         private StringReader m_sr;
         private string m_line = "";
         private DialogResult m_dResult;
-        private char m_char;
-        public static bool isUnlockLicence = false;
-        private PasteDeleteRequest m_serverDelReq;
-        private PasteCreateRequest m_serverCreateReq;
+        private string m_localText1 = String.Empty;
+        private string m_localText2 = String.Empty;
 
         private PastebinAPI_nikibobi.User m_userAsync;
         private Uri m_uriAsync;
-        private PastebinAPI_nikibobi.Paste m_serverDelReqAsync;
+        private PastebinAPI_nikibobi.Paste m_serverAccPageDelReqAsync;
+
+        private string m_serverSignPageUri = "";
+        private string m_serverSignPageReq = "";
+        private PastebinAPI_nikibobi.Paste m_serverSignPageDelReqAsync;
 
         public AccountForm( )
         {
@@ -71,6 +128,7 @@ namespace trackID3TagSwitcher
 
         private void LoginForm_Load( object sender , EventArgs e )
         {
+            HideInputObjs( false );
             GetCurrentMachineID( );
             LoadSetting( );
             CheckNetwork( );
@@ -108,13 +166,8 @@ namespace trackID3TagSwitcher
         /// </summary>
         private void CheckNetwork( )
         {
-            if ( !System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable( ) )
-            {
-                /* 確認ダイアログを表示 */
-                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Connect_Network] , MessageForm.MODE_OK );
-                messageForm.ShowDialog( );
+            if ( !NetworkFunc.CheckNetworkWithMessage( ) )
                 this.Close( );
-            }
         }
 
         /// <summary>
@@ -122,14 +175,22 @@ namespace trackID3TagSwitcher
         /// </summary>
         private void CheckServiceInfo( )
         {
-            if ( ( m_serverUsername.Length == 0 ) ||
-                    ( m_serverPassword.Length == 0 ) ||
-                    ( m_serverKey.Length == 0 ) ||
-                    ( m_serverPage.Length == 0 ) )
+            /*
+            if ( ( m_serverUsername == String.Empty ) ||
+                    ( m_serverPassword == String.Empty ) ||
+                    ( m_serverKey == String.Empty ) ||
+                    ( m_serverSignPage == String.Empty ) ||
+                    ( m_machineId == String.Empty ) ||
+                    ( m_serverSettingInfo == String.Empty ) ||
+                    ( m_serverAccPage == String.Empty ) )
+                    */
+            if ( m_serverSettingInfo == String.Empty )
             {
-                /* 確認ダイアログを表示 */
-                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_ServerInfo] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Press_Reflesh] , MessageForm.MODE_OK );
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_ServerInfo] +
+                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Re_Download_App] , 
+                                            MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
+                this.Close( );
             }
         }
 
@@ -156,6 +217,12 @@ namespace trackID3TagSwitcher
                 messageForm.ShowDialog( );
                 return false;
             }
+            else if ( this.box_user.Text.Contains( SPACE_SIGN ) )
+            {
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Cannot_Use_Username] , MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                return false;
+            }
 
             if ( this.box_pass.Text.Contains( SPACE_PASS ) )
             {
@@ -175,6 +242,12 @@ namespace trackID3TagSwitcher
                 messageForm.ShowDialog( );
                 return false;
             }
+            else if ( this.box_pass.Text.Contains( SPACE_SIGN ) )
+            {
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Cannot_Use_Password] , MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                return false;
+            }
 
             return true;
         }
@@ -188,6 +261,7 @@ namespace trackID3TagSwitcher
             {
                 LockLogin( false );
                 SetLog( this.lblAppLogText ,  Color.LimeGreen , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Login_noticeBar] );
+                SetLog( this.lbl_progressContent , Color.AliceBlue , String.Empty );
             }
         }
 
@@ -201,321 +275,182 @@ namespace trackID3TagSwitcher
             this.btn_Login.Enabled = onf;
         }
 
-        #endregion
-
-        #region サーバー接続処理（同期）
-
         /// <summary>
-        /// アカウント管理サーバーにログインする
+        /// ログアウト時に入力可能なフィールドは表示しないようにする
         /// </summary>
-        private bool LoginToPastebin( )
+        private void HideInputObjs( bool onf )
         {
-            m_serverAPI = new PastebinAPI( );
-            m_serverAPI.APIKey = m_serverKey;
-
-            if ( m_serverLoginReq != null )
-                m_serverLoginReq = null;
-            m_serverLoginReq = new PasteLoginRequest( );
-            m_serverLoginReq.Name = m_serverUsername;
-            m_serverLoginReq.Password = m_serverPassword;
-
-            m_serverLoggedUser = m_serverAPI.Login( m_serverLoginReq );
-
-            /* ユーザー情報を取得できなかった場合 */
-            if ( m_serverLoggedUser.Length == 0 )
-            {
-                /* 確認ダイアログを表示 */
-                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Connect_Server] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Press_Reflesh] , MessageForm.MODE_OK );
-                messageForm.ShowDialog( );
-                return false;
-            }
-
-            return true;
-            /* MessageBox.Show( "UserKey : " + m_loggedUser ); */
-        }
-
-        /// <summary>
-        /// アカウント管理サーバーからアカウント管理ページのURLを取得する
-        /// </summary>
-        private bool GetListToPastebin( )
-        {
-            if ( m_serverListReq != null )
-                m_serverListReq = null;
-            m_serverListReq = new PasteListRequest( );
-            m_serverListReq.UserKey = m_serverLoggedUser;
-            m_serverListReq.ResultsLimit = null;
-
-            if ( m_serverDatas != null )
-                m_serverDatas = null;
-            m_serverDatas = m_serverAPI.ListPastes( m_serverListReq );
-            foreach ( var paste in m_serverDatas )
-            {
-                if ( paste.Title == m_serverPage )
-                {
-                    m_serverUri = paste.Url;
-                    m_serverReq = paste.Key;
-                    return true;
-                }
-            }
-
-            /* 確認ダイアログを表示 */
-            messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Server_Setting] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Press_Reflesh] , MessageForm.MODE_OK );
-            messageForm.ShowDialog( );
-            return false;
-        }
-
-        /// <summary>
-        /// アカウント管理ページから全アカウント情報を取得する
-        /// </summary>
-        private bool GetHtml( )
-        {
-            if ( m_webClient != null )
-                m_webClient = null;
-            m_webClient = new WebClient( );
-
-            try
-            {
-                m_serverContent = m_webClient.DownloadString( m_serverUri );
-                if ( m_serverContent.Contains( START_TXT ) )
-                {
-                    /* アカウントリストを取得する範囲設定 */
-                    m_startPos = m_serverContent.IndexOf( START_TXT );
-                    m_startPos += START_TXT.Length;
-                    m_endPos = m_serverContent.IndexOf( END_TXT );
-                    m_length = m_endPos - m_startPos;
-
-                    m_serverContent = m_serverContent.Substring( m_startPos , m_length );
-                    if ( m_serverContent.Length == 0 )
-                    {
-                        /* 確認ダイアログを表示 */
-                        messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_Account_Info] + 
-                                                    MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Re_Login_After] +
-                                                    MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Case_To_Developer] , 
-                                                    MessageForm.MODE_OK );
-                        messageForm.ShowDialog( );
-                        return false;
-                    }
-
-                    // MessageBox.Show( m_serverContent );
-                    return true;
-                }
-            }
-            catch ( WebException exc )
-            {
-                /* 確認ダイアログを表示 */
-                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Error_Get_Account_Info] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Error_To_Developer] + exc.ToString( ) , MessageForm.MODE_OK );
-                messageForm.ShowDialog( );
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// 取得した全アカウント情報を復号化する
-        /// </summary>
-        private bool DecryptHtml( )
-        {
-            try
-            {
-                m_decryptContent = "";
-                for ( int i = 0 ; i < m_serverContent.Length ; i++ )
-                {
-                    //m_char = m_serverContent[i];
-                    //m_char = (char)( (int)m_char - 2 );
-                    m_decryptContent += (char)( (int)m_serverContent[i] - 2 );
-                }
-                // MessageBox.Show( m_decryptContent );
-                return true;
-            }
-            catch ( Exception ex )
-            {
-                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_Account_Info] +
-                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Error_To_Developer] +
-                                            ex.Message ,
-                                            MessageForm.MODE_OK );
-                messageForm.ShowDialog( );
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// 全アカウント情報の中から自分の情報があるか検索する
-        /// </summary>
-        private bool AnalysisHtml( )
-        {
-            try
-            {
-                isUnlockLicence = false;
-
-                /* 入力されたユーザー名が存在しないパターン */
-                if ( !m_decryptContent.Contains( this.box_user.Text + SPACE_PASS ) )
-                {
-                    messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Found_Your_Account_Make_Now] , MessageForm.MODE_YN );
-                    m_dResult = messageForm.ShowDialog( );
-                    if ( m_dResult == DialogResult.Yes )
-                        return true;
-                    else
-                        return false;
-                }
-
-                if ( m_sr != null )
-                    m_sr = null;
-                m_sr = new StringReader( m_decryptContent );
-                while ( m_sr.Peek( ) > -1 )
-                {
-                    m_line = m_sr.ReadLine( );
-
-                    /* その行内にユーザー名がマッチ */
-                    if ( m_line.Contains( this.box_user.Text + SPACE_PASS ) )
-                    {
-                        /* パスワードも一致 */
-                        if ( m_line.Contains( this.box_pass.Text + SPACE_MCNID ) )
-                        {
-                            /* アカウント作成したPCのIDも一致 */
-                            if ( m_line.Contains( SPACE_MCNID + m_machineId ) )
-                            {
-                                isUnlockLicence = true;
-                                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Login_pt1] +
-                                                            this.box_user.Text +
-                                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Login_pt2] ,
-                                                            MessageForm.MODE_OK );
-                                messageForm.ShowDialog( );
-                                return true;
-                            }
-                            /* 違うPCからのログインの場合 */
-                            else
-                            {
-                                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Match_MachineID] , MessageForm.MODE_OK );
-                                messageForm.ShowDialog( );
-                                return false;
-                            }
-                        }
-                        /* 入力されたユーザー名に対し、パスワードが一致しないパターン */
-                        else
-                        {
-                            messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Match_Password] , MessageForm.MODE_OK );
-                            messageForm.ShowDialog( );
-                            return false;
-                        }
-                    }
-                }
-            }
-            catch ( Exception ex )
-            {
-                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_Account_Info] +
-                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Error_To_Developer] +
-                                            ex.Message ,
-                                            MessageForm.MODE_OK );
-                messageForm.ShowDialog( );
-                return false;
-            }
-
-            messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Found_Your_Account_Make_Now] , MessageForm.MODE_YN );
-            m_dResult = messageForm.ShowDialog( );
-            if ( m_dResult == DialogResult.Yes )
-                return true;
+            bool flag = false;
+            if ( onf )
+                flag = false;
             else
-                return false;
-        }
-
-        /// <summary>
-        /// 自分のアカウント情報を付けたし、暗号化する
-        /// </summary>
-        private bool EncryptHtml( )
-        {
-            try
-            {
-                m_decryptContent += "\r\n";
-                m_decryptContent += this.box_user.Text + SPACE_PASS;
-                m_decryptContent += this.box_pass.Text + SPACE_MCNID;
-                m_decryptContent += m_machineId;
-
-                m_encryptContent = "";
-                for ( int i = 0 ; i < m_decryptContent.Length ; i++ )
-                {
-                    m_encryptContent += (char)( (int)m_decryptContent[i] + 2 );
-                }
-                // MessageBox.Show( m_encryptContent );
-                return true;
-            }
-            catch ( Exception ex )
-            {
-                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_Account_Info] +
-                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Error_To_Developer] +
-                                            ex.Message ,
-                                            MessageForm.MODE_OK );
-                messageForm.ShowDialog( );
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// 現在のアカウント管理ページを一旦削除する
-        /// </summary>
-        private bool DeleteHtml( )
-        {
-            if ( m_serverDelReq != null )
-                m_serverDelReq = null;
-
-            m_serverDelReq = new PasteDeleteRequest( );
-            m_serverDelReq.UserKey = m_serverLoggedUser;
-            m_serverDelReq.PasteKey = m_serverReq;
-
-            if ( m_serverAPI.DeletePaste( m_serverDelReq ) )
-            {
-                return true;
-            }
-            else
-            {
-                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Failed_Login] +
-                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Re_Login_After] +
-                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Case_To_Developer] ,
-                                            MessageForm.MODE_OK );
-                messageForm.ShowDialog( );
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// 新しくアカウントページを作り直す
-        /// </summary>
-        private bool MakeHtml( )
-        {
-            if ( m_serverCreateReq != null )
-                m_serverCreateReq = null;
-
-            m_serverCreateReq = new PasteCreateRequest( );
-            m_serverCreateReq.Code = m_encryptContent;
-            m_serverCreateReq.Name = m_serverPage;
-            m_serverCreateReq.ExpireDate = PasteExpireDate.Never;
-            m_serverCreateReq.Private = PastePrivate.Unlisted;
-            m_serverCreateReq.Format = "text";
-            m_serverCreateReq.UserKey = m_serverLoggedUser; // Set UserKey In Login,  Empty(or null) In Guest
-
-            if( m_serverAPI.CreatePaste( m_serverCreateReq ).Length != 0 )
-            {
-                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Login_pt1] +
-                                            this.box_user.Text +
-                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Register_pt2] ,
-                                            MessageForm.MODE_OK );
-                messageForm.ShowDialog( );
-
-                isUnlockLicence = true;
-                return true;
-            }
-            else
-            {
-                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Failed_Login] +
-                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Re_Login_After] +
-                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Case_To_Developer] ,
-                                            MessageForm.MODE_OK );
-                messageForm.ShowDialog( );
-                return false;
-            }
+                flag = true;
+            this.box_user.Visible = flag;
+            this.box_pass.Visible = flag;
+            this.btn_Login.Visible = flag;
         }
 
         #endregion
 
         #region サーバー接続処理（非同期）
+
+        /// <summary>
+        /// 全処理で使う変数を初期化する
+        /// </summary>
+        /// <returns></returns>
+        private async Task<bool> ClearArgs( )
+        {
+            try
+            {
+                SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Clear_Args] );
+
+                Pastebin.DevKey = String.Empty;
+                m_userAsync = null;
+
+                m_serverAccPageUri = String.Empty;
+                m_serverAccPageReq = String.Empty;
+                m_serverAccPageDelReqAsync = null;
+                m_serverSignPageUri = String.Empty;
+                m_serverSignPageReq = String.Empty;
+                m_serverSignPageDelReqAsync = null;
+
+                m_webClient = null;
+                m_uriAsync = null;
+                m_serverContent = String.Empty;
+                m_startPos = 0;
+                m_startPos = 0;
+                m_endPos = 0;
+                m_length = 0;
+
+                m_decryptContent = String.Empty;
+
+                m_sr = null;
+                m_line = String.Empty;
+
+                m_decryptContent = String.Empty;
+
+                m_localText1 = String.Empty;
+                m_localText2 = String.Empty;
+
+                isMatchMyAccount = false;
+                isNeedCreateStatus = false;
+                isUnlockLicence = false;
+
+                await Task.Delay( 1 );
+                return true;
+            }
+            catch( Exception ex )
+            {
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Error] + ex.ToString( ) , MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Clear_Args] );
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// サーバーから全
+        /// </summary>
+        /// <returns></returns>
+        private async Task<bool> GetServerSettingsAsync( string uri )
+        {
+            if ( m_webClient != null )
+                m_webClient = null;
+            m_webClient = new WebClient( );
+
+            if ( m_uriAsync != null )
+                m_uriAsync = null;
+            m_uriAsync = new Uri( uri );
+
+            try
+            {
+                SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Get_Data_List] );
+                m_localText1 = await m_webClient.DownloadStringTaskAsync( m_uriAsync );
+                m_localText1 = NetworkFunc.DecryptHtmlWithMessage( m_localText1 , ENCRYPT_SHIFT_SIZE_SERVER_ACC );
+
+                if ( m_localText1.Contains( START_TXT_S_USER ) )
+                {
+                    m_startPos = m_localText1.IndexOf( START_TXT_S_USER );
+                    m_startPos += START_TXT_S_USER.Length;
+                    m_endPos = m_localText1.IndexOf( END_TXT_S_USER );
+                    m_length = m_endPos - m_startPos;
+                    m_serverUsername = m_localText1.Substring( m_startPos , m_length );
+                }
+
+                if ( m_localText1.Contains( START_TXT_S_PASS ) )
+                {
+                    m_startPos = m_localText1.IndexOf( START_TXT_S_PASS );
+                    m_startPos += START_TXT_S_PASS.Length;
+                    m_endPos = m_localText1.IndexOf( END_TXT_S_PASS );
+                    m_length = m_endPos - m_startPos;
+                    m_serverPassword = m_localText1.Substring( m_startPos , m_length );
+                }
+
+                if ( m_localText1.Contains( START_TXT_S_KEY ) )
+                {
+                    m_startPos = m_localText1.IndexOf( START_TXT_S_KEY );
+                    m_startPos += START_TXT_S_KEY.Length;
+                    m_endPos = m_localText1.IndexOf( END_TXT_S_KEY );
+                    m_length = m_endPos - m_startPos;
+                    m_serverKey = m_localText1.Substring( m_startPos , m_length );
+                }
+
+                if ( m_localText1.Contains( START_TXT_S_ACC_TITLE ) )
+                {
+                    m_startPos = m_localText1.IndexOf( START_TXT_S_ACC_TITLE );
+                    m_startPos += START_TXT_S_ACC_TITLE.Length;
+                    m_endPos = m_localText1.IndexOf( END_TXT_S_ACC_TITLE );
+                    m_length = m_endPos - m_startPos;
+                    m_serverAccPage = m_localText1.Substring( m_startPos , m_length );
+                }
+
+                if ( m_localText1.Contains( START_TXT_S_SIGN_TITLE ) )
+                {
+                    m_startPos = m_localText1.IndexOf( START_TXT_S_SIGN_TITLE );
+                    m_startPos += START_TXT_S_SIGN_TITLE.Length;
+                    m_endPos = m_localText1.IndexOf( END_TXT_S_SIGN_TITLE );
+                    m_length = m_endPos - m_startPos;
+                    m_serverSignPage = m_localText1.Substring( m_startPos , m_length );
+                }
+
+                return true;
+            }
+            catch ( WebException exc )
+            {
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Error_Get_Account_Info] + 
+                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Error_To_Developer] + 
+                                            exc.ToString( ) , 
+                                            MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Get_Data_List] );
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// サーバー接続設定が取得できているかチェックし、できていなければ更新ボタンを押すよう促す
+        /// </summary>
+        private async Task<bool> CheckServiceInfoAsync( )
+        {
+            SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Get_Data_List] );
+            if ( ( m_serverUsername == String.Empty ) ||
+                    ( m_serverPassword == String.Empty ) ||
+                    ( m_serverKey == String.Empty ) ||
+                    ( m_serverSignPage == String.Empty ) ||
+                    ( m_machineId == String.Empty ) ||
+                    ( m_serverSettingInfo == String.Empty ) ||
+                    ( m_serverAccPage == String.Empty ) )
+            {
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_ServerInfo] +
+                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Case_To_Developer] ,
+                                            MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Get_Data_List] );
+                return false;
+            }
+            await Task.Delay( 1 );
+            return true;
+        }
 
         /// <summary>
         /// アカウント管理サーバーにログインする
@@ -534,7 +469,7 @@ namespace trackID3TagSwitcher
             /* ログインに失敗した場合 */
             catch ( PastebinAPI_nikibobi.PastebinException ex )
             {
-                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Connect_Server] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Press_Reflesh] , MessageForm.MODE_OK );
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Connect_Server] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Re_Download_App] , MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
                 SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Server_Connect] );
                 return false;
@@ -548,31 +483,40 @@ namespace trackID3TagSwitcher
         /// </summary>
         private async Task<bool> GetListToPastebinAsync( )
         {
-            /* サーバーから3件ページを取得する */
             try
             {
                 SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Get_Server_List] );
 
-                foreach ( Paste paste in await m_userAsync.ListPastesAsync( 3 ) )
+                foreach ( Paste paste in await m_userAsync.ListPastesAsync( SERVER_MAX_PAGE ) )
                 {
-                    if ( paste.Title == m_serverPage )
+                    if ( paste.Title == m_serverAccPage )
                     {
-                        m_serverUri = paste.Url;
-                        m_serverReq = paste.Key;
-                        m_serverDelReqAsync = paste;
-                        return true;
+                        m_serverAccPageUri = paste.Url;
+                        m_serverAccPageReq = paste.Key;
+                        m_serverAccPageDelReqAsync = paste;
+                    }
+                    else if ( paste.Title == m_serverSignPage )
+                    {
+                        m_serverSignPageUri = paste.Url;
+                        m_serverSignPageReq = paste.Key;
+                        m_serverSignPageDelReqAsync = paste;
                     }
                 }
-                
-                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Connect_Server] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Press_Reflesh] , MessageForm.MODE_OK );
-                messageForm.ShowDialog( );
-                SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Find_Server_List] );
-                return false;
+
+                if ( (m_serverAccPageReq != String.Empty) && (m_serverAccPageReq != String.Empty) )
+                    return true;
+                else
+                {
+                    messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Connect_Server] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Re_Download_App] , MessageForm.MODE_OK );
+                    messageForm.ShowDialog( );
+                    SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Find_Server_List] );
+                    return false;
+                }
             }
             /* 取得に失敗した場合 */
             catch ( PastebinAPI_nikibobi.PastebinException ex )
             {
-                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Server_Setting] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Press_Reflesh] , MessageForm.MODE_OK );
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Server_Setting] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Re_Download_App] , MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
                 SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Server_Connect] );
                 return false;
@@ -580,9 +524,9 @@ namespace trackID3TagSwitcher
         }
 
         /// <summary>
-        /// アカウント管理ページから全アカウント情報を取得する
+        /// 指定されたページのテキストデータを取得する
         /// </summary>
-        private async Task<bool> GetHtmlAsync( )
+        private async Task<bool> GetHtmlAsync( string uri , string st , string  ed )
         {
             if ( m_webClient != null )
                 m_webClient = null;
@@ -590,7 +534,7 @@ namespace trackID3TagSwitcher
             
             if ( m_uriAsync != null )
                 m_uriAsync = null;
-            m_uriAsync = new Uri( m_serverUri );
+            m_uriAsync = new Uri( uri );
 
             try
             {
@@ -630,9 +574,9 @@ namespace trackID3TagSwitcher
         }
 
         /// <summary>
-        /// 取得した全アカウント情報を復号化する
+        /// 取得したテキストデータを復号化する
         /// </summary>
-        private async Task<bool> DecryptHtmlAsync( )
+        private async Task<bool> DecryptHtmlAsync( int shift )
         {
             try
             {
@@ -640,12 +584,9 @@ namespace trackID3TagSwitcher
                 m_decryptContent = "";
                 for ( int i = 0 ; i < m_serverContent.Length ; i++ )
                 {
-                    //m_char = m_serverContent[i];
-                    //m_char = (char)( (int)m_char - 2 );
-                    m_decryptContent += (char)( (int)m_serverContent[i] - 2 );
+                    m_decryptContent += (char)( (int)m_serverContent[i] - shift );
                     await Task.Delay( 1 );
                 }
-                // MessageBox.Show( m_decryptContent );
                 return true;
             }
             catch ( Exception ex )
@@ -663,7 +604,7 @@ namespace trackID3TagSwitcher
         /// <summary>
         /// 全アカウント情報の中から自分の情報があるか検索する
         /// </summary>
-        private async Task<bool> AnalysisHtmlAsync( )
+        private async Task<bool> CheckAccountExistAsync( )
         {
             try
             {
@@ -700,13 +641,7 @@ namespace trackID3TagSwitcher
                             /* アカウント作成したPCのIDも一致 */
                             if ( m_line.Contains( SPACE_MCNID + m_machineId ) )
                             {
-                                isUnlockLicence = true;
-                                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Login_pt1] +
-                                                            this.box_user.Text +
-                                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Login_pt2] ,
-                                                            MessageForm.MODE_OK );
-                                messageForm.ShowDialog( );
-                                SetLog( this.lbl_progressContent , Color.AliceBlue , "" );
+                                isMatchMyAccount = true;
                                 return true;
                             }
                             /* 違うPCからのログインの場合 */
@@ -754,22 +689,43 @@ namespace trackID3TagSwitcher
         }
 
         /// <summary>
-        /// 自分のアカウント情報を付けたし、暗号化する
+        /// 自分のアカウント情報を付けたす
         /// </summary>
-        private async Task<bool> EncryptHtmlAsync( )
+        private async Task<bool> AddMyInfoToDecryptedHtml( )
         {
             try
             {
-                SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Encrypt_Data_List] );
+                SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Add_My_Info_To_Data_List] );
                 m_decryptContent += "\r\n";
                 m_decryptContent += this.box_user.Text + SPACE_PASS;
                 m_decryptContent += this.box_pass.Text + SPACE_MCNID;
                 m_decryptContent += m_machineId;
+                await Task.Delay( 1 );
+                return true;
+            }
+            catch ( Exception ex )
+            {
+                SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Add_My_Info_To_Data_List] );
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Error] +
+                                            ex.Message ,
+                                            MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                return false;
+            }
+        }
 
+        /// <summary>
+        /// 取得したテキストデータを暗号化する
+        /// </summary>
+        private async Task<bool> EncryptHtmlAsync( int shift )
+        {
+            try
+            {
+                SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Encrypt_Data_List] );
                 m_encryptContent = "";
                 for ( int i = 0 ; i < m_decryptContent.Length ; i++ )
                 {
-                    m_encryptContent += (char)( (int)m_decryptContent[i] + 2 );
+                    m_encryptContent += (char)( (int)m_decryptContent[i] + shift );
                     await Task.Delay( 1 );
                 }
                 return true;
@@ -777,8 +733,7 @@ namespace trackID3TagSwitcher
             catch ( Exception ex )
             {
                 SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Encrypt_Data_List] );
-                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_Account_Info] +
-                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Error_To_Developer] +
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Error] +
                                             ex.Message ,
                                             MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
@@ -789,12 +744,12 @@ namespace trackID3TagSwitcher
         /// <summary>
         /// 現在のアカウント管理ページを一旦削除する
         /// </summary>
-        private async Task<bool> DeleteHtmlAsync( )
+        private async Task<bool> DeleteHtmlAsync( Paste page )
         {
             try
             {
                 SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Delete_Server] );
-                await m_userAsync.DeletePasteAsync( m_serverDelReqAsync );
+                await m_userAsync.DeletePasteAsync( page );
                 return true;
             }
             catch ( PastebinAPI_nikibobi.PastebinException ex )
@@ -812,21 +767,195 @@ namespace trackID3TagSwitcher
         /// <summary>
         /// 新しくアカウントページを作り直す
         /// </summary>
-        private async Task<bool> MakeHtmlAsync( )
+        private async Task<bool> MakeHtmlAsync( string tryProgText , string failedProgText , string pageTitle )
         {
             try
             {
-                SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Upload_Account] );
-                await m_userAsync.CreatePasteAsync( m_encryptContent , m_serverPage , Language.None , Visibility.Unlisted , Expiration.Never );
+                SetLog( this.lbl_progressContent , Color.AliceBlue , tryProgText );
+                await m_userAsync.CreatePasteAsync( m_encryptContent , pageTitle , Language.None , Visibility.Unlisted , Expiration.Never );
+                isMatchMyAccount = true;
                 return true;
             }
             catch ( PastebinAPI_nikibobi.PastebinException ex )
             {
-                SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Upload_Account] );
+                SetLog( this.lbl_progressContent , Color.Orange , failedProgText );
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Failed_Login] +
                                             MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Re_Login_After] +
                                             MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Case_To_Developer] ,
                                             MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 全サインイン情報の中から自分のアカウントがサインイン済みか検索する
+        /// </summary>
+        /// <returns></returns>
+        private async Task<bool> CheckAccountLoginAsync( string serverLoginStatus )
+        {
+            try
+            {
+                if ( serverLoginStatus == STATUS_SIGNOUT )
+                    m_localText1 = STATUS_SIGNIN;
+                else if ( serverLoginStatus == STATUS_SIGNIN )
+                    m_localText1 = STATUS_SIGNOUT;
+
+                isUnlockLicence = false;
+                SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Find_Login_Status] );
+
+                /* 入力されたユーザー名が存在しないパターン*/
+                if ( !m_decryptContent.Contains( this.box_user.Text + SPACE_SIGN ) )
+                {
+                    isNeedCreateStatus = true;
+                    return true;
+                }
+
+                if ( m_sr != null )
+                    m_sr = null;
+                m_sr = new StringReader( m_decryptContent );
+                while ( m_sr.Peek( ) > -1 )
+                {
+                    m_line = m_sr.ReadLine( );
+
+                    /* その行内にユーザー名がマッチ */
+                    if ( m_line.Contains( this.box_user.Text + SPACE_SIGN ) )
+                    {
+                        /* 指定されたログインステータスになっている */
+                        if ( m_line.Contains( SPACE_SIGN + serverLoginStatus ) )
+                        {
+                            isNeedCreateStatus = false;
+                            return true;
+                        }
+                        /* 指定されたログインステータスになっていない場合 */
+                        else if ( m_line.Contains( SPACE_SIGN + m_localText1 ) )
+                        {
+                            /* 前回アプリを正常終了していない形跡があるなら、サーバーステータスと一致しないのは当然なので、このまま処理する */
+                            if ( Form1.isExitStatus == Form1.ExitStatus.ForceClosed )
+                            {
+#if DEBUG
+                                MessageBox.Show( "CheckAccountLoginAsync - ForceClosed" );
+#endif
+                                isNeedCreateStatus = false;
+                                return true;
+                            }
+                            SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Login_Status_Already_Hacked] );
+                            messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Failed_Login_Already_Loggedin] , MessageForm.MODE_OK );
+                            messageForm.ShowDialog( );
+                            return false;
+                        }
+                    }
+
+                    await Task.Delay( 1 );
+                }
+
+                throw new Exception( );
+            }
+            catch ( Exception ex )
+            {
+                SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Login_Status] );
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_Account_Info] +
+                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Error_To_Developer] +
+                                            ex.Message ,
+                                            MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 自分のアカウントのサインイン情報を付けたす
+        /// </summary>
+        private async Task<bool> AddMyLoginStatusToDecryptedHtml( )
+        {
+            try
+            {
+                SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Add_My_Login_To_Data_List] );
+                m_decryptContent += "\r\n";
+                m_decryptContent += this.box_user.Text + SPACE_SIGN + STATUS_SIGNIN;
+                await Task.Delay( 1 );
+                return true;
+            }
+            catch ( Exception ex )
+            {
+                SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Add_My_Login_To_Data_List] );
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Error] + ex.Message , MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 自分のアカウントのサインイン情報を修正する
+        /// </summary>
+        private async Task<bool> EditMyLoginStatusToDecryptedHtml( bool loginStatus )
+        {
+            try
+            {
+                SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Add_My_Login_To_Data_List] );
+                await Task.Delay( 1 );
+
+                if ( !loginStatus )
+                {
+                    if ( m_decryptContent.Contains( this.box_user.Text + SPACE_SIGN + STATUS_SIGNIN ) )
+                    {
+                        m_decryptContent.Replace( this.box_user.Text + SPACE_SIGN + STATUS_SIGNIN , this.box_user.Text + SPACE_SIGN + STATUS_SIGNOUT );
+                        return true;
+                    }
+                    else if ( m_decryptContent.Contains( this.box_user.Text + SPACE_SIGN + STATUS_SIGNOUT ) )
+                    {
+                        /* 前回アプリを正常終了していない形跡があるなら、サーバーステータスと一致しないのは当然なので、このまま処理する */
+                        if ( Form1.isExitStatus == Form1.ExitStatus.ForceClosed )
+                        {
+#if DEBUG
+                            MessageBox.Show( "EditMyLoginStatusToDecryptedHtml - ForceClosed" );
+#endif
+                            return true;
+                        }
+
+                        SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Login_Status_Already_Hacked] );
+                        messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Failed_Login_Already_Loggedin] , MessageForm.MODE_OK );
+                        messageForm.ShowDialog( );
+                        return false;
+                    }
+                }
+                else
+                {
+                    if ( m_decryptContent.Contains( this.box_user.Text + SPACE_SIGN + STATUS_SIGNOUT ) )
+                    {
+                        m_decryptContent.Replace( this.box_user.Text + SPACE_SIGN + STATUS_SIGNOUT , this.box_user.Text + SPACE_SIGN + STATUS_SIGNIN );
+                        return true;
+                    }
+                    else if ( m_decryptContent.Contains( this.box_user.Text + SPACE_SIGN + STATUS_SIGNIN ) )
+                    {
+                        /* 前回アプリを正常終了していない形跡があるなら、サーバーステータスと一致しないのは当然なので、このまま処理する */
+                        if ( Form1.isExitStatus == Form1.ExitStatus.ForceClosed )
+                        {
+#if DEBUG
+                            MessageBox.Show( "EditMyLoginStatusToDecryptedHtml - ForceClosed" );
+#endif
+                            return true;
+                        }
+                        SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Login_Status_Already_Hacked] );
+                        messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Failed_Login_Already_Loggedin] , MessageForm.MODE_OK );
+                        messageForm.ShowDialog( );
+                        return false;
+                    }
+                }
+
+                SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Add_My_Login_To_Data_List] );
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_Account_Info] +
+                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Re_Login_After] +
+                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Case_To_Developer] ,
+                                            MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                return false;
+            }
+            catch ( Exception ex )
+            {
+                SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Add_My_Login_To_Data_List] );
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Error] + ex.Message , MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
                 return false;
             }
@@ -913,6 +1042,7 @@ namespace trackID3TagSwitcher
                 StreamReader sr = new StreamReader( path );
                 text = sr.ReadToEnd( );
                 sr.Close( );
+                text = NetworkFunc.DecryptHtmlWithMessage( text , ENCRYPT_SHIFT_SIZE_CONFIG_FILE );
 
                 string line = "";
                 string target = "";
@@ -922,6 +1052,8 @@ namespace trackID3TagSwitcher
                 while ( rs.Peek( ) > -1 )
                 {
                     line = rs.ReadLine( );
+
+                    /*
 
                     target = "s_user:";
                     if ( line.Contains( target ) )
@@ -944,13 +1076,22 @@ namespace trackID3TagSwitcher
                         ed = line.Length - st;
                         m_serverKey = line.Substring( st , ed );
                     }
-                    target = "s_title:";
+                    target = "s_acctitle:";
                     if ( line.Contains( target ) )
                     {
                         st = target.Length;
                         ed = line.Length - st;
-                        m_serverPage = line.Substring( st , ed );
+                        m_serverAccPage = line.Substring( st , ed );
                     }
+                    target = "s_signtitle:";
+                    if ( line.Contains( target ) )
+                    {
+                        st = target.Length;
+                        ed = line.Length - st;
+                        m_serverSignPage = line.Substring( st , ed );
+                    }
+
+                    */
                     target = "l_user:";
                     if ( line.Contains( target ) )
                     {
@@ -965,6 +1106,13 @@ namespace trackID3TagSwitcher
                         ed = line.Length - st;
                         this.box_pass.Text = line.Substring( st , ed );
                     }
+                    target = "s_settingInfo:";
+                    if ( line.Contains( target ) )
+                    {
+                        st = target.Length;
+                        ed = line.Length - st;
+                        m_serverSettingInfo = line.Substring( st , ed );
+                    }
                 }
             }
             else
@@ -977,13 +1125,20 @@ namespace trackID3TagSwitcher
         {
             string path = Application.StartupPath + "\\item\\acc.cbl";
             string text = "";
-
+            /*
             text = "s_user:" + m_serverUsername + "\r\n";
             text += "s_pass:" + m_serverPassword + "\r\n";
             text += "s_key:" + m_serverKey + "\r\n";
-            text += "s_title:" + m_serverPage + "\r\n";
+            text += "s_acctitle:" + m_serverAccPage + "\r\n";
+            text += "s_signtitle:" + m_serverSignPage + "\r\n";
             text += "l_user:" + this.box_user.Text + "\r\n";
             text += "l_pass:" + this.box_pass.Text + "\r\n";
+            */
+            text = "l_user:" + this.box_user.Text + "\r\n";
+            text += "l_pass:" + this.box_pass.Text + "\r\n";
+            text += "s_settingInfo:" + m_serverSettingInfo + "\r\n";
+
+            text = NetworkFunc.EncryptHtmlWithMessage( text , ENCRYPT_SHIFT_SIZE_CONFIG_FILE );
             
             StreamWriter sw = new StreamWriter( path , false );
             sw.Write( text );
@@ -999,6 +1154,26 @@ namespace trackID3TagSwitcher
         {
             SaveSetting( );
             this.Close( );
+        }
+
+        public async Task<bool> Logout( )
+        {
+            HideInputObjs( true );
+            // LockLogin( false );
+            SetLog( this.lblAppLogText , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Failed_Login_noticeBar] );
+
+            this.webProgressBar.Maximum = SERVER_FUNC_NUM;
+            this.webProgressBar.Value = 0;
+
+            if ( await LoginThink( isSign: false ) == false )
+            {
+                // LockLogin( true );
+                SetLog( this.lblAppLogText , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Failed_Login_noticeBar] );
+                return false;
+            }
+            this.webProgressBar.Value = 0;
+
+            return true;
         }
 
         /// <summary>
@@ -1021,7 +1196,7 @@ namespace trackID3TagSwitcher
             this.webProgressBar.Maximum = SERVER_FUNC_NUM;
             this.webProgressBar.Value = 0;
 
-            if ( await LoginThink( ) == false )
+            if ( await LoginThink( isSign: true ) == false )
             {
                 LockLogin( true );
                 SetLog( this.lblAppLogText , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Failed_Login_noticeBar] );
@@ -1029,71 +1204,206 @@ namespace trackID3TagSwitcher
             this.webProgressBar.Value = 0;
         }
 
-        private async Task<bool> LoginThink( )
+        private async Task<bool> LoginThink( bool isSign )
         {
+            /* 1 */
+            m_coroutine_task = ClearArgs( );
+            m_coroutine_flag = await m_coroutine_task;
+            if ( !m_coroutine_flag )
+                return m_coroutine_flag;
+            this.webProgressBar.Value++;
+
+            /* 2 */
             m_coroutine_task = CheckUsernameNPassword( );
             m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
                 return m_coroutine_flag;
             this.webProgressBar.Value++;
 
+            /* 3 */
+            m_coroutine_task = GetServerSettingsAsync( m_serverSettingInfo );
+            m_coroutine_flag = await m_coroutine_task;
+            if ( !m_coroutine_flag )
+                return m_coroutine_flag;
+            this.webProgressBar.Value++;
+
+            /* 4 */
+            m_coroutine_task = CheckServiceInfoAsync( );
+            m_coroutine_flag = await m_coroutine_task;
+            if ( !m_coroutine_flag )
+                return m_coroutine_flag;
+            this.webProgressBar.Value++;
+
+            /* 5 */
             m_coroutine_task = LoginToPastebinAsync( );
             m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
                 return m_coroutine_flag;
             this.webProgressBar.Value++;
 
+            /* 6 */
             m_coroutine_task = GetListToPastebinAsync( );
             m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
                 return m_coroutine_flag;
             this.webProgressBar.Value++;
 
-            m_coroutine_task = GetHtmlAsync( );
+            /* 7 */
+            /* ここからアカウントリストページ関連の処理 */
+            m_coroutine_task = GetHtmlAsync( m_serverAccPageUri , START_TXT , END_TXT );
             m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
                 return m_coroutine_flag;
             this.webProgressBar.Value++;
 
-            m_coroutine_task = DecryptHtmlAsync( );
+            /* 8 */
+            m_coroutine_task = DecryptHtmlAsync( ENCRYPT_SHIFT_SIZE_ACC_PAGE );
             m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
                 return m_coroutine_flag;
             this.webProgressBar.Value++;
 
-            m_coroutine_task = AnalysisHtmlAsync( );
+            /* 9 */
+            m_coroutine_task = CheckAccountExistAsync( );
             m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
                 return m_coroutine_flag;
             this.webProgressBar.Value++;
 
             /* アカウントが無いため作らなければいけない */
-            if ( !isUnlockLicence )
+            if ( !isMatchMyAccount )
             {
-                m_coroutine_task = EncryptHtmlAsync( );
+                /* 10 */
+                m_coroutine_task = AddMyInfoToDecryptedHtml( );
                 m_coroutine_flag = await m_coroutine_task;
                 if ( !m_coroutine_flag )
                     return m_coroutine_flag;
                 this.webProgressBar.Value++;
 
-                m_coroutine_task = DeleteHtmlAsync( );
+                /* 11 */
+                m_coroutine_task = EncryptHtmlAsync( ENCRYPT_SHIFT_SIZE_ACC_PAGE );
                 m_coroutine_flag = await m_coroutine_task;
                 if ( !m_coroutine_flag )
                     return m_coroutine_flag;
                 this.webProgressBar.Value++;
 
-                m_coroutine_task = MakeHtmlAsync( );
+                /* 12 */
+                m_coroutine_task = DeleteHtmlAsync( m_serverAccPageDelReqAsync );
                 m_coroutine_flag = await m_coroutine_task;
                 if ( !m_coroutine_flag )
                     return m_coroutine_flag;
                 this.webProgressBar.Value++;
 
+                /* 13 */
+                m_localText1 = MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Upload_Account];
+                m_localText2 = MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Upload_Account];
+                m_coroutine_task = MakeHtmlAsync( m_localText1 , m_localText2 , m_serverAccPage );
+                m_coroutine_flag = await m_coroutine_task;
+                if ( !m_coroutine_flag )
+                    return m_coroutine_flag;
+                this.webProgressBar.Value++;
+            }
+            /* アカウントが既に作られていた場合のみの処理 */
+            else
+            {
+                /* アカウントを作成する処理分プログレスバーを進める */
+                await Task.Delay( 1 );
+                this.webProgressBar.Value++;
+                await Task.Delay( 1 );
+                this.webProgressBar.Value++;
+                await Task.Delay( 1 );
+                this.webProgressBar.Value++;
+                await Task.Delay( 1 );
+                this.webProgressBar.Value++;
+                await Task.Delay( 1 );
+            }
+
+            /* 14 */
+            /* ここからログインリストページ関連の処理 */
+            m_coroutine_task = GetHtmlAsync( m_serverSignPageUri , START_TXT , END_TXT );
+            m_coroutine_flag = await m_coroutine_task;
+            if ( !m_coroutine_flag )
+                return m_coroutine_flag;
+            this.webProgressBar.Value++;
+
+            /* 15 */
+            m_coroutine_task = DecryptHtmlAsync( ENCRYPT_SHIFT_SIZE_SIGN_PAGE );
+            m_coroutine_flag = await m_coroutine_task;
+            if ( !m_coroutine_flag )
+                return m_coroutine_flag;
+            this.webProgressBar.Value++;
+
+            /* 16 */
+            string status = String.Empty;
+            if ( isSign )
+                status = STATUS_SIGNOUT;
+            else
+                status = STATUS_SIGNIN;
+            m_coroutine_task = CheckAccountLoginAsync( status );
+            m_coroutine_flag = await m_coroutine_task;
+            if ( !m_coroutine_flag )
+                return m_coroutine_flag;
+            this.webProgressBar.Value++;
+
+            /* 17 */
+            /* ログインステータスがまだ追加されてなかった場合 */
+            if ( isNeedCreateStatus )
+            {
+                m_coroutine_task = AddMyLoginStatusToDecryptedHtml( );
+                m_coroutine_flag = await m_coroutine_task;
+                if ( !m_coroutine_flag )
+                    return m_coroutine_flag;
+                this.webProgressBar.Value++;
+            }
+            /* ログインステータスが既に存在していた場合 */
+            else
+            {
+                m_coroutine_task = EditMyLoginStatusToDecryptedHtml( loginStatus: isSign );
+                m_coroutine_flag = await m_coroutine_task;
+                if ( !m_coroutine_flag )
+                    return m_coroutine_flag;
+                this.webProgressBar.Value++;
+            }
+
+            /* 18 */
+            m_coroutine_task = EncryptHtmlAsync( ENCRYPT_SHIFT_SIZE_SIGN_PAGE );
+            m_coroutine_flag = await m_coroutine_task;
+            if ( !m_coroutine_flag )
+                return m_coroutine_flag;
+            this.webProgressBar.Value++;
+
+            /* 19 */
+            m_coroutine_task = DeleteHtmlAsync( m_serverSignPageDelReqAsync );
+            m_coroutine_flag = await m_coroutine_task;
+            if ( !m_coroutine_flag )
+                return m_coroutine_flag;
+            this.webProgressBar.Value++;
+
+            /* 20 */
+            m_localText1 = MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Upload_Account];
+            m_localText2 = MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Upload_Account];
+            m_coroutine_task = MakeHtmlAsync( m_localText1 , m_localText2 , m_serverSignPage );
+            m_coroutine_flag = await m_coroutine_task;
+            if ( !m_coroutine_flag )
+                return m_coroutine_flag;
+            this.webProgressBar.Value++;
+
+            if ( isSign )
+            {
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Login_pt1] +
                                             this.box_user.Text +
-                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Register_pt2] ,
+                                            MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Success_Login_pt2],//Success_Register_pt2] ,
                                             MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
+
+                if ( Form1.isExitStatus == Form1.ExitStatus.ForceClosed )
+                    Form1.isExitStatus = Form1.ExitStatus.Running;
+
                 isUnlockLicence = true;
+            }
+            else
+            {
+                isUnlockLicence = false;
             }
 
             LockLoginOnShowUI( );
