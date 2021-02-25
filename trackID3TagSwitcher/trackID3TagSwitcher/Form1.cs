@@ -59,6 +59,7 @@ namespace trackID3TagSwitcher
         private string currentAlbumLabelName = "";              /* 現在読み込んでいるアルバムのリリース元レーベル */
         private int currentMaxTrack = 0;                        /* 現在読み込んでいるアルバムの曲数 */
         private bool isTypeFYS = false;                         /* 現在読み込んでいるアルバムの曲形式がARNかFYSかを判断する変数 */
+        private bool isTypeWaveVo = false;                      /* 現在読み込んでいるアルバムの音源がインストかボーカルかを判断する変数 */
         private bool canStartSwitcher = false;                  /* アルバムを正常に読み込めていて、変換可能かを示す変数 */
         private string new_ver = "";                            /* 取得したアプリ更新ページのバージョンを記憶する変数 */
         private string artworkPath = "";                        /* 取得したアートワークのファイルパスを格納する変数 */
@@ -112,7 +113,7 @@ namespace trackID3TagSwitcher
         private const int HEADERT_BTN_SETTING_MOVE_X        = (HEADERT_BTN_ACCOUNT_MOVE_X - 40);
 
         private const int APP_BIG_WIDTH                     = 760;
-        private const int APP_BIG_HEIGHT                    = (APP_BIG_WIDTH - 60);
+        private const int APP_BIG_HEIGHT                    = (APP_BIG_WIDTH - 10);
         private const int FOOTER_BIG_Y                      = (APP_BIG_HEIGHT - 20);
         private const int FOOTER_LINE_BIG_Y                 = (FOOTER_BIG_Y - 2);
         private const int HEADERT_BTN_EXIT_BIG_X            = (APP_BIG_WIDTH - 28);
@@ -176,14 +177,6 @@ namespace trackID3TagSwitcher
             this.lblID3TagLabel.Visible = false;
             this.imgCurrentAlbumArtwork.ImageLocation = "";
             this.imgCurrentAlbumArtwork.Visible = false;
-            /*
-            this.lblCurrentText.Text = "";
-            this.lblCurrentText.Visible = false;
-            this.lblNextText.Text = "";
-            this.lblNextText.Visible = false;
-            this.imgNextMode.ImageLocation = "";
-            this.imgNextMode.Visible = false;
-            */
             this.lbl_currTagType.Text = "";
             this.lbl_currTagType.Visible = false;
             this.lbl_currWavesType.Text = "";
@@ -192,7 +185,9 @@ namespace trackID3TagSwitcher
             this.imgCurrentMode.Visible = false;
             this.lblArrow2.Visible = false;
             this.isTypeFYS = false;
+            this.isTypeWaveVo = false;
             this.canStartSwitcher = false;
+            this.box_WaveLink.Text = String.Empty;
             /* 曲数 */
             this.lblTrackCount.Visible = false;
             this.lblTrackCount.Text = "";
@@ -506,34 +501,22 @@ namespace trackID3TagSwitcher
             if (!this.isTypeFYS)
             {
                 this.imgCurrentMode.ImageLocation = Application.StartupPath + "\\item\\arn.jpg";
-                this.lbl_currTagType.Text = "ID3：A-Remix Nation方式";
-                /*
-                this.lblCurrentText.Text = "A-Remix Nation方式";
-                this.lblNextText.Text = "For You Sounds方式";
-                this.imgCurrentMode.ImageLocation = Application.StartupPath + "\\item\\arn.jpg";
-                this.imgNextMode.ImageLocation = Application.StartupPath + "\\item\\fys.jpg";
-                */
+                this.lbl_currTagType.Text = "ID3タグ：A-Remix Nation方式";
             }
             else
             {
                 this.imgCurrentMode.ImageLocation = Application.StartupPath + "\\item\\fys.jpg";
-                this.lbl_currTagType.Text = "ID3：For You Sounds方式";
-                /*
-                this.lblCurrentText.Text = "For You Sounds方式";
-                this.lblNextText.Text = "A-Remix Nation方式";
-                this.imgCurrentMode.ImageLocation = Application.StartupPath + "\\item\\fys.jpg";
-                this.imgNextMode.ImageLocation = Application.StartupPath + "\\item\\arn.jpg";
-                */
+                this.lbl_currTagType.Text = "ID3タグ：For You Sounds方式";
             }
+
+            if ( !this.isTypeWaveVo )
+                this.lbl_currWavesType.Text = "波形：ボーカル版";
+            else
+                this.lbl_currWavesType.Text = "波形：Instrumental版";
+
             this.imgCurrentMode.Visible = true;
             this.lbl_currTagType.Visible = true;
-            /*
-            this.lblCurrentText.Visible = true;
-            this.lblNextText.Visible = true;
-            this.lblArrow2.Visible = true;
-            this.imgCurrentMode.Visible = true;
-            this.imgNextMode.Visible = true;
-            */
+            this.lbl_currWavesType.Visible = true;
         }
         private bool GetMaxTrack( string path )
         {
@@ -705,6 +688,31 @@ namespace trackID3TagSwitcher
                         this.isTypeFYS = true;
                     /* どれか1つでも対象のワードを発見できたらデータ正常扱いにする */
                     isBreak++;
+                    continue;
+                }
+
+                target = "Wave_Type:";
+                if ( line.Contains( target ) )
+                {
+                    st = target.Length;
+                    ed = line.Length - st;
+                    string mode = line.Substring( st , ed );
+                    if ( mode == "INST" )
+                        this.isTypeWaveVo = true;
+                    else if ( mode == "VO" )
+                        this.isTypeWaveVo = false;
+                    /* このタグはアップデートで追加した機能であり、見つける必要はない */
+                    continue;
+                }
+
+                target = "Wave_Link:";
+                if ( line.Contains( target ) )
+                {
+                    st = target.Length;
+                    ed = line.Length - st;
+                    string link = line.Substring( st , ed );
+                    this.box_WaveLink.Text = link;
+                    /* このタグはアップデートで追加した機能であり、見つける必要はない */
                     continue;
                 }
 
@@ -1012,6 +1020,7 @@ namespace trackID3TagSwitcher
                 file.Tag.Genres = new string[] { TrackID3Tag[track, GENRE] };
                 file.Tag.BeatsPerMinute = Convert.ToUInt16( TrackID3Tag[track, BPM] );
                 file.Tag.Pictures = new TagLib.IPicture[1] { this.aawork };
+                file.Tag.Conductor = this.currentAlbumReleaseNumber + "_" + ( track + 1 ).ToString( );
                 if (!this.isTypeFYS)
                 {
                     file.Tag.Grouping = TrackID3Tag[track, SUBTITLE];
@@ -1060,32 +1069,12 @@ namespace trackID3TagSwitcher
                 this.imgCurrentMode.ImageLocation = Application.StartupPath + "\\item\\fys.jpg";
                 this.lbl_currTagType.Text = "ID3タグ：For You Sounds方式";
                 this.isTypeFYS = true;
-                /*
-                this.lblCurrentText.Text = "For You Sounds方式";
-                this.lblNextText.Text = "A-Remix Nation方式";
-                this.imgCurrentMode.ImageLocation = Application.StartupPath + "\\item\\fys.jpg";
-                this.imgNextMode.ImageLocation = Application.StartupPath + "\\item\\arn.jpg";
-                this.lblCurrentText.Visible = true;
-                this.lblNextText.Visible = true;
-                this.lblArrow2.Visible = true;
-                this.isTypeFYS = true;
-                */
             }
             else
             {
                 this.imgCurrentMode.ImageLocation = Application.StartupPath + "\\item\\arn.jpg";
                 this.lbl_currTagType.Text = "ID3タグ：A-Remix Nation方式";
                 this.isTypeFYS = false;
-                /*
-                this.lblCurrentText.Text = "A-Remix Nation方式";
-                this.lblNextText.Text = "For You Sounds方式";
-                this.imgCurrentMode.ImageLocation = Application.StartupPath + "\\item\\arn.jpg";
-                this.imgNextMode.ImageLocation = Application.StartupPath + "\\item\\fys.jpg";
-                this.lblCurrentText.Visible = true;
-                this.lblNextText.Visible = true;
-                this.lblArrow2.Visible = true;
-                this.isTypeFYS = false;
-                */
             }
         }
 
@@ -1261,9 +1250,8 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
             coroutineExitButton.Start( );
             */
 
-#if DEBUG
-            this.debugTextUI.Location = new System.Drawing.Point( 411 , 3 );
-            this.debugTextUI.Visible = true;
+#if !DEBUG
+            this.button2.Visible = false;
 #endif
         }
 
@@ -1911,7 +1899,7 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
             int accountX    = HEADERT_BTN_ACCOUNT_MOVE_X;
             int settingX    = HEADERT_BTN_SETTING_MOVE_X;
             int volX        = 7;
-            int volY        = 3;
+            int volY        = 5;
             int page2X      = SUB_AREA_HIDE_X;
             int plusX       = 60;
 
@@ -1991,7 +1979,7 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
             int accountX    = HEADERT_BTN_ACCOUNT_MOVE_BIG_X;
             int settingX    = HEADERT_BTN_SETTING_MOVE_BIG_X;
             int volX        = 8;
-            int volY        = 4;
+            int volY        = 6;
             int page2X      = DESIGN_DEF_X;
             int plusX       = 69;
 
@@ -2244,9 +2232,14 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
             string text = "";
 
             text += "Is_Type:ARN\r\n";
+            if ( !this.chkbx_off_vocal.Checked )
+                text += "Wave_Type:VO\r\n";
+            else
+                text += "Wave_Type:INST\r\n";
             text += "Album_Label:" + this.boxLabelName.Text + "\r\n";
             text += "Album_Name:" + this.boxAlbumName.Text + "\r\n";
             text += "Album_Number:" + this.boxAlbumNumber.Text + "\r\n";
+            text += "Wave_Link:" + this.box_WaveLink.Text + "\r\n";
             text += "==============================\r\n";
             for (int j = 0; j < MAX_TAG; j++)
             {
@@ -2430,6 +2423,20 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
         WaveOffsetStream[] offsetStream = new WaveOffsetStream[2];
         WaveChannel32[] channelSteam = new WaveChannel32[2];
 
+        private void btn_vocalLayer_Click( object sender , EventArgs e )
+        {
+            if ( this.box_WaveLink.Text == String.Empty )
+            {
+                /* 確認ダイアログを表示 */
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Found_Wave_Link] , MessageForm.MODE_OK );
+                DialogResult dr = messageForm.ShowDialog( );
+            }
+            else
+            {
+
+            }
+        }
+
         private void StartVocalPlus( )
         {
             /*
@@ -2449,7 +2456,7 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
             ofd.FileName = "default.html";
             //はじめに表示されるフォルダを指定する
             //指定しない（空の文字列）の時は、現在のディレクトリが表示される
-            ofd.InitialDirectory = @"C:\";
+            // ofd.InitialDirectory = @"C:\";
             //[ファイルの種類]に表示される選択肢を指定する
             //指定しないとすべてのファイルが表示される
             ofd.Filter = "HTMLファイル(*.html;*.htm)|*.html;*.htm|すべてのファイル(*.*)|*.*";
@@ -2493,6 +2500,32 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
             string dir = Path.GetDirectoryName( vocalOnly );
             string fileNameNotExt = System.IO.Path.GetFileNameWithoutExtension( vocalOnly );
 
+            string melodyOnlyWav = melodyOnly.Replace( ".flac" , ".wav" );
+            string vocalOnlyWav = vocalOnly.Replace( ".flac" , ".wav" );
+
+            MediaToolkit.Options.ConversionOptions opt = new MediaToolkit.Options.ConversionOptions( );
+            opt.AudioSampleRate = MediaToolkit.Options.AudioSampleRate.Hz48000;
+            if ( melodyOnly.Contains( ".flac" ) )
+            {
+                var inputFile = new MediaFile { Filename = melodyOnly };
+                var outputFile = new MediaFile { Filename = melodyOnlyWav };
+                using ( var engine = new Engine( ) )
+                {
+                    engine.Convert( inputFile , outputFile );
+                }
+            }
+
+            if ( vocalOnly.Contains( ".flac" ) )
+            {
+                var inputFile = new MediaFile { Filename = vocalOnly };
+                var outputFile = new MediaFile { Filename = vocalOnlyWav };
+                using ( var engine = new Engine( ) )
+                {
+                    engine.Convert( inputFile , outputFile );
+                }
+            }
+
+            /*
             using ( var rd1 = new FlacReader( melodyOnly ) )
             using ( var rd2 = new FlacReader( vocalOnly ) )
             {
@@ -2508,10 +2541,10 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
                 var mixer = new NAudio.Wave.SampleProviders.MixingSampleProvider( new[] { rd1 , rd2 } );
                 WaveFileWriter.CreateWaveFile16( dir + "/_resample" , mixer );
             }
+            */
 
-
-            using ( var reader1 = new AudioFileReader( melodyOnly ) )
-            using ( var reader2 = new AudioFileReader( vocalOnly ) )
+            using ( var reader1 = new AudioFileReader( melodyOnlyWav ) )
+            using ( var reader2 = new AudioFileReader( vocalOnlyWav ) )
             {
                 if ( File.Exists( dir + "/_resample" ) )
                 {
@@ -2538,25 +2571,28 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
                 fs.Close( );*/
 
                 //WaveFileReader wavFile = new WaveFileReader( dir + "/_resample" );
-                System.IO.FileStream fs = new System.IO.FileStream( dir + "/_resample" , System.IO.FileMode.Open , System.IO.FileAccess.ReadWrite );
-                IAudioSource audioSource = new WAVReader( null , fs );
-                AudioBuffer buff = new AudioBuffer( audioSource , 0x10000 );
-                FlakeWriter fw = new FlakeWriter( dir + "/" + fileNameNotExt + "_mixed.flac" , audioSource.PCM );
-                
-                fw.CompressionLevel = 8;
-                while ( audioSource.Read( buff , -1 ) != 0 )
-                {
-                    fw.Write( buff );
-                }
-                fw.Close( );
-                fw.Dispose( );
-                fs.Close( );
-                fs.Dispose( );
-
-                File.Delete( dir + "/_resample" );
-
-                MessageBox.Show( dir + "/" + fileNameNotExt + "_mixed.flac" );
             }
+
+            System.IO.FileStream fs = new System.IO.FileStream( dir + "/_resample" , System.IO.FileMode.Open , System.IO.FileAccess.ReadWrite );
+            IAudioSource audioSource = new WAVReader( null , fs );
+            AudioBuffer buff = new AudioBuffer( audioSource , 0x10000 );
+            FlakeWriter fw = new FlakeWriter( dir + "/" + fileNameNotExt + "_mixed.flac" , audioSource.PCM );
+            
+            fw.CompressionLevel = 8;
+            while ( audioSource.Read( buff , -1 ) != 0 )
+            {
+                fw.Write( buff );
+            }
+            fw.Close( );
+            fw.Dispose( );
+            fs.Close( );
+            fs.Dispose( );
+
+            File.Delete( dir + "/_resample" );
+            /* File.Delete( melodyOnlyWav );
+            File.Delete( vocalOnlyWav ); */
+
+            MessageBox.Show( dir + "/" + fileNameNotExt + "_mixed.flac" );
         }
 
         private void TwoWaveMix( )
@@ -2674,16 +2710,142 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
             }
         }
 
+        private async Task<bool> SoundLayerCoroutine( )
+        {
+            /* 1 */
+            if ( !NetworkFunc.CheckNetworkWithMessage( ) )
+                return false;
+
+            /* 2 */
+            if ( this.currentAlbumReleaseNumber == String.Empty )
+            {
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Load_Album_Number] , MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                return false;
+            }
+
+            /* 3 */
+            m_coroutine_task_bool = GetHtmlAsync( ALBUM_LICENSE_URL );
+            m_coroutine_flag = await m_coroutine_task_bool;
+            if ( !m_coroutine_flag )
+                return false;
+
+            /* 4 */
+            m_coroutine_task_str = NetworkFunc.DecryptHtmlAsyncWithMessage( m_serverContent , ENCRYPT_SHIFT_SIZE_LICENSE_PAGE );
+            m_coroutine_text = await m_coroutine_task_str;
+            if ( m_coroutine_text == String.Empty )
+                return false;
+            m_serverContent = m_coroutine_text;
+
+            /* 5 */
+            m_coroutine_task_bool = CheckNeedLicense( m_serverContent );
+            m_coroutine_flag = await m_coroutine_task_bool;
+            if ( !m_coroutine_flag )
+                return false;
+
+            if (m_currLicense == AlbumLicense.Non_License)
+            {
+                
+            }
+            else if ( m_currLicense == AlbumLicense.Need_License )
+            {
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// 指定されたページのテキストデータを取得する
+        /// </summary>
+        private async Task<bool> GetHtmlAsync( string uri )
+        {
+            if ( m_webClient != null )
+                m_webClient = null;
+            m_webClient = new WebClient( );
+
+            if ( m_uriAsync != null )
+                m_uriAsync = null;
+            m_uriAsync = new Uri( uri );
+
+            if ( m_serverContent != String.Empty )
+                m_serverContent = String.Empty;
+
+            m_startText = "[" + this.currentAlbumReleaseNumber + "]";
+            m_endText = "[/" + this.currentAlbumReleaseNumber + "]";
+
+            try
+            {
+                //SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Get_Data_List] );
+                m_serverContent = await m_webClient.DownloadStringTaskAsync( m_uriAsync );
+                if ( m_serverContent.Contains( m_startText ) )
+                {
+                    m_startPos = m_serverContent.IndexOf( m_startText );
+                    m_startPos += m_startText.Length;
+                    m_endPos = m_serverContent.IndexOf( m_endText );
+                    m_length = m_endPos - m_startPos;
+
+                    m_serverContent = m_serverContent.Substring( m_startPos , m_length );
+                    if ( m_serverContent == String.Empty )
+                    {
+                        messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_Account_Info] +
+                                                    MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Re_Login_After] +
+                                                    MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Case_To_Developer] ,
+                                                    MessageForm.MODE_OK );
+                        messageForm.ShowDialog( );
+                        return false;
+                    }
+
+                    // MessageBox.Show( m_serverContent );
+                    return true;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            catch ( WebException exc )
+            {
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Error_Get_Account_Info] + MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Plz_Send_Error_To_Developer] + exc.ToString( ) , MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                //SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Get_Data_List] );
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 取得したページデータからライセンスが必要なアルバムかどうかを調べる
+        /// </summary>
+        private async Task<bool> CheckNeedLicense( string str )
+        {
+            try
+            {
+                //SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Get_Data_List] );
+                switch ( str )
+                {
+                    case "Non_License":
+                        m_currLicense = AlbumLicense.Non_License;
+                        break;
+
+                    case "Need_License":
+                        m_currLicense = AlbumLicense.Need_License;
+                        break;
+                }
+                await Task.Delay( 1 );
+                return true;
+            }
+            catch ( Exception ex )
+            {
+                messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Irregular_Error] + ex.ToString( ) , MessageForm.MODE_OK );
+                messageForm.ShowDialog( );
+                //SetLog( this.lbl_progressContent , Color.Orange , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Failed_Get_Data_List] );
+                return false;
+            }
+        }
+
+
         #endregion
 
-        private void loginSetting_Click( object sender , EventArgs e )
-        {
-            if ( loginForm.IsDisposed )
-            {
-                loginForm = new AccountForm( );
-            }
-            loginForm.Show( );
-        }
+        #region アカウント
 
         private void img_btn_account_Click( object sender , EventArgs e )
         {
@@ -2694,14 +2856,14 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
             loginForm.Show( );
         }
 
-#if DEBUG
-        DebugText debugUI = new DebugText( );
-        private void debugTextUI_Click( object sender , EventArgs e )
+        #endregion
+
+        private void button2_Click( object sender , EventArgs e )
         {
-            debugUI.Show( );
+            DebugText debugUI = new DebugText( );
+                debugUI.Show( );
         }
 
-#endif
 
         /*
         private void OnFX_btn_Exit( )

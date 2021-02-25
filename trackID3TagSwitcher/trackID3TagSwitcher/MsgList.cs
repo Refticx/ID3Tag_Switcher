@@ -47,6 +47,7 @@ namespace trackID3TagSwitcher
             Target_Word,
 
             Not_Load_Album_Number,
+            Not_Found_Wave_Link,
 
             /* ========== ここからLogin Form用 ========== */
 
@@ -155,6 +156,7 @@ namespace trackID3TagSwitcher
             "対象文字：",
 
             "アルバムナンバーを読み込めていません。\r\n再度アルバムをロードし直してください。\r\n",
+            "チェックリンク先が指定されていないため、この機能は利用できません。",
             
             /* ========== ここからLogin Form用 ========== */
 

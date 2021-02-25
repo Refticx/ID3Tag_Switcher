@@ -34,6 +34,7 @@
             this.btnLoadAlbum = new System.Windows.Forms.Button();
             this.btnSwitcher = new System.Windows.Forms.Button();
             this.pnlAppHeader = new System.Windows.Forms.Panel();
+            this.button2 = new System.Windows.Forms.Button();
             this.img_btn_setting = new System.Windows.Forms.PictureBox();
             this.img_btn_account = new System.Windows.Forms.PictureBox();
             this.btnExit = new System.Windows.Forms.Button();
@@ -76,6 +77,7 @@
             this.pnl_albumSearch = new System.Windows.Forms.Panel();
             this.lbl_title_albumSearch = new System.Windows.Forms.Label();
             this.pnl_execConvert = new System.Windows.Forms.Panel();
+            this.btn_vocalLayer = new System.Windows.Forms.Button();
             this.lbl_title_execConvert = new System.Windows.Forms.Label();
             this.pnl_AppLine4 = new System.Windows.Forms.Panel();
             this.pnl_currLoadInfo = new System.Windows.Forms.Panel();
@@ -84,16 +86,18 @@
             this.lblTrackCount = new System.Windows.Forms.Label();
             this.pnl_currTagType = new System.Windows.Forms.Panel();
             this.lbl_title_currTagType = new System.Windows.Forms.Label();
-            this.btn_loginForm = new System.Windows.Forms.Button();
             this.pnl_AppLine3 = new System.Windows.Forms.Panel();
             this.imgCurrentMode = new System.Windows.Forms.PictureBox();
             this.imgNextMode = new System.Windows.Forms.PictureBox();
             this.pnlTrackInfo = new System.Windows.Forms.Panel();
+            this.box_WaveLink = new System.Windows.Forms.TextBox();
+            this.lbl_WaveLink = new System.Windows.Forms.Label();
+            this.chkbx_off_vocal = new System.Windows.Forms.CheckBox();
             this.btnShowCurrentTrackName = new System.Windows.Forms.Button();
             this.lblCustom = new System.Windows.Forms.Label();
             this.boxEx9 = new System.Windows.Forms.TextBox();
             this.boxLastWord = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.lbl_lastWord = new System.Windows.Forms.Label();
             this.chkIsXXs = new System.Windows.Forms.CheckBox();
             this.boxLabelName = new System.Windows.Forms.TextBox();
             this.lblLabelName = new System.Windows.Forms.Label();
@@ -171,13 +175,13 @@
             // 
             this.btnSwitcher.BackColor = System.Drawing.SystemColors.HotTrack;
             this.btnSwitcher.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSwitcher.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnSwitcher.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold);
             this.btnSwitcher.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.btnSwitcher.Location = new System.Drawing.Point(133, 49);
+            this.btnSwitcher.Location = new System.Drawing.Point(120, 30);
             this.btnSwitcher.Name = "btnSwitcher";
             this.btnSwitcher.Size = new System.Drawing.Size(140, 35);
             this.btnSwitcher.TabIndex = 3;
-            this.btnSwitcher.Text = "変換";
+            this.btnSwitcher.Text = "ID3タグを変換";
             this.tipIsDot.SetToolTip(this.btnSwitcher, "trackinfo.cblの情報に基づいて、ARN形式かFYS形式に変換します。");
             this.btnSwitcher.UseVisualStyleBackColor = false;
             this.btnSwitcher.Click += new System.EventHandler(this.BtnSwitcher_Click);
@@ -185,6 +189,8 @@
             // pnlAppHeader
             // 
             this.pnlAppHeader.BackColor = System.Drawing.Color.SteelBlue;
+            this.pnlAppHeader.Controls.Add(this.button2);
+            this.pnlAppHeader.Controls.Add(this.button1);
             this.pnlAppHeader.Controls.Add(this.img_btn_setting);
             this.pnlAppHeader.Controls.Add(this.img_btn_account);
             this.pnlAppHeader.Controls.Add(this.btnExit);
@@ -195,6 +201,20 @@
             this.pnlAppHeader.TabIndex = 7;
             this.pnlAppHeader.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PnlAppHeader_MouseDown);
             this.pnlAppHeader.MouseMove += new System.Windows.Forms.MouseEventHandler(this.PnlAppHeader_MouseMove);
+            // 
+            // button2
+            // 
+            this.button2.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button2.ForeColor = System.Drawing.Color.Crimson;
+            this.button2.Location = new System.Drawing.Point(258, 3);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(25, 25);
+            this.button2.TabIndex = 37;
+            this.button2.Text = "De";
+            this.button2.UseVisualStyleBackColor = false;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // img_btn_setting
             // 
@@ -253,7 +273,7 @@
             this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button1.ForeColor = System.Drawing.Color.Crimson;
-            this.button1.Location = new System.Drawing.Point(507, 10);
+            this.button1.Location = new System.Drawing.Point(295, 3);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(29, 25);
             this.button1.TabIndex = 11;
@@ -277,7 +297,7 @@
             this.pnlAppFooter.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.pnlAppFooter.Controls.Add(this.lblAppLogText);
             this.pnlAppFooter.Controls.Add(this.lblAppLogTitle);
-            this.pnlAppFooter.Location = new System.Drawing.Point(0, 680);
+            this.pnlAppFooter.Location = new System.Drawing.Point(0, 730);
             this.pnlAppFooter.Name = "pnlAppFooter";
             this.pnlAppFooter.Size = new System.Drawing.Size(2000, 20);
             this.pnlAppFooter.TabIndex = 9;
@@ -313,7 +333,7 @@
             // pnlAppFooterLine
             // 
             this.pnlAppFooterLine.BackColor = System.Drawing.Color.Gold;
-            this.pnlAppFooterLine.Location = new System.Drawing.Point(0, 678);
+            this.pnlAppFooterLine.Location = new System.Drawing.Point(0, 728);
             this.pnlAppFooterLine.Name = "pnlAppFooterLine";
             this.pnlAppFooterLine.Size = new System.Drawing.Size(2000, 2);
             this.pnlAppFooterLine.TabIndex = 10;
@@ -465,7 +485,7 @@
             this.btnClearCache.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClearCache.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.btnClearCache.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.btnClearCache.Location = new System.Drawing.Point(318, 49);
+            this.btnClearCache.Location = new System.Drawing.Point(230, 80);
             this.btnClearCache.Name = "btnClearCache";
             this.btnClearCache.Size = new System.Drawing.Size(140, 35);
             this.btnClearCache.TabIndex = 25;
@@ -542,7 +562,7 @@
             this.chkIsDot.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkIsDot.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
             this.chkIsDot.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.chkIsDot.Location = new System.Drawing.Point(293, 575);
+            this.chkIsDot.Location = new System.Drawing.Point(290, 580);
             this.chkIsDot.Name = "chkIsDot";
             this.chkIsDot.Size = new System.Drawing.Size(158, 19);
             this.chkIsDot.TabIndex = 31;
@@ -573,7 +593,7 @@
             this.pnlPage1.Controls.Add(this.pnl_execConvert);
             this.pnlPage1.Controls.Add(this.pnl_currLoadInfo);
             this.pnlPage1.Controls.Add(this.pnl_currTagType);
-            this.pnlPage1.Location = new System.Drawing.Point(237, 82);
+            this.pnlPage1.Location = new System.Drawing.Point(198, 6);
             this.pnlPage1.Name = "pnlPage1";
             this.pnlPage1.Size = new System.Drawing.Size(550, 600);
             this.pnlPage1.TabIndex = 33;
@@ -592,7 +612,7 @@
             this.pnl_settings.Controls.Add(this.isReplaceRegisterWord);
             this.pnl_settings.Controls.Add(this.autoSearchFile);
             this.pnl_settings.Controls.Add(this.cmbbx_convertExt);
-            this.pnl_settings.Location = new System.Drawing.Point(0, 0);
+            this.pnl_settings.Location = new System.Drawing.Point(500, 400);
             this.pnl_settings.Name = "pnl_settings";
             this.pnl_settings.Size = new System.Drawing.Size(300, 400);
             this.pnl_settings.TabIndex = 35;
@@ -755,6 +775,7 @@
             // pnl_execConvert
             // 
             this.pnl_execConvert.BackColor = System.Drawing.Color.MidnightBlue;
+            this.pnl_execConvert.Controls.Add(this.btn_vocalLayer);
             this.pnl_execConvert.Controls.Add(this.lbl_title_execConvert);
             this.pnl_execConvert.Controls.Add(this.pnl_AppLine4);
             this.pnl_execConvert.Controls.Add(this.btnSwitcher);
@@ -765,6 +786,21 @@
             this.pnl_execConvert.TabIndex = 41;
             this.pnl_execConvert.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnl_execConvert_MouseDown);
             this.pnl_execConvert.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnl_execConvert_MouseMove);
+            // 
+            // btn_vocalLayer
+            // 
+            this.btn_vocalLayer.BackColor = System.Drawing.Color.OliveDrab;
+            this.btn_vocalLayer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_vocalLayer.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold);
+            this.btn_vocalLayer.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.btn_vocalLayer.Location = new System.Drawing.Point(335, 30);
+            this.btn_vocalLayer.Name = "btn_vocalLayer";
+            this.btn_vocalLayer.Size = new System.Drawing.Size(140, 35);
+            this.btn_vocalLayer.TabIndex = 34;
+            this.btn_vocalLayer.Text = "波形を変換";
+            this.tipIsDot.SetToolTip(this.btn_vocalLayer, "trackinfo.cblの情報に基づいて、オフボーカル版かボーカル版に変換します。");
+            this.btn_vocalLayer.UseVisualStyleBackColor = false;
+            this.btn_vocalLayer.Click += new System.EventHandler(this.btn_vocalLayer_Click);
             // 
             // lbl_title_execConvert
             // 
@@ -849,8 +885,6 @@
             // 
             this.pnl_currTagType.BackColor = System.Drawing.Color.MidnightBlue;
             this.pnl_currTagType.Controls.Add(this.lbl_title_currTagType);
-            this.pnl_currTagType.Controls.Add(this.btn_loginForm);
-            this.pnl_currTagType.Controls.Add(this.button1);
             this.pnl_currTagType.Controls.Add(this.pnl_AppLine3);
             this.pnl_currTagType.Controls.Add(this.imgCurrentMode);
             this.pnl_currTagType.Controls.Add(this.lbl_currTagType);
@@ -879,22 +913,6 @@
             this.lbl_title_currTagType.Text = "【現在のモード】";
             this.lbl_title_currTagType.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lbl_title_currTagType_MouseDown);
             this.lbl_title_currTagType.MouseMove += new System.Windows.Forms.MouseEventHandler(this.lbl_title_currTagType_MouseMove);
-            // 
-            // btn_loginForm
-            // 
-            this.btn_loginForm.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.btn_loginForm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_loginForm.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.btn_loginForm.ForeColor = System.Drawing.Color.MediumBlue;
-            this.btn_loginForm.Image = global::trackID3TagSwitcher.Properties.Resources.icon_user;
-            this.btn_loginForm.Location = new System.Drawing.Point(464, 49);
-            this.btn_loginForm.Name = "btn_loginForm";
-            this.btn_loginForm.Size = new System.Drawing.Size(70, 25);
-            this.btn_loginForm.TabIndex = 10;
-            this.btn_loginForm.Text = "アカウント";
-            this.btn_loginForm.UseVisualStyleBackColor = false;
-            this.btn_loginForm.Visible = false;
-            this.btn_loginForm.Click += new System.EventHandler(this.loginSetting_Click);
             // 
             // pnl_AppLine3
             // 
@@ -934,13 +952,16 @@
             // pnlTrackInfo
             // 
             this.pnlTrackInfo.BackColor = System.Drawing.Color.DarkSlateBlue;
+            this.pnlTrackInfo.Controls.Add(this.box_WaveLink);
+            this.pnlTrackInfo.Controls.Add(this.lbl_WaveLink);
+            this.pnlTrackInfo.Controls.Add(this.chkbx_off_vocal);
             this.pnlTrackInfo.Controls.Add(this.btnShowCurrentTrackName);
             this.pnlTrackInfo.Controls.Add(this.lblCustom);
             this.pnlTrackInfo.Controls.Add(this.chkIsDot);
             this.pnlTrackInfo.Controls.Add(this.boxEx9);
             this.pnlTrackInfo.Controls.Add(this.pnlPage1);
             this.pnlTrackInfo.Controls.Add(this.boxLastWord);
-            this.pnlTrackInfo.Controls.Add(this.label1);
+            this.pnlTrackInfo.Controls.Add(this.lbl_lastWord);
             this.pnlTrackInfo.Controls.Add(this.chkIsXXs);
             this.pnlTrackInfo.Controls.Add(this.boxLabelName);
             this.pnlTrackInfo.Controls.Add(this.lblLabelName);
@@ -970,8 +991,42 @@
             this.pnlTrackInfo.Controls.Add(this.lblARNName);
             this.pnlTrackInfo.Location = new System.Drawing.Point(0, 32);
             this.pnlTrackInfo.Name = "pnlTrackInfo";
-            this.pnlTrackInfo.Size = new System.Drawing.Size(760, 646);
+            this.pnlTrackInfo.Size = new System.Drawing.Size(760, 696);
             this.pnlTrackInfo.TabIndex = 34;
+            // 
+            // box_WaveLink
+            // 
+            this.box_WaveLink.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.box_WaveLink.Location = new System.Drawing.Point(111, 669);
+            this.box_WaveLink.Name = "box_WaveLink";
+            this.box_WaveLink.Size = new System.Drawing.Size(149, 21);
+            this.box_WaveLink.TabIndex = 69;
+            this.tipIsDot.SetToolTip(this.box_WaveLink, "波形変換の機能を利用する場合は、ここにライセンス照合するURLを入力して下さい。");
+            // 
+            // lbl_WaveLink
+            // 
+            this.lbl_WaveLink.AutoSize = true;
+            this.lbl_WaveLink.BackColor = System.Drawing.Color.Transparent;
+            this.lbl_WaveLink.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lbl_WaveLink.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.lbl_WaveLink.Location = new System.Drawing.Point(6, 672);
+            this.lbl_WaveLink.Name = "lbl_WaveLink";
+            this.lbl_WaveLink.Size = new System.Drawing.Size(69, 15);
+            this.lbl_WaveLink.TabIndex = 68;
+            this.lbl_WaveLink.Text = "チェックリンク";
+            // 
+            // chkbx_off_vocal
+            // 
+            this.chkbx_off_vocal.AutoSize = true;
+            this.chkbx_off_vocal.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
+            this.chkbx_off_vocal.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.chkbx_off_vocal.Location = new System.Drawing.Point(290, 630);
+            this.chkbx_off_vocal.Name = "chkbx_off_vocal";
+            this.chkbx_off_vocal.Size = new System.Drawing.Size(101, 19);
+            this.chkbx_off_vocal.TabIndex = 67;
+            this.chkbx_off_vocal.Text = "オフボーカル版";
+            this.tipIsDot.SetToolTip(this.chkbx_off_vocal, "現在のアルバム内の楽曲がオフボーカル版（Instrumental）であれば、こちらにチェックを入れてください。");
+            this.chkbx_off_vocal.UseVisualStyleBackColor = true;
             // 
             // btnShowCurrentTrackName
             // 
@@ -979,7 +1034,7 @@
             this.btnShowCurrentTrackName.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnShowCurrentTrackName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnShowCurrentTrackName.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.btnShowCurrentTrackName.Location = new System.Drawing.Point(493, 575);
+            this.btnShowCurrentTrackName.Location = new System.Drawing.Point(600, 580);
             this.btnShowCurrentTrackName.Name = "btnShowCurrentTrackName";
             this.btnShowCurrentTrackName.Size = new System.Drawing.Size(140, 26);
             this.btnShowCurrentTrackName.TabIndex = 66;
@@ -1017,24 +1072,24 @@
             // boxLastWord
             // 
             this.boxLastWord.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.boxLastWord.Location = new System.Drawing.Point(375, 621);
+            this.boxLastWord.Location = new System.Drawing.Point(111, 646);
             this.boxLastWord.Name = "boxLastWord";
-            this.boxLastWord.Size = new System.Drawing.Size(104, 21);
+            this.boxLastWord.Size = new System.Drawing.Size(149, 21);
             this.boxLastWord.TabIndex = 63;
             this.boxLastWord.Text = "Bootleg";
             this.tipIsDot.SetToolTip(this.boxLastWord, "「01. Test (Refticx\'s Animetic Hardcore ??).mp3」\r\nこの??の部分を編集できます。");
             // 
-            // label1
+            // lbl_lastWord
             // 
-            this.label1.AutoSize = true;
-            this.label1.BackColor = System.Drawing.Color.Transparent;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label1.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.label1.Location = new System.Drawing.Point(290, 624);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(83, 15);
-            this.label1.TabIndex = 62;
-            this.label1.Text = "最後尾の単語";
+            this.lbl_lastWord.AutoSize = true;
+            this.lbl_lastWord.BackColor = System.Drawing.Color.Transparent;
+            this.lbl_lastWord.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lbl_lastWord.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.lbl_lastWord.Location = new System.Drawing.Point(6, 649);
+            this.lbl_lastWord.Name = "lbl_lastWord";
+            this.lbl_lastWord.Size = new System.Drawing.Size(83, 15);
+            this.lbl_lastWord.TabIndex = 62;
+            this.lbl_lastWord.Text = "最後尾の単語";
             // 
             // chkIsXXs
             // 
@@ -1043,7 +1098,7 @@
             this.chkIsXXs.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkIsXXs.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
             this.chkIsXXs.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.chkIsXXs.Location = new System.Drawing.Point(292, 600);
+            this.chkIsXXs.Location = new System.Drawing.Point(290, 605);
             this.chkIsXXs.Name = "chkIsXXs";
             this.chkIsXXs.Size = new System.Drawing.Size(178, 19);
             this.chkIsXXs.TabIndex = 61;
@@ -1055,9 +1110,9 @@
             // boxLabelName
             // 
             this.boxLabelName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.boxLabelName.Location = new System.Drawing.Point(111, 618);
+            this.boxLabelName.Location = new System.Drawing.Point(111, 623);
             this.boxLabelName.Name = "boxLabelName";
-            this.boxLabelName.Size = new System.Drawing.Size(171, 21);
+            this.boxLabelName.Size = new System.Drawing.Size(149, 21);
             this.boxLabelName.TabIndex = 60;
             // 
             // lblLabelName
@@ -1066,7 +1121,7 @@
             this.lblLabelName.BackColor = System.Drawing.Color.Transparent;
             this.lblLabelName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.lblLabelName.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblLabelName.Location = new System.Drawing.Point(6, 621);
+            this.lblLabelName.Location = new System.Drawing.Point(6, 626);
             this.lblLabelName.Name = "lblLabelName";
             this.lblLabelName.Size = new System.Drawing.Size(63, 15);
             this.lblLabelName.TabIndex = 59;
@@ -1075,9 +1130,9 @@
             // boxAlbumNumber
             // 
             this.boxAlbumNumber.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.boxAlbumNumber.Location = new System.Drawing.Point(111, 596);
+            this.boxAlbumNumber.Location = new System.Drawing.Point(111, 600);
             this.boxAlbumNumber.Name = "boxAlbumNumber";
-            this.boxAlbumNumber.Size = new System.Drawing.Size(171, 21);
+            this.boxAlbumNumber.Size = new System.Drawing.Size(149, 21);
             this.boxAlbumNumber.TabIndex = 58;
             // 
             // lblAlbumNumberText
@@ -1086,7 +1141,7 @@
             this.lblAlbumNumberText.BackColor = System.Drawing.Color.Transparent;
             this.lblAlbumNumberText.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.lblAlbumNumberText.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblAlbumNumberText.Location = new System.Drawing.Point(5, 599);
+            this.lblAlbumNumberText.Location = new System.Drawing.Point(5, 603);
             this.lblAlbumNumberText.Name = "lblAlbumNumberText";
             this.lblAlbumNumberText.Size = new System.Drawing.Size(93, 15);
             this.lblAlbumNumberText.TabIndex = 57;
@@ -1098,7 +1153,7 @@
             this.lblAlbumTitleText.BackColor = System.Drawing.Color.Transparent;
             this.lblAlbumTitleText.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.lblAlbumTitleText.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblAlbumTitleText.Location = new System.Drawing.Point(5, 576);
+            this.lblAlbumTitleText.Location = new System.Drawing.Point(5, 580);
             this.lblAlbumTitleText.Name = "lblAlbumTitleText";
             this.lblAlbumTitleText.Size = new System.Drawing.Size(63, 15);
             this.lblAlbumTitleText.TabIndex = 56;
@@ -1107,9 +1162,9 @@
             // boxAlbumName
             // 
             this.boxAlbumName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.boxAlbumName.Location = new System.Drawing.Point(111, 573);
+            this.boxAlbumName.Location = new System.Drawing.Point(111, 577);
             this.boxAlbumName.Name = "boxAlbumName";
-            this.boxAlbumName.Size = new System.Drawing.Size(171, 21);
+            this.boxAlbumName.Size = new System.Drawing.Size(149, 21);
             this.boxAlbumName.TabIndex = 55;
             // 
             // btnCloseTrackInfo
@@ -1325,13 +1380,13 @@
             // 
             this.btnSaveTrackinfo.BackColor = System.Drawing.SystemColors.HotTrack;
             this.btnSaveTrackinfo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSaveTrackinfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnSaveTrackinfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
             this.btnSaveTrackinfo.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.btnSaveTrackinfo.Location = new System.Drawing.Point(493, 607);
+            this.btnSaveTrackinfo.Location = new System.Drawing.Point(600, 630);
             this.btnSaveTrackinfo.Name = "btnSaveTrackinfo";
-            this.btnSaveTrackinfo.Size = new System.Drawing.Size(201, 30);
+            this.btnSaveTrackinfo.Size = new System.Drawing.Size(140, 30);
             this.btnSaveTrackinfo.TabIndex = 38;
-            this.btnSaveTrackinfo.Text = "trackinfo.cblに書き出す";
+            this.btnSaveTrackinfo.Text = "タグリストを書き出す";
             this.tipIsDot.SetToolTip(this.btnSaveTrackinfo, "この画面上で編集した各楽曲情報を、本アプリが読み込めるリスト形式に書き出します。");
             this.btnSaveTrackinfo.UseVisualStyleBackColor = false;
             this.btnSaveTrackinfo.Click += new System.EventHandler(this.btnSaveTrackinfo_Click);
@@ -1371,7 +1426,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.MidnightBlue;
-            this.ClientSize = new System.Drawing.Size(760, 700);
+            this.ClientSize = new System.Drawing.Size(760, 750);
             this.Controls.Add(this.pnlAppFooterLine);
             this.Controls.Add(this.pnlAppFooter);
             this.Controls.Add(this.pnlAppHeaderLine);
@@ -1473,7 +1528,7 @@
         private System.Windows.Forms.Label lblAlbumTitleText;
         private System.Windows.Forms.TextBox boxAlbumName;
         private System.Windows.Forms.TextBox boxLastWord;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lbl_lastWord;
         private System.Windows.Forms.CheckBox chkIsXXs;
         private System.Windows.Forms.ToolTip tipIsDot;
         private System.Windows.Forms.Label lblCustom;
@@ -1482,12 +1537,8 @@
         private System.Windows.Forms.CheckBox autoSearchFile;
         private System.Windows.Forms.Label lblTrackCount;
         private System.Windows.Forms.CheckBox isReplaceRegisterWord;
-        private System.Windows.Forms.Button btn_loginForm;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ComboBox cmbbx_convertExt;
-#if DEBUG
-        private System.Windows.Forms.Button debugTextUI;
-#endif
         private System.Windows.Forms.Panel pnl_albumSearch;
         private System.Windows.Forms.Label lbl_title_albumSearch;
         private System.Windows.Forms.Panel pnl_currLoadInfo;
@@ -1507,6 +1558,11 @@
         private System.Windows.Forms.Label lbl_title_settings_albumSearch;
         private System.Windows.Forms.Label lbl_title_header_settings;
         private System.Windows.Forms.Panel pnl_line_setting_header;
+        private System.Windows.Forms.CheckBox chkbx_off_vocal;
+        private System.Windows.Forms.Button btn_vocalLayer;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Label lbl_WaveLink;
+        private System.Windows.Forms.TextBox box_WaveLink;
     }
 }
 
