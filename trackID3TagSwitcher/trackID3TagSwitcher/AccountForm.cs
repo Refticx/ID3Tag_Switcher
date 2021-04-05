@@ -831,7 +831,7 @@ namespace trackID3TagSwitcher
                         else if ( m_line.Contains( SPACE_SIGN + m_localText1 ) )
                         {
                             /* 前回アプリを正常終了していない形跡があるなら、サーバーステータスと一致しないのは当然なので、このまま処理する */
-                            if ( Form1.isExitStatus == Form1.ExitStatus.ForceClosed )
+                            if ( Form1.isExitStatus == Defines.ExitStatus.ForceClosed )
                             {
 #if DEBUG
                                 MessageBox.Show( "CheckAccountLoginAsync - ForceClosed" );
@@ -906,7 +906,7 @@ namespace trackID3TagSwitcher
                     else if ( m_decryptContent.Contains( this.box_user.Text + SPACE_SIGN + STATUS_SIGNOUT ) )
                     {
                         /* 前回アプリを正常終了していない形跡があるなら、サーバーステータスと一致しないのは当然なので、このまま処理する */
-                        if ( Form1.isExitStatus == Form1.ExitStatus.ForceClosed )
+                        if ( Form1.isExitStatus == Defines.ExitStatus.ForceClosed )
                         {
 #if DEBUG
                             MessageBox.Show( "EditMyLoginStatusToDecryptedHtml - ForceClosed" );
@@ -930,7 +930,7 @@ namespace trackID3TagSwitcher
                     else if ( m_decryptContent.Contains( this.box_user.Text + SPACE_SIGN + STATUS_SIGNIN ) )
                     {
                         /* 前回アプリを正常終了していない形跡があるなら、サーバーステータスと一致しないのは当然なので、このまま処理する */
-                        if ( Form1.isExitStatus == Form1.ExitStatus.ForceClosed )
+                        if ( Form1.isExitStatus == Defines.ExitStatus.ForceClosed )
                         {
 #if DEBUG
                             MessageBox.Show( "EditMyLoginStatusToDecryptedHtml - ForceClosed" );
@@ -1396,8 +1396,8 @@ namespace trackID3TagSwitcher
                                             MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
 
-                if ( Form1.isExitStatus == Form1.ExitStatus.ForceClosed )
-                    Form1.isExitStatus = Form1.ExitStatus.Running;
+                if ( Form1.isExitStatus == Defines.ExitStatus.ForceClosed )
+                    Form1.isExitStatus = Defines.ExitStatus.Running;
 
                 isUnlockLicence = true;
             }

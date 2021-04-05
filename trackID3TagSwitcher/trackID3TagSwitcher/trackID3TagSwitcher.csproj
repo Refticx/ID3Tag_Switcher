@@ -86,6 +86,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Defines.cs" />
     <Compile Include="DebugText.cs">
       <SubType>Form</SubType>
     </Compile>

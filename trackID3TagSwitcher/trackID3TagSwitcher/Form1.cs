@@ -27,31 +27,9 @@ namespace trackID3TagSwitcher
             InitializeComponent();
         }
 
-        private const string APP_DOWNLOAD_URL = "https://chaoticbootstrage.wixsite.com/scene/id3-tool";     /* アプリ更新があった時に開かせるURL */
-        private const string VERSION_INFO_URL = "https://chaoticbootstrage.wixsite.com/scene/idtool-ver";   /* アプリ更新があるかを確認するページ */
-        private const string ALBUM_LICENSE_URL = "https://chaoticbootstrage.wixsite.com/scene/idtool-ver";   /* 変換するアルバムのサウンドレイヤーの権限を確認するページ */
-        private const string CURRENT_VERSION = "1.20";                                                       /* 現在のアプリのバージョン */
-
         /* マルチスレッド */
         private SynchronizationContext _mainContext;            /* asyncのサブスレッドからメインUIスレッドに処理を戻すための変数 */
-
-        /* アプリケーション終了状態 */
-        public enum ExitStatus
-        {
-            Launching,
-            Running,
-            Closing,
-            ForceClosed,
-        }
-        public static ExitStatus isExitStatus = ExitStatus.Launching;
-
-        public enum ConvertExt
-        {
-            flac,
-            mp3,
-            wav,
-        }
-
+        public static Defines.ExitStatus isExitStatus = Defines.ExitStatus.Launching;
         private string trackcbl = "";                           /* trackinfo.cblから読み込んだ文字列全体を格納する変数 */
         private string[,] TrackID3Tag;                          /* trackinfo.cblから読み込んだ各ID3 Tag情報を記憶する二次元配列 */
         private string currentAlbumReleaseTitle = "";           /* 現在読み込んでいるアルバムのリリースタイトル */
@@ -69,69 +47,13 @@ namespace trackID3TagSwitcher
         private AccountForm loginForm = new AccountForm( );     /* ログイン用フォームを作成しておく */
         private char[] invalidChars;                            /* 設定中の文字列内に、使用不可能な文字があるかチェックするための変数 */
         private string invalidReplase;                          /* 設定中の文字列内に、使用不可能な文字があっ他場合に、置き換えするための変数 */
-        private ConvertExt m_convertExt;                        /* タグ設定、サウンドレイヤー対象の音源の拡張子 */
-
-        /* 配列参照時の要素数 */
-        private const int ARN_NAME = 0;
-        private const int FYS_NAME = 1;
-        private const int SUBTITLE = 2;
-        private const int ARTIST = 3;
-        private const int COMMENT = 4;
-        private const int CREATOR = 5;
-        private const int BPM = 6;
-        private const int GENRE = 7;
-        private const int CUSTOM = 8;
-
-        private const int MAX_TRACK = 20;   /* 一括変更できる最大曲数、ここを変更すると曲情報画面の縦ボックス数を変更できる */
-        private const int MAX_TAG = 9;      /* 設定する項目数、ここを変更すると曲情報画面の横ボックス数を変更できる */
-
-        /* デザイナーサイズ */
-        private const int EXIT_Y                            = 3;
-        private const int DESIGN_DEF_X                      = 0;
-        private const int DESIGN_DEF_Y                      = 0;
-        private const int MAIN_AREA_Y                       = 32;
-        private const int MAIN_AREA_HIDE_X                  = -(APP_WIDTH + 20);
-        private const int SUB_AREA_HIDE_X                   = (APP_WIDTH + 10);
-        private const int LINE_HEIGHT                       = 2;
-        private const int CURR_INFO_AREA_Y                  = (DESIGN_DEF_Y + 126);
-        private const int CURR_ID3_AREA_Y                   = (CURR_INFO_AREA_Y + 126);
-        private const int EXEC_CONV_AREA_Y                  = (CURR_ID3_AREA_Y + 126);
-
+        private Defines.ConvertExt m_convertExt;                /* タグ設定、サウンドレイヤー対象の音源の拡張子 */
+        private int m_appdec = 1;                               /* app.cblのオフセット値 */
         /* 設定パネル */
-        private const int SETTING_AREA_HEIGHT               = 400;
-        private const int SETTING_AREA_HIDE_Y               = (DESIGN_DEF_Y - (SETTING_AREA_HEIGHT + 20));
+        private bool m_settings_open = false;
+        private bool m_settings_running = false;
 
-        private const int APP_WIDTH                         = 550;
-        private const int APP_HEIGHT                        = (APP_WIDTH + 50);
-        private const int FOOTER_Y                          = (APP_HEIGHT - 20);
-        private const int FOOTER_LINE_Y                     = (FOOTER_Y - 2);
-        private const int HEADERT_BTN_EXIT_X                = (APP_WIDTH - 28);
-        private const int HEADERT_BTN_ACCOUNT_X             = (HEADERT_BTN_EXIT_X - 40);
-        private const int HEADERT_BTN_SETTING_X             = (HEADERT_BTN_ACCOUNT_X - 40);
-        private const int HEADERT_BTN_EXIT_MOVE_X           = (APP_WIDTH - 90);
-        private const int HEADERT_BTN_ACCOUNT_MOVE_X        = (HEADERT_BTN_EXIT_MOVE_X - 40);
-        private const int HEADERT_BTN_SETTING_MOVE_X        = (HEADERT_BTN_ACCOUNT_MOVE_X - 40);
 
-        private const int APP_BIG_WIDTH                     = 760;
-        private const int APP_BIG_HEIGHT                    = (APP_BIG_WIDTH - 10);
-        private const int FOOTER_BIG_Y                      = (APP_BIG_HEIGHT - 20);
-        private const int FOOTER_LINE_BIG_Y                 = (FOOTER_BIG_Y - 2);
-        private const int HEADERT_BTN_EXIT_BIG_X            = (APP_BIG_WIDTH - 28);
-        private const int HEADERT_BTN_ACCOUNT_BIG_X         = (HEADERT_BTN_EXIT_BIG_X - 40);
-        private const int HEADERT_BTN_SETTING_BIG_X         = (HEADERT_BTN_ACCOUNT_BIG_X - 40);
-        private const int HEADERT_BTN_EXIT_MOVE_BIG_X       = (APP_BIG_WIDTH - 90);
-        private const int HEADERT_BTN_ACCOUNT_MOVE_BIG_X    = (HEADERT_BTN_EXIT_MOVE_BIG_X - 40);
-        private const int HEADERT_BTN_SETTING_MOVE_BIG_X    = (HEADERT_BTN_ACCOUNT_MOVE_BIG_X - 40);
-
-        /* 音源合成 */
-        private Thread coroutineVocalPlus;     /* ボーカル合成用スレッド */
-
-        /* アルバムライセンサー */
-        private enum AlbumLicense
-        {
-            Non_License,
-            Need_License,
-        }
         private Task<bool> m_coroutine_task_bool;
         private Task<string> m_coroutine_task_str;
         private bool m_coroutine_flag = false;
@@ -144,21 +66,20 @@ namespace trackID3TagSwitcher
         private int m_startPos = 0;
         private int m_endPos = 0;
         private int m_length = 0;
-        private AlbumLicense m_currLicense;
+        private Defines.AlbumLicense m_currLicense;
 
+        /* 音源合成 */
+        private Thread coroutineVocalPlus;     /* ボーカル合成用スレッド */
         /// <summary>
         /// アカウントリストのページの暗号化の際の移動オフセット量
         /// </summary>
         private const int ENCRYPT_SHIFT_SIZE_LICENSE_PAGE = 4;
-
         private const int RGB_MAX = 255;
         private const int RGB_MIN = 0;
         private bool isEnterExitBtn = false;
         private Thread coroutineExitButton;
 
-        /* 設定パネル */
-        private bool m_settings_open = false;
-        private bool m_settings_running = false;
+
 
 
         #region 汎用型スクリプト
@@ -192,7 +113,7 @@ namespace trackID3TagSwitcher
             this.lblTrackCount.Visible = false;
             this.lblTrackCount.Text = "";
 
-            for (int tag = 0; tag < MAX_TAG; tag++)
+            for (int tag = 0; tag < Defines.MAX_TAG; tag++)
             {
                 for (int track = 0; track < this.currentMaxTrack; track++)
                 {
@@ -229,22 +150,22 @@ namespace trackID3TagSwitcher
 
             while ( loop )
             {
-                if ( ( this.pnl_currLoadInfo.Location.X - fast ) > MAIN_AREA_HIDE_X )
-                    this.pnl_currLoadInfo.Location = new Point( this.pnl_currLoadInfo.Location.X - fast , CURR_INFO_AREA_Y );
+                if ( ( this.pnl_currLoadInfo.Location.X - fast ) > Defines.MAIN_AREA_HIDE_X )
+                    this.pnl_currLoadInfo.Location = new Point( this.pnl_currLoadInfo.Location.X - fast , Defines.CURR_INFO_AREA_Y );
                 else
-                    this.pnl_currLoadInfo.Location = new Point( MAIN_AREA_HIDE_X , CURR_INFO_AREA_Y );
+                    this.pnl_currLoadInfo.Location = new Point( Defines.MAIN_AREA_HIDE_X , Defines.CURR_INFO_AREA_Y );
 
-                if ( ( this.pnl_currTagType.Location.X - medium ) > MAIN_AREA_HIDE_X )
-                    this.pnl_currTagType.Location = new Point( this.pnl_currTagType.Location.X - medium , CURR_ID3_AREA_Y );
+                if ( ( this.pnl_currTagType.Location.X - medium ) > Defines.MAIN_AREA_HIDE_X )
+                    this.pnl_currTagType.Location = new Point( this.pnl_currTagType.Location.X - medium , Defines.CURR_ID3_AREA_Y );
                 else
-                    this.pnl_currTagType.Location = new Point( MAIN_AREA_HIDE_X , CURR_ID3_AREA_Y );
+                    this.pnl_currTagType.Location = new Point( Defines.MAIN_AREA_HIDE_X , Defines.CURR_ID3_AREA_Y );
 
-                if ( ( this.pnl_execConvert.Location.X - lower ) > MAIN_AREA_HIDE_X )
-                    this.pnl_execConvert.Location = new Point( this.pnl_execConvert.Location.X - lower , EXEC_CONV_AREA_Y );
+                if ( ( this.pnl_execConvert.Location.X - lower ) > Defines.MAIN_AREA_HIDE_X )
+                    this.pnl_execConvert.Location = new Point( this.pnl_execConvert.Location.X - lower , Defines.EXEC_CONV_AREA_Y );
                 else
-                    this.pnl_execConvert.Location = new Point( MAIN_AREA_HIDE_X , EXEC_CONV_AREA_Y );
+                    this.pnl_execConvert.Location = new Point( Defines.MAIN_AREA_HIDE_X , Defines.EXEC_CONV_AREA_Y );
 
-                if ( ( this.pnl_currLoadInfo.Location.X == MAIN_AREA_HIDE_X ) && ( this.pnl_currTagType.Location.X == MAIN_AREA_HIDE_X ) && ( this.pnl_execConvert.Location.X == MAIN_AREA_HIDE_X ) )
+                if ( ( this.pnl_currLoadInfo.Location.X == Defines.MAIN_AREA_HIDE_X ) && ( this.pnl_currTagType.Location.X == Defines.MAIN_AREA_HIDE_X ) && ( this.pnl_execConvert.Location.X == Defines.MAIN_AREA_HIDE_X ) )
                     loop = false;
 
                 await Task.Delay( 1 );
@@ -286,11 +207,11 @@ namespace trackID3TagSwitcher
 
             while ( m_settings_running )
             {
-                if ( ( this.pnl_settings.Location.Y + speed ) < DESIGN_DEF_Y )
-                    this.pnl_settings.Location = new Point( DESIGN_DEF_X , this.pnl_settings.Location.Y + speed );
+                if ( ( this.pnl_settings.Location.Y + speed ) < Defines.DESIGN_DEF_Y )
+                    this.pnl_settings.Location = new Point( Defines.DESIGN_DEF_X , this.pnl_settings.Location.Y + speed );
                 else
                 {
-                    this.pnl_settings.Location = new Point( DESIGN_DEF_X , DESIGN_DEF_Y );
+                    this.pnl_settings.Location = new Point( Defines.DESIGN_DEF_X , Defines.DESIGN_DEF_Y );
                     m_settings_open = true;
                     m_settings_running = false;
                 }
@@ -306,11 +227,11 @@ namespace trackID3TagSwitcher
 
             while ( m_settings_running )
             {
-                if ( ( this.pnl_settings.Location.Y - speed ) > SETTING_AREA_HIDE_Y )
-                    this.pnl_settings.Location = new Point( DESIGN_DEF_X , this.pnl_settings.Location.Y - speed );
+                if ( ( this.pnl_settings.Location.Y - speed ) > Defines.SETTING_AREA_HIDE_Y )
+                    this.pnl_settings.Location = new Point( Defines.DESIGN_DEF_X , this.pnl_settings.Location.Y - speed );
                 else
                 {
-                    this.pnl_settings.Location = new Point( DESIGN_DEF_X , SETTING_AREA_HIDE_Y );
+                    this.pnl_settings.Location = new Point( Defines.DESIGN_DEF_X , Defines.SETTING_AREA_HIDE_Y );
                     m_settings_open = false;
                     m_settings_running = false;
                 }
@@ -327,7 +248,7 @@ namespace trackID3TagSwitcher
 
         private void cmbbx_convertExt_SelectedIndexChanged( object sender , EventArgs e )
         {
-            m_convertExt = (ConvertExt)this.cmbbx_convertExt.SelectedIndex;
+            m_convertExt = (Defines.ConvertExt)this.cmbbx_convertExt.SelectedIndex;
         }
 
         #endregion
@@ -626,9 +547,9 @@ namespace trackID3TagSwitcher
         private bool AnalysisID3List()
         {
             /* 
-             要素数8（ARN名、FYS名、サブタイトル、アーティスト、コメント、作曲者、BPM、ジャンル）
+             要素数8（ARN名、FYS名、サブタイトル、アーティスト、コメント、作曲者、Defines.BPM、ジャンル）
              */
-            TrackID3Tag = new string[this.currentMaxTrack, MAX_TAG];
+            TrackID3Tag = new string[this.currentMaxTrack, Defines.MAX_TAG];
             string line = "";
             string target = "";
             string num = "";
@@ -643,7 +564,7 @@ namespace trackID3TagSwitcher
                 line = rs.ReadLine();
                 isFind = false;
 
-                target = "Album_Label:";
+                target = Defines.TRACKINFO_ALBUM_LABEL + ":";
                 if (line.Contains(target))
                 {
                     st = target.Length;
@@ -654,7 +575,7 @@ namespace trackID3TagSwitcher
                     continue;
                 }
 
-                target = "Album_Name:";
+                target = Defines.TRACKINFO_ALBUM_NAME + ":";
                 if (line.Contains(target))
                 {
                     st = target.Length;
@@ -665,7 +586,7 @@ namespace trackID3TagSwitcher
                     continue;
                 }
 
-                target = "Album_Number:";
+                target = Defines.TRACKINFO_ALBUM_NUMBER + ":";
                 if (line.Contains(target))
                 {
                     st = target.Length;
@@ -676,7 +597,7 @@ namespace trackID3TagSwitcher
                     continue;
                 }
 
-                target = "Is_Type:";
+                target = Defines.TRACKINFO_ID3_TYPE + ":";
                 if (line.Contains(target))
                 {
                     st = target.Length;
@@ -691,7 +612,7 @@ namespace trackID3TagSwitcher
                     continue;
                 }
 
-                target = "Wave_Type:";
+                target = Defines.TRACKINFO_WAVE_TYPE + ":";
                 if ( line.Contains( target ) )
                 {
                     st = target.Length;
@@ -705,7 +626,7 @@ namespace trackID3TagSwitcher
                     continue;
                 }
 
-                target = "Wave_Link:";
+                target = Defines.TRACKINFO_WAVE_LINK + ":";
                 if ( line.Contains( target ) )
                 {
                     st = target.Length;
@@ -716,14 +637,14 @@ namespace trackID3TagSwitcher
                     continue;
                 }
 
-                for (int tag = 0; tag < MAX_TAG; tag++)
+                for (int tag = 0; tag < Defines.MAX_TAG; tag++)
                 {
                     for (int track = 0; track < this.currentMaxTrack; track++)
                     {
                         switch (tag)
                         {
-                            case 0: target = "ARN_Name_"; break;
-                            case 1: target = "FYS_Name_"; break;
+                            case 0: target = "Defines.ARN_NAME_"; break;
+                            case 1: target = "Defines.FYS_NAME_"; break;
                             case 2: target = "FYS_Subtitle_"; break;
                             case 3: target = "FYS_Artist_"; break;
                             case 4: target = "FYS_Comment_"; break;
@@ -776,11 +697,11 @@ namespace trackID3TagSwitcher
             this.boxAlbumName.Text = this.currentAlbumReleaseTitle;
             this.boxAlbumNumber.Text = this.currentAlbumReleaseNumber;
             this.boxLabelName.Text = this.currentAlbumLabelName;
-            for (int tag = 0; tag < MAX_TAG; tag++)
+            for (int tag = 0; tag < Defines.MAX_TAG; tag++)
             {
                 for (int track = 0; track < this.currentMaxTrack; track++)
                 {
-                    if ( tag != FYS_NAME )
+                    if ( tag != Defines.FYS_NAME )
                         this.boxTracks[track, tag].Text = this.TrackID3Tag[track, tag];
                     else
                     {
@@ -802,22 +723,22 @@ namespace trackID3TagSwitcher
 
             while ( loop )
             {
-                if ( ( this.pnl_currLoadInfo.Location.X + fast ) < DESIGN_DEF_X )
-                    this.pnl_currLoadInfo.Location = new Point( this.pnl_currLoadInfo.Location.X + fast , CURR_INFO_AREA_Y);
+                if ( ( this.pnl_currLoadInfo.Location.X + fast ) < Defines.DESIGN_DEF_X )
+                    this.pnl_currLoadInfo.Location = new Point( this.pnl_currLoadInfo.Location.X + fast , Defines.CURR_INFO_AREA_Y);
                 else
-                    this.pnl_currLoadInfo.Location = new Point( DESIGN_DEF_X , CURR_INFO_AREA_Y );
+                    this.pnl_currLoadInfo.Location = new Point( Defines.DESIGN_DEF_X , Defines.CURR_INFO_AREA_Y );
 
-                if ( ( this.pnl_currTagType.Location.X + medium ) < DESIGN_DEF_X )
-                    this.pnl_currTagType.Location = new Point( this.pnl_currTagType.Location.X + medium , CURR_ID3_AREA_Y );
+                if ( ( this.pnl_currTagType.Location.X + medium ) < Defines.DESIGN_DEF_X )
+                    this.pnl_currTagType.Location = new Point( this.pnl_currTagType.Location.X + medium , Defines.CURR_ID3_AREA_Y );
                 else
-                    this.pnl_currTagType.Location = new Point( DESIGN_DEF_X , CURR_ID3_AREA_Y );
+                    this.pnl_currTagType.Location = new Point( Defines.DESIGN_DEF_X , Defines.CURR_ID3_AREA_Y );
 
-                if ( ( this.pnl_execConvert.Location.X + lower ) < DESIGN_DEF_X )
-                    this.pnl_execConvert.Location = new Point( this.pnl_execConvert.Location.X + lower , EXEC_CONV_AREA_Y );
+                if ( ( this.pnl_execConvert.Location.X + lower ) < Defines.DESIGN_DEF_X )
+                    this.pnl_execConvert.Location = new Point( this.pnl_execConvert.Location.X + lower , Defines.EXEC_CONV_AREA_Y );
                 else
-                    this.pnl_execConvert.Location = new Point( DESIGN_DEF_X , EXEC_CONV_AREA_Y );
+                    this.pnl_execConvert.Location = new Point( Defines.DESIGN_DEF_X , Defines.EXEC_CONV_AREA_Y );
 
-                if ( ( this.pnl_currLoadInfo.Location.X == DESIGN_DEF_X ) && ( this.pnl_currTagType.Location.X == DESIGN_DEF_X ) && ( this.pnl_execConvert.Location.X == DESIGN_DEF_X ) )
+                if ( ( this.pnl_currLoadInfo.Location.X == Defines.DESIGN_DEF_X ) && ( this.pnl_currTagType.Location.X == Defines.DESIGN_DEF_X ) && ( this.pnl_execConvert.Location.X == Defines.DESIGN_DEF_X ) )
                     loop = false;
 
                 await Task.Delay( 1 );
@@ -985,9 +906,9 @@ namespace trackID3TagSwitcher
             /* 曲名のタイプを読み分ける */
             int nameNum = 0;
             if ( !this.isTypeFYS )
-                nameNum = FYS_NAME;
+                nameNum = Defines.FYS_NAME;
             else
-                nameNum = ARN_NAME;
+                nameNum = Defines.ARN_NAME;
 
             /* ループ処理用の変数を初期化 */
             string num = "";
@@ -1016,21 +937,21 @@ namespace trackID3TagSwitcher
                 file.Tag.Track = Convert.ToUInt16((track + 1));
                 file.Tag.AlbumArtists = new string[] { this.currentAlbumLabelName };
                 file.Tag.Album = this.currentAlbumReleaseTitle;
-                file.Tag.Composers = new string[] { TrackID3Tag[track, CREATOR] };
-                file.Tag.Genres = new string[] { TrackID3Tag[track, GENRE] };
-                file.Tag.BeatsPerMinute = Convert.ToUInt16( TrackID3Tag[track, BPM] );
+                file.Tag.Composers = new string[] { TrackID3Tag[track, Defines.CREATOR] };
+                file.Tag.Genres = new string[] { TrackID3Tag[track, Defines.GENRE] };
+                file.Tag.BeatsPerMinute = Convert.ToUInt16( TrackID3Tag[track, Defines.BPM] );
                 file.Tag.Pictures = new TagLib.IPicture[1] { this.aawork };
                 file.Tag.Conductor = this.currentAlbumReleaseNumber + "_" + ( track + 1 ).ToString( );
                 if (!this.isTypeFYS)
                 {
-                    file.Tag.Grouping = TrackID3Tag[track, SUBTITLE];
-                    file.Tag.Performers = new string[] { TrackID3Tag[track, ARTIST] , TrackID3Tag[track, CREATOR] };
-                    file.Tag.Comment = TrackID3Tag[track, COMMENT];
+                    file.Tag.Grouping = TrackID3Tag[track, Defines.SUBTITLE];
+                    file.Tag.Performers = new string[] { TrackID3Tag[track, Defines.ARTIST] , TrackID3Tag[track, Defines.CREATOR] };
+                    file.Tag.Comment = TrackID3Tag[track, Defines.COMMENT];
                 }
                 else
                 {
                     file.Tag.Grouping = "";
-                    file.Tag.Performers = new string[] { TrackID3Tag[track, CREATOR] };
+                    file.Tag.Performers = new string[] { TrackID3Tag[track, Defines.CREATOR] };
                     file.Tag.Comment = "";
                 }
                 file.Save();
@@ -1091,13 +1012,13 @@ namespace trackID3TagSwitcher
             {
                 line = rs.ReadLine();
 
-                target = "Is_Type:";
+                target = Defines.TRACKINFO_ID3_TYPE + ":";
                 if (line.Contains(target))
                 {
                     if (this.isTypeFYS)
-                        text += "Is_Type:FYS\r\n";
+                        text += Defines.TRACKINFO_ID3_TYPE + ":" + "FYS\r\n";
                     else
-                        text += "Is_Type:ARN\r\n";
+                        text += Defines.TRACKINFO_ID3_TYPE + ":" + "ARN\r\n";
                 }
                 else
                 {
@@ -1181,7 +1102,7 @@ namespace trackID3TagSwitcher
                                                     MessageBoxDefaultButton.Button2);
             if (result == DialogResult.Yes)
             {
-                System.Diagnostics.Process.Start(APP_DOWNLOAD_URL);
+                System.Diagnostics.Process.Start(Defines.APP_DOWNLOAD_URL);
                 this.Close();
             }
         }
@@ -1191,7 +1112,7 @@ namespace trackID3TagSwitcher
             WebClient wc = new WebClient();
             try
             {
-                string html = wc.DownloadString(VERSION_INFO_URL);
+                string html = wc.DownloadString( Defines.VERSION_INFO_URL );
                 string target = "track_id3_ver:";
                 if (html.Contains(target))
                 {
@@ -1199,7 +1120,7 @@ namespace trackID3TagSwitcher
                     int len = target.Length;
                     int ed = 4;
                     this.new_ver = html.Substring(st + len, ed);
-                    if (this.new_ver != CURRENT_VERSION)
+                    if (this.new_ver != Defines.CURRENT_VERSION )
                         return true;
                 }
             }
@@ -1226,17 +1147,17 @@ namespace trackID3TagSwitcher
             SaveSetting( launch: true );
 
             /* 座標初期化 */
-            this.pnlPage1.Location          = new Point(DESIGN_DEF_X, DESIGN_DEF_Y);
-            this.ClientSize                 = new Size(APP_WIDTH, APP_HEIGHT);
-            this.pnlAppFooterLine.Location  = new Point(DESIGN_DEF_X, FOOTER_LINE_Y);
-            this.pnlAppFooter.Location      = new Point(DESIGN_DEF_X, FOOTER_Y);
-            this.pnlAppLine1.Size           = new Size(APP_WIDTH, LINE_HEIGHT);
-            this.pnlAppLine2.Size           = new Size(APP_WIDTH, LINE_HEIGHT);
-            this.pnlTrackInfo.Location      = new Point(DESIGN_DEF_X, MAIN_AREA_Y);
-            this.pnl_currLoadInfo.Location  = new Point(MAIN_AREA_HIDE_X, CURR_INFO_AREA_Y);
-            this.pnl_currTagType.Location   = new Point(MAIN_AREA_HIDE_X, CURR_ID3_AREA_Y);
-            this.pnl_execConvert.Location   = new Point(MAIN_AREA_HIDE_X , EXEC_CONV_AREA_Y);
-            this.pnl_settings.Location      = new Point(DESIGN_DEF_X , SETTING_AREA_HIDE_Y);
+            this.pnlPage1.Location          = new Point(Defines.DESIGN_DEF_X, Defines.DESIGN_DEF_Y);
+            this.ClientSize                 = new Size(Defines.APP_WIDTH, Defines.APP_HEIGHT);
+            this.pnlAppFooterLine.Location  = new Point(Defines.DESIGN_DEF_X, Defines.FOOTER_LINE_Y);
+            this.pnlAppFooter.Location      = new Point(Defines.DESIGN_DEF_X, Defines.FOOTER_Y);
+            this.pnlAppLine1.Size           = new Size(Defines.APP_WIDTH, Defines.LINE_HEIGHT);
+            this.pnlAppLine2.Size           = new Size(Defines.APP_WIDTH, Defines.LINE_HEIGHT);
+            this.pnlTrackInfo.Location      = new Point(Defines.DESIGN_DEF_X, Defines.MAIN_AREA_Y);
+            this.pnl_currLoadInfo.Location  = new Point(Defines.MAIN_AREA_HIDE_X, Defines.CURR_INFO_AREA_Y);
+            this.pnl_currTagType.Location   = new Point(Defines.MAIN_AREA_HIDE_X, Defines.CURR_ID3_AREA_Y);
+            this.pnl_execConvert.Location   = new Point(Defines.MAIN_AREA_HIDE_X , Defines.EXEC_CONV_AREA_Y);
+            this.pnl_settings.Location      = new Point(Defines.DESIGN_DEF_X , Defines.SETTING_AREA_HIDE_Y);
             SetupTrackInfoPanel();
             
 
@@ -1299,21 +1220,21 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
                 {
                     line = rs.ReadLine();
 
-                    target = "Jacket_Name:";
+                    target = Defines.CONFIG_JACKET_NAME + ":";
                     if (line.Contains(target))
                     {
                         st = target.Length;
                         ed = line.Length - st;
                         this.boxArtworkName.Text = line.Substring(st, ed);
                     }
-                    target = "Track_Folder:";
+                    target = Defines.CONFIG_TRACK_FOLDER + ":";
                     if (line.Contains(target))
                     {
                         st = target.Length;
                         ed = line.Length - st;
                         this.boxTrackFolder.Text = line.Substring(st, ed);
                     }
-                    target = "Is_Dot:";
+                    target = Defines.CONFIG_IS_DOT + ":";
                     if (line.Contains(target))
                     {
                         if (line.Contains("1"))
@@ -1321,7 +1242,7 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
                         else if (line.Contains("0"))
                             this.chkIsDot.Checked = false;
                     }
-                    target = "Is_AutoSearch:";
+                    target = Defines.CONFIG_AUTO_SEARCH + ":";
                     if (line.Contains(target))
                     {
                         if (line.Contains("1"))
@@ -1337,7 +1258,7 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
                             this.boxTrackFolder.Enabled = true;
                         }
                     }
-                    target = "Is_ReplaceRegisterWord:";
+                    target = Defines.CONFIG_REPLACE_REGISTER_WORD + ":";
                     if (line.Contains(target))
                     {
                         if (line.Contains("1"))
@@ -1349,43 +1270,48 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
                             this.isReplaceRegisterWord.Checked = false;
                         }
                     }
-                    target = "App_Exit:";
+                    target = Defines.CONFIG_APP_EXIT + ":";
                     if ( line.Contains( target ) )
                     {
-                        if ( line.Contains( ExitStatus.Launching.ToString( ) ) )
+                        if ( line.Contains( Defines.ExitStatus.Launching.ToString( ) ) )
                         {
-                            isExitStatus = ExitStatus.Running;
+                            isExitStatus = Defines.ExitStatus.Running;
                         }
-                        else if ( line.Contains( ExitStatus.Closing.ToString( ) ) )
+                        else if ( line.Contains( Defines.ExitStatus.Closing.ToString( ) ) )
                         {
-                            isExitStatus = ExitStatus.Running;
+                            isExitStatus = Defines.ExitStatus.Running;
                         }
-                        else if ( line.Contains( ExitStatus.Running.ToString( ) ) )
+                        else if ( line.Contains( Defines.ExitStatus.Running.ToString( ) ) )
                         {
                             MessageBox.Show( "ForceClosed" );
-                            isExitStatus = ExitStatus.ForceClosed;
+                            isExitStatus = Defines.ExitStatus.ForceClosed;
                         }
                     }
-                    target = "Convert_Ext:";
+                    target = Defines.CONFIG_CONVERT_EXT + ":";
                     if ( line.Contains( target ) )
                     {
-                        if ( line.Contains( ConvertExt.flac.ToString( ) ) )
+                        if ( line.Contains( Defines.ConvertExt.flac.ToString( ) ) )
                         {
-                            m_convertExt = ConvertExt.flac;
+                            m_convertExt = Defines.ConvertExt.flac;
                         }
-                        else if ( line.Contains( ConvertExt.mp3.ToString( ) ) )
+                        else if ( line.Contains( Defines.ConvertExt.mp3.ToString( ) ) )
                         {
-                            m_convertExt = ConvertExt.mp3;
+                            m_convertExt = Defines.ConvertExt.mp3;
                         }
-                        else if ( line.Contains( ConvertExt.wav.ToString( ) ) )
+                        else if ( line.Contains( Defines.ConvertExt.wav.ToString( ) ) )
                         {
-                            m_convertExt = ConvertExt.wav;
+                            m_convertExt = Defines.ConvertExt.wav;
                         }
                         else
                         {
-                            m_convertExt = ConvertExt.flac;
+                            m_convertExt = Defines.ConvertExt.flac;
                         }
                         this.cmbbx_convertExt.SelectedIndex = (int)m_convertExt;
+                    }
+                    target = Defines.CONFIG_ACC_DEC + ":";
+                    if ( line.Contains( target ) )
+                    {
+                        m_appdec = Convert.ToInt32( line.Substring( target.Length , (line.Length - target.Length) ) );
                     }
                 }
             }
@@ -1400,32 +1326,35 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
             string path = Application.StartupPath + "\\item\\config.cbl";
             string text = "";
 
-            text = "Jacket_Name:" + this.boxArtworkName.Text + "\r\n";
-            text += "Track_Folder:" + this.boxTrackFolder.Text + "\r\n";
+            text = Defines.CONFIG_JACKET_NAME + ":" + this.boxArtworkName.Text + "\r\n";
+            text += Defines.CONFIG_TRACK_FOLDER + ":" + this.boxTrackFolder.Text + "\r\n";
 
             if ( this.chkIsDot.Checked)
-                text += "Is_Dot:" + "1\r\n";
+                text += Defines.CONFIG_IS_DOT + ":" + "1\r\n";
             else
-                text += "Is_Dot:" + "0\r\n";
+                text += Defines.CONFIG_IS_DOT + ":" + "0\r\n";
 
             if (this.autoSearchFile.Checked)
-                text += "Is_AutoSearch:" + "1\r\n";
+                text += Defines.CONFIG_AUTO_SEARCH + ":" + "1\r\n";
             else
-                text += "Is_AutoSearch:" + "0\r\n";
+                text += Defines.CONFIG_AUTO_SEARCH + ":" + "0\r\n";
 
             if (this.isReplaceRegisterWord.Checked)
-                text += "Is_ReplaceRegisterWord:" + "1\r\n";
+                text += Defines.CONFIG_REPLACE_REGISTER_WORD + ":" + "1\r\n";
             else
-                text += "Is_ReplaceRegisterWord:" + "0\r\n";
+                text += Defines.CONFIG_REPLACE_REGISTER_WORD + ":" + "0\r\n";
 
-            text += "App_Exit:";
+            text += Defines.CONFIG_APP_EXIT + ":";
             if ( launch )
-                text += ExitStatus.Running.ToString( ) + "\r\n";
+                text += Defines.ExitStatus.Running.ToString( ) + "\r\n";
             else
-                text += ExitStatus.Closing.ToString( ) + "\r\n";
+                text += Defines.ExitStatus.Closing.ToString( ) + "\r\n";
 
-            text += "Convert_Ext:";
+            text += Defines.CONFIG_CONVERT_EXT + ":";
             text += m_convertExt.ToString( ) + "\r\n";
+
+            text += Defines.CONFIG_ACC_DEC + ":";
+            text += m_appdec.ToString( ) + "\r\n";
 
             StreamWriter sw = new StreamWriter(path, false);
             sw.Write(text);
@@ -1889,18 +1818,18 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
         private async void btnOpenTrackInfoPage_Click(object sender, EventArgs e)
         {
             /* 移動先、計算量定義 */
-            int st          = DESIGN_DEF_X;
-            int ed          = MAIN_AREA_HIDE_X;
-            int width       = APP_WIDTH;
-            int height      = APP_HEIGHT;
-            int footerLineY = FOOTER_LINE_Y;
-            int footerY     = FOOTER_Y;
-            int exitX       = HEADERT_BTN_EXIT_MOVE_X;
-            int accountX    = HEADERT_BTN_ACCOUNT_MOVE_X;
-            int settingX    = HEADERT_BTN_SETTING_MOVE_X;
+            int st          = Defines.DESIGN_DEF_X;
+            int ed          = Defines.MAIN_AREA_HIDE_X;
+            int width       = Defines.APP_WIDTH;
+            int height      = Defines.APP_HEIGHT;
+            int footerLineY = Defines.FOOTER_LINE_Y;
+            int footerY     = Defines.FOOTER_Y;
+            int exitX       = Defines.HEADERT_BTN_EXIT_MOVE_X;
+            int accountX    = Defines.HEADERT_BTN_ACCOUNT_MOVE_X;
+            int settingX    = Defines.HEADERT_BTN_SETTING_MOVE_X;
             int volX        = 7;
             int volY        = 5;
-            int page2X      = SUB_AREA_HIDE_X;
+            int page2X      = Defines.SUB_AREA_HIDE_X;
             int plusX       = 60;
 
             /* アニメーションでレイアウトが重くならないように */
@@ -1947,14 +1876,14 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
             VisibleBoxes(true);
 
             /* 固定位置に最終フレームで配置 */
-            this.pnlPage1.Location          = new Point(MAIN_AREA_HIDE_X            , DESIGN_DEF_Y);
-            this.ClientSize                 = new Size(APP_BIG_WIDTH                , APP_BIG_HEIGHT);
-            this.btnExit.Location           = new Point(HEADERT_BTN_EXIT_BIG_X      , EXIT_Y);
-            this.img_btn_account.Location   = new Point(HEADERT_BTN_ACCOUNT_BIG_X   , EXIT_Y);
-            this.img_btn_setting.Location   = new Point(HEADERT_BTN_SETTING_BIG_X   , EXIT_Y);
-            this.pnlAppFooter.Location      = new Point(DESIGN_DEF_X                , FOOTER_BIG_Y);
-            this.pnlAppFooterLine.Location  = new Point(DESIGN_DEF_X                , FOOTER_LINE_BIG_Y);
-            //this.pnlTrackInfo.Location      = new Point(DESIGN_DEF_X        , MAIN_AREA_Y);
+            this.pnlPage1.Location          = new Point(Defines.MAIN_AREA_HIDE_X            , Defines.DESIGN_DEF_Y);
+            this.ClientSize                 = new Size(Defines.APP_BIG_WIDTH                , Defines.APP_BIG_HEIGHT);
+            this.btnExit.Location           = new Point(Defines.HEADERT_BTN_EXIT_BIG_X      , Defines.EXIT_Y);
+            this.img_btn_account.Location   = new Point(Defines.HEADERT_BTN_ACCOUNT_BIG_X   , Defines.EXIT_Y);
+            this.img_btn_setting.Location   = new Point(Defines.HEADERT_BTN_SETTING_BIG_X   , Defines.EXIT_Y);
+            this.pnlAppFooter.Location      = new Point(Defines.DESIGN_DEF_X                , Defines.FOOTER_BIG_Y);
+            this.pnlAppFooterLine.Location  = new Point(Defines.DESIGN_DEF_X                , Defines.FOOTER_LINE_BIG_Y);
+            //this.pnlTrackInfo.Location      = new Point(Defines.DESIGN_DEF_X        , Defines.MAIN_AREA_Y);
             await Task.Run(() => Thread.Sleep(10));
 
             /* レイアウトのロック解除 */
@@ -1970,17 +1899,17 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
         private async void btnCloseTrackInfo_Click(object sender, EventArgs e)
         {
             int st          = -500;
-            int ed          = DESIGN_DEF_X;
-            int width       = APP_BIG_WIDTH;
-            int height      = APP_BIG_HEIGHT;
-            int footerLineY = FOOTER_LINE_BIG_Y;
-            int footerY     = FOOTER_BIG_Y;
-            int exitX       = HEADERT_BTN_EXIT_MOVE_BIG_X;
-            int accountX    = HEADERT_BTN_ACCOUNT_MOVE_BIG_X;
-            int settingX    = HEADERT_BTN_SETTING_MOVE_BIG_X;
+            int ed          = Defines.DESIGN_DEF_X;
+            int width       = Defines.APP_BIG_WIDTH;
+            int height      = Defines.APP_BIG_HEIGHT;
+            int footerLineY = Defines.FOOTER_LINE_BIG_Y;
+            int footerY     = Defines.FOOTER_BIG_Y;
+            int exitX       = Defines.HEADERT_BTN_EXIT_MOVE_BIG_X;
+            int accountX    = Defines.HEADERT_BTN_ACCOUNT_MOVE_BIG_X;
+            int settingX    = Defines.HEADERT_BTN_SETTING_MOVE_BIG_X;
             int volX        = 8;
             int volY        = 6;
-            int page2X      = DESIGN_DEF_X;
+            int page2X      = Defines.DESIGN_DEF_X;
             int plusX       = 69;
 
             this.pnlPage1.SuspendLayout();
@@ -2018,14 +1947,14 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
             }
             
             /* 固定位置に最終フレームで配置 */
-            this.pnlPage1.Location          = new Point(DESIGN_DEF_X            , DESIGN_DEF_Y);
-            this.ClientSize                 = new Size(APP_WIDTH                , APP_HEIGHT);
-            this.btnExit.Location           = new Point(HEADERT_BTN_EXIT_X      , EXIT_Y);
-            this.img_btn_account.Location   = new Point(HEADERT_BTN_ACCOUNT_X   , EXIT_Y);
-            this.img_btn_setting.Location   = new Point(HEADERT_BTN_SETTING_X   , EXIT_Y);
-            this.pnlAppFooter.Location      = new Point(DESIGN_DEF_X            , FOOTER_Y);
-            this.pnlAppFooterLine.Location  = new Point(DESIGN_DEF_X            , FOOTER_LINE_Y);
-            //this.pnlTrackInfo.Location      = new Point(DESIGN_DEF_X    , MAIN_AREA_Y);
+            this.pnlPage1.Location          = new Point(Defines.DESIGN_DEF_X            , Defines.DESIGN_DEF_Y);
+            this.ClientSize                 = new Size(Defines.APP_WIDTH                , Defines.APP_HEIGHT);
+            this.btnExit.Location           = new Point(Defines.HEADERT_BTN_EXIT_X      , Defines.EXIT_Y);
+            this.img_btn_account.Location   = new Point(Defines.HEADERT_BTN_ACCOUNT_X   , Defines.EXIT_Y);
+            this.img_btn_setting.Location   = new Point(Defines.HEADERT_BTN_SETTING_X   , Defines.EXIT_Y);
+            this.pnlAppFooter.Location      = new Point(Defines.DESIGN_DEF_X            , Defines.FOOTER_Y);
+            this.pnlAppFooterLine.Location  = new Point(Defines.DESIGN_DEF_X            , Defines.FOOTER_LINE_Y);
+            //this.pnlTrackInfo.Location      = new Point(Defines.DESIGN_DEF_X    , Defines.MAIN_AREA_Y);
             await Task.Run(() => Thread.Sleep(10));
             
             this.pnlPage1.ResumeLayout();
@@ -2049,9 +1978,9 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
         {
             int DEF_Y = 74;
             int VOL_Y = 25;
-            this.lblTracks = new Label[MAX_TRACK];
+            this.lblTracks = new Label[Defines.MAX_TRACK];
 
-            for (int i = 0; i < MAX_TRACK; i++)
+            for (int i = 0; i < Defines.MAX_TRACK; i++)
             {
                 this.lblTracks[i] = new Label();
                 this.lblTracks[i].SuspendLayout();
@@ -2076,11 +2005,11 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
             int DEF_Y = 74;
             int VOL_X = 72;
             int VOL_Y = 25;
-            this.boxTracks = new TextBox[MAX_TRACK, MAX_TAG];
+            this.boxTracks = new TextBox[Defines.MAX_TRACK, Defines.MAX_TAG];
 
-            for (int track = 0; track < MAX_TRACK; track++)
+            for (int track = 0; track < Defines.MAX_TRACK; track++)
             {
-                for (int tag = 0; tag < MAX_TAG; tag++)
+                for (int tag = 0; tag < Defines.MAX_TAG; tag++)
                 {
 
                     this.boxTracks[track, tag] = new TextBox();
@@ -2102,9 +2031,9 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
 
         private void VisibleBoxes(bool show)
         {
-            for (int track = 0; track < MAX_TRACK; track++)
+            for (int track = 0; track < Defines.MAX_TRACK; track++)
             {
-                for (int tag = 0; tag < MAX_TAG; tag++)
+                for (int tag = 0; tag < Defines.MAX_TAG; tag++)
                 {
 
                     this.boxTracks[track, tag].Visible = show;
@@ -2115,11 +2044,11 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
 
         private void DeleteAnotherBoxes()
         {
-            for (int track = 0; track < MAX_TRACK; track++)
+            for (int track = 0; track < Defines.MAX_TRACK; track++)
             {
                 if (this.currentMaxTrack <= track)
                 {
-                    for (int tag = 0; tag < MAX_TAG; tag++)
+                    for (int tag = 0; tag < Defines.MAX_TAG; tag++)
                     {
                         this.boxTracks[track, tag].Text = "";
                     }
@@ -2231,19 +2160,19 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
             string zero = "";
             string text = "";
 
-            text += "Is_Type:ARN\r\n";
+            text += Defines.TRACKINFO_ID3_TYPE + ":" + "ARN\r\n";
             if ( !this.chkbx_off_vocal.Checked )
-                text += "Wave_Type:VO\r\n";
+                text += Defines.TRACKINFO_WAVE_TYPE + ":" + "VO\r\n";
             else
-                text += "Wave_Type:INST\r\n";
-            text += "Album_Label:" + this.boxLabelName.Text + "\r\n";
-            text += "Album_Name:" + this.boxAlbumName.Text + "\r\n";
-            text += "Album_Number:" + this.boxAlbumNumber.Text + "\r\n";
-            text += "Wave_Link:" + this.box_WaveLink.Text + "\r\n";
+                text += Defines.TRACKINFO_WAVE_TYPE + ":" + "INST\r\n";
+            text += Defines.TRACKINFO_ALBUM_LABEL + ":" + this.boxLabelName.Text + "\r\n";
+            text += Defines.TRACKINFO_ALBUM_NAME + ":" + this.boxAlbumName.Text + "\r\n";
+            text += Defines.TRACKINFO_ALBUM_NUMBER + ":" + this.boxAlbumNumber.Text + "\r\n";
+            text += Defines.TRACKINFO_WAVE_LINK + ":" + this.box_WaveLink.Text + "\r\n";
             text += "==============================\r\n";
-            for (int j = 0; j < MAX_TAG; j++)
+            for (int j = 0; j < Defines.MAX_TAG; j++)
             {
-                for (int i = 0; i < MAX_TRACK; i++)
+                for (int i = 0; i < Defines.MAX_TRACK; i++)
                 {
                     if (i < 9)
                         zero = "0";
@@ -2251,28 +2180,28 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
                         zero = "";
                     switch ( j )
                     {
-                        case ARN_NAME:
-                            text += "ARN_Name_" + zero + (i + 1) + ":" + this.boxTracks[i, ARN_NAME].Text + "\r\n";
+                        case Defines.ARN_NAME:
+                            text += "Defines.ARN_NAME_" + zero + (i + 1) + ":" + this.boxTracks[i, Defines.ARN_NAME].Text + "\r\n";
                             break;
-                        case FYS_NAME:
+                        case Defines.FYS_NAME:
                             /* ナンバリング */
-                            text += "FYS_Name_" + zero + (i + 1) + ":";
+                            text += "Defines.FYS_NAME_" + zero + (i + 1) + ":";
 
                             /* 原曲名 ( */
-                            text += this.boxTracks[i, FYS_NAME].Text + " (";
+                            text += this.boxTracks[i, Defines.FYS_NAME].Text + " (";
 
                             /* カスタム名分岐 */
-                            if ( this.boxTracks[i, CUSTOM].Text != "" )
+                            if ( this.boxTracks[i, Defines.CUSTOM].Text != "" )
                             {
                                 /* カスタム名ルート */
-                                text += this.boxTracks[i, CUSTOM].Text + ")\r\n";
+                                text += this.boxTracks[i, Defines.CUSTOM].Text + ")\r\n";
                             }
                             else
                             {
                                 /* 命名規則ルート */
 
                                 /* 作者 */
-                                text += this.boxTracks[i, CREATOR].Text;
+                                text += this.boxTracks[i, Defines.CREATOR].Text;
 
                                 /* 's */
                                 if (this.chkIsXXs.Checked)
@@ -2281,36 +2210,36 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
                                     text += " ";
 
                                 /* ジャンル名 */
-                                text += this.boxTracks[i, GENRE].Text;
+                                text += this.boxTracks[i, Defines.GENRE].Text;
 
                                 /* Bootleg) */
                                 text += " " + this.boxLastWord.Text + ")\r\n";
                             }
                             break;
-                        case SUBTITLE:
-                            text += "FYS_Subtitle_" + zero + (i + 1) + ":" + this.boxTracks[i, SUBTITLE].Text + "\r\n";
+                        case Defines.SUBTITLE:
+                            text += "FYS_Subtitle_" + zero + (i + 1) + ":" + this.boxTracks[i, Defines.SUBTITLE].Text + "\r\n";
                             break;
-                        case ARTIST:
-                            text += "FYS_Artist_" + zero + (i + 1) + ":" + this.boxTracks[i, ARTIST].Text + "\r\n";
+                        case Defines.ARTIST:
+                            text += "FYS_Artist_" + zero + (i + 1) + ":" + this.boxTracks[i, Defines.ARTIST].Text + "\r\n";
                             break;
-                        case COMMENT:
-                            text += "FYS_Comment_" + zero + (i + 1) + ":" + this.boxTracks[i, COMMENT].Text + "\r\n";
+                        case Defines.COMMENT:
+                            text += "FYS_Comment_" + zero + (i + 1) + ":" + this.boxTracks[i, Defines.COMMENT].Text + "\r\n";
                             break;
-                        case CREATOR:
-                            text += "Creator_" + zero + (i + 1) + ":" + this.boxTracks[i, CREATOR].Text + "\r\n";
+                        case Defines.CREATOR:
+                            text += "Creator_" + zero + (i + 1) + ":" + this.boxTracks[i, Defines.CREATOR].Text + "\r\n";
                             break;
-                        case BPM:
-                            text += "BPM_" + zero + (i + 1) + ":" + this.boxTracks[i, BPM].Text + "\r\n";
+                        case Defines.BPM:
+                            text += "BPM_" + zero + (i + 1) + ":" + this.boxTracks[i, Defines.BPM].Text + "\r\n";
                             break;
-                        case GENRE:
-                            text += "Genre_" + zero + (i + 1) + ":" + this.boxTracks[i, GENRE].Text + "\r\n";
+                        case Defines.GENRE:
+                            text += "Genre_" + zero + (i + 1) + ":" + this.boxTracks[i, Defines.GENRE].Text + "\r\n";
                             break;
-                        case CUSTOM:
-                            text += "FYS_CustomName_" + zero + (i + 1) + ":" + this.boxTracks[i, CUSTOM].Text + "\r\n";
+                        case Defines.CUSTOM:
+                            text += "FYS_CustomName_" + zero + (i + 1) + ":" + this.boxTracks[i, Defines.CUSTOM].Text + "\r\n";
                             break;
                     }
                 }
-                if ( (j == ARN_NAME) || (j == COMMENT))
+                if ( (j == Defines.ARN_NAME) || (j == Defines.COMMENT))
                     text += "==============================\r\n";
             }
 
@@ -2364,15 +2293,15 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
             string zero = "";
 
             text += "【ARN式表示名】\r\n";
-            for (int i = 0; i < MAX_TRACK; i++)
+            for (int i = 0; i < Defines.MAX_TRACK; i++)
             {
                 if (i < 9) zero = "0";
                 else zero = "";
-                text += zero + (i + 1) + ". " + this.boxTracks[i, ARN_NAME].Text + "." + m_convertExt.ToString( ) + "\r\n";
+                text += zero + (i + 1) + ". " + this.boxTracks[i, Defines.ARN_NAME].Text + "." + m_convertExt.ToString( ) + "\r\n";
             }
             text += "===============\r\n";
             text += "【FYS式表示名】\r\n";
-            for (int i = 0; i < MAX_TRACK; i++)
+            for (int i = 0; i < Defines.MAX_TRACK; i++)
             {
                 /* ナンバリング */
                 if (i < 9) zero = "0";
@@ -2380,20 +2309,20 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
                 text += zero + (i + 1) + ". ";
 
                 /* 原曲名 ( */
-                text += this.boxTracks[i, FYS_NAME].Text + " (";
+                text += this.boxTracks[i, Defines.FYS_NAME].Text + " (";
 
                 /* カスタム名分岐 */
-                if (this.boxTracks[i, CUSTOM].Text != "")
+                if (this.boxTracks[i, Defines.CUSTOM].Text != "")
                 {
                     /* カスタム名入っていたので()内に優先入力 */
-                    text += this.boxTracks[i, CUSTOM].Text + ")." + m_convertExt.ToString( ) + "\r\n";
+                    text += this.boxTracks[i, Defines.CUSTOM].Text + ")." + m_convertExt.ToString( ) + "\r\n";
                 }
                 else
                 {
                     /* カスタム名未入力なので、ツール制度に従って標準入力 */
 
                     /* 作者名 */
-                    text += this.boxTracks[i, CREATOR].Text;
+                    text += this.boxTracks[i, Defines.CREATOR].Text;
 
                     /* 's */
                     if (this.chkIsXXs.Checked)
@@ -2402,7 +2331,7 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
                         text += " ";
 
                     /* ジャンル名 */
-                    text += this.boxTracks[i, GENRE].Text;
+                    text += this.boxTracks[i, Defines.GENRE].Text;
 
                     /* Bootleg) */
                     text += " " + this.boxLastWord.Text + ")." + m_convertExt.ToString( ) + "\r\n";
@@ -2725,7 +2654,7 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
             }
 
             /* 3 */
-            m_coroutine_task_bool = GetHtmlAsync( ALBUM_LICENSE_URL );
+            m_coroutine_task_bool = GetHtmlAsync( Defines.ALBUM_LICENSE_URL );
             m_coroutine_flag = await m_coroutine_task_bool;
             if ( !m_coroutine_flag )
                 return false;
@@ -2743,11 +2672,11 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
             if ( !m_coroutine_flag )
                 return false;
 
-            if (m_currLicense == AlbumLicense.Non_License)
+            if (m_currLicense == Defines.AlbumLicense.Non_License)
             {
                 
             }
-            else if ( m_currLicense == AlbumLicense.Need_License )
+            else if ( m_currLicense == Defines.AlbumLicense.Need_License )
             {
             }
 
@@ -2823,11 +2752,11 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
                 switch ( str )
                 {
                     case "Non_License":
-                        m_currLicense = AlbumLicense.Non_License;
+                        m_currLicense = Defines.AlbumLicense.Non_License;
                         break;
 
                     case "Need_License":
-                        m_currLicense = AlbumLicense.Need_License;
+                        m_currLicense = Defines.AlbumLicense.Need_License;
                         break;
                 }
                 await Task.Delay( 1 );
