@@ -48,7 +48,6 @@ namespace trackID3TagSwitcher
         private char[] invalidChars;                            /* 設定中の文字列内に、使用不可能な文字があるかチェックするための変数 */
         private string invalidReplase;                          /* 設定中の文字列内に、使用不可能な文字があっ他場合に、置き換えするための変数 */
         private Defines.ConvertExt m_convertExt;                /* タグ設定、サウンドレイヤー対象の音源の拡張子 */
-        private int m_appdec = 1;                               /* app.cblのオフセット値 */
         /* 設定パネル */
         private bool m_settings_open = false;
         private bool m_settings_running = false;
@@ -1311,7 +1310,7 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
                     target = Defines.CONFIG_ACC_DEC + ":";
                     if ( line.Contains( target ) )
                     {
-                        m_appdec = Convert.ToInt32( line.Substring( target.Length , (line.Length - target.Length) ) );
+                        Defines.Encrypt_Shift_Size_Config_File = Convert.ToInt32( line.Substring( target.Length , (line.Length - target.Length) ) );
                     }
                 }
             }
@@ -1354,7 +1353,7 @@ invalidChars = System.IO.Path.GetInvalidFileNameChars();
             text += m_convertExt.ToString( ) + "\r\n";
 
             text += Defines.CONFIG_ACC_DEC + ":";
-            text += m_appdec.ToString( ) + "\r\n";
+            text += Defines.Encrypt_Shift_Size_Config_File.ToString( ) + "\r\n";
 
             StreamWriter sw = new StreamWriter(path, false);
             sw.Write(text);

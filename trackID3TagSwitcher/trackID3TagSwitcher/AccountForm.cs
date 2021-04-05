@@ -20,39 +20,6 @@ namespace trackID3TagSwitcher
     {
         private MessageForm messageForm = new MessageForm( );    /* ダイアログ用フォームを作成しておく */
 
-        /* プログレスバー設定 */
-        /// <summary>
-        /// プログレスバーに割り当てる、async処理内のファンクション数
-        /// </summary>
-        private const int SERVER_FUNC_NUM = 20;
-
-        /* ==================== サーバー設定 ==================== */
-
-        /// <summary>
-        /// サーバーから取得するページの最大件数
-        /// </summary>
-        private const int SERVER_MAX_PAGE = 3;
-
-        /// <summary>
-        /// アカウントリストのページの暗号化の際の移動オフセット量
-        /// </summary>
-        private const int ENCRYPT_SHIFT_SIZE_ACC_PAGE = 2;
-
-        /// <summary>
-        /// サインインリストのページの暗号化の際の移動オフセット量
-        /// </summary>
-        private const int ENCRYPT_SHIFT_SIZE_SIGN_PAGE = 3;
-
-        /// <summary>
-        /// アカウントコンフィグファイルの暗号化の際の移動オフセット量
-        /// </summary>
-        private const int ENCRYPT_SHIFT_SIZE_CONFIG_FILE = 5;
-
-        /// <summary>
-        /// サーバーアカウントデータの暗号化の際の移動オフセット量
-        /// </summary>
-        private const int ENCRYPT_SHIFT_SIZE_SERVER_ACC = 6;
-
         public static string m_serverUsername = "";
         public static string m_serverPassword = "";
         public static string m_serverKey = "";
@@ -60,26 +27,6 @@ namespace trackID3TagSwitcher
         public static string m_serverSignPage = "";
         public static string m_serverSettingInfo = "";
         private string m_machineId = "";
-
-        /* 各関数処理用変数 */
-        private const string START_TXT = "<textarea class=\"textarea\">";
-        private const string END_TXT = "</textarea>";
-        private const string SPACE_PASS = "[+@]";
-        private const string SPACE_MCNID = "[+=]";
-        private const string SPACE_UNQID = "[+!]";
-        private const string SPACE_SIGN = "[+*]";
-        private const string STATUS_SIGNIN = "1";
-        private const string STATUS_SIGNOUT = "0";
-        private const string START_TXT_S_USER = "<s_user>";
-        private const string END_TXT_S_USER = "</s_user>";
-        private const string START_TXT_S_PASS = "<s_pass>";
-        private const string END_TXT_S_PASS = "</s_pass>";
-        private const string START_TXT_S_KEY = "<s_key>";
-        private const string END_TXT_S_KEY = "</s_key>";
-        private const string START_TXT_S_ACC_TITLE = "<s_acctitle>";
-        private const string END_TXT_S_ACC_TITLE = "</s_acctitle>";
-        private const string START_TXT_S_SIGN_TITLE = "<s_signtitle>";
-        private const string END_TXT_S_SIGN_TITLE = "</s_signtitle>";
 
         /// <summary>
         /// アカウントリスト内に自分のアカウントがあり、デバイス情報も一致しているかどうか
@@ -151,7 +98,7 @@ namespace trackID3TagSwitcher
                                 .AddMotherboardSerialNumber( )
                                 .ToString( );
                                 */
-            m_machineId = DeviceInfo.getCPUId( ) + SPACE_UNQID + DeviceInfo.getUUID( );
+            m_machineId = DeviceInfo.getCPUId( ) + Defines.SPACE_UNQID + DeviceInfo.getUUID( );
             // MessageBox.Show( m_machineId );
             if ( m_machineId.Length == 0 )
             {
@@ -199,50 +146,50 @@ namespace trackID3TagSwitcher
         /// </summary>
         private async Task<bool> CheckUsernameNPassword( )
         {
-            if ( this.box_user.Text.Contains( SPACE_PASS ) )
+            if ( this.box_user.Text.Contains( Defines.SPACE_PASS ) )
             {
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Cannot_Use_Username] , MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
                 return false;
             }
-            else if ( this.box_user.Text.Contains( SPACE_MCNID ) )
+            else if ( this.box_user.Text.Contains( Defines.SPACE_MCNID ) )
             {
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Cannot_Use_Username] , MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
                 return false;
             }
-            else if ( this.box_user.Text.Contains( SPACE_UNQID ) )
+            else if ( this.box_user.Text.Contains( Defines.SPACE_UNQID ) )
             {
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Cannot_Use_Username] , MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
                 return false;
             }
-            else if ( this.box_user.Text.Contains( SPACE_SIGN ) )
+            else if ( this.box_user.Text.Contains( Defines.SPACE_SIGN ) )
             {
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Cannot_Use_Username] , MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
                 return false;
             }
 
-            if ( this.box_pass.Text.Contains( SPACE_PASS ) )
+            if ( this.box_pass.Text.Contains( Defines.SPACE_PASS ) )
             {
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Cannot_Use_Password] , MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
                 return false;
             }
-            else if ( this.box_pass.Text.Contains( SPACE_MCNID ) )
+            else if ( this.box_pass.Text.Contains( Defines.SPACE_MCNID ) )
             {
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Cannot_Use_Password] , MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
                 return false;
             }
-            else if ( this.box_pass.Text.Contains( SPACE_UNQID ) )
+            else if ( this.box_pass.Text.Contains( Defines.SPACE_UNQID ) )
             {
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Cannot_Use_Password] , MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
                 return false;
             }
-            else if ( this.box_pass.Text.Contains( SPACE_SIGN ) )
+            else if ( this.box_pass.Text.Contains( Defines.SPACE_SIGN ) )
             {
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Cannot_Use_Password] , MessageForm.MODE_OK );
                 messageForm.ShowDialog( );
@@ -366,49 +313,49 @@ namespace trackID3TagSwitcher
             {
                 SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Get_Data_List] );
                 m_localText1 = await m_webClient.DownloadStringTaskAsync( m_uriAsync );
-                m_localText1 = NetworkFunc.DecryptHtmlWithMessage( m_localText1 , ENCRYPT_SHIFT_SIZE_SERVER_ACC );
+                m_localText1 = NetworkFunc.DecryptHtmlWithMessage( m_localText1 , Defines.ENCRYPT_SHIFT_SIZE_SERVER_ACC );
 
-                if ( m_localText1.Contains( START_TXT_S_USER ) )
+                if ( m_localText1.Contains( Defines.START_TXT_S_USER ) )
                 {
-                    m_startPos = m_localText1.IndexOf( START_TXT_S_USER );
-                    m_startPos += START_TXT_S_USER.Length;
-                    m_endPos = m_localText1.IndexOf( END_TXT_S_USER );
+                    m_startPos = m_localText1.IndexOf( Defines.START_TXT_S_USER );
+                    m_startPos += Defines.START_TXT_S_USER.Length;
+                    m_endPos = m_localText1.IndexOf( Defines.END_TXT_S_USER );
                     m_length = m_endPos - m_startPos;
                     m_serverUsername = m_localText1.Substring( m_startPos , m_length );
                 }
 
-                if ( m_localText1.Contains( START_TXT_S_PASS ) )
+                if ( m_localText1.Contains( Defines.START_TXT_S_PASS ) )
                 {
-                    m_startPos = m_localText1.IndexOf( START_TXT_S_PASS );
-                    m_startPos += START_TXT_S_PASS.Length;
-                    m_endPos = m_localText1.IndexOf( END_TXT_S_PASS );
+                    m_startPos = m_localText1.IndexOf( Defines.START_TXT_S_PASS );
+                    m_startPos += Defines.START_TXT_S_PASS.Length;
+                    m_endPos = m_localText1.IndexOf( Defines.END_TXT_S_PASS );
                     m_length = m_endPos - m_startPos;
                     m_serverPassword = m_localText1.Substring( m_startPos , m_length );
                 }
 
-                if ( m_localText1.Contains( START_TXT_S_KEY ) )
+                if ( m_localText1.Contains( Defines.START_TXT_S_KEY ) )
                 {
-                    m_startPos = m_localText1.IndexOf( START_TXT_S_KEY );
-                    m_startPos += START_TXT_S_KEY.Length;
-                    m_endPos = m_localText1.IndexOf( END_TXT_S_KEY );
+                    m_startPos = m_localText1.IndexOf( Defines.START_TXT_S_KEY );
+                    m_startPos += Defines.START_TXT_S_KEY.Length;
+                    m_endPos = m_localText1.IndexOf( Defines.END_TXT_S_KEY );
                     m_length = m_endPos - m_startPos;
                     m_serverKey = m_localText1.Substring( m_startPos , m_length );
                 }
 
-                if ( m_localText1.Contains( START_TXT_S_ACC_TITLE ) )
+                if ( m_localText1.Contains( Defines.START_TXT_S_ACC_TITLE ) )
                 {
-                    m_startPos = m_localText1.IndexOf( START_TXT_S_ACC_TITLE );
-                    m_startPos += START_TXT_S_ACC_TITLE.Length;
-                    m_endPos = m_localText1.IndexOf( END_TXT_S_ACC_TITLE );
+                    m_startPos = m_localText1.IndexOf( Defines.START_TXT_S_ACC_TITLE );
+                    m_startPos += Defines.START_TXT_S_ACC_TITLE.Length;
+                    m_endPos = m_localText1.IndexOf( Defines.END_TXT_S_ACC_TITLE );
                     m_length = m_endPos - m_startPos;
                     m_serverAccPage = m_localText1.Substring( m_startPos , m_length );
                 }
 
-                if ( m_localText1.Contains( START_TXT_S_SIGN_TITLE ) )
+                if ( m_localText1.Contains( Defines.START_TXT_S_SIGN_TITLE ) )
                 {
-                    m_startPos = m_localText1.IndexOf( START_TXT_S_SIGN_TITLE );
-                    m_startPos += START_TXT_S_SIGN_TITLE.Length;
-                    m_endPos = m_localText1.IndexOf( END_TXT_S_SIGN_TITLE );
+                    m_startPos = m_localText1.IndexOf( Defines.START_TXT_S_SIGN_TITLE );
+                    m_startPos += Defines.START_TXT_S_SIGN_TITLE.Length;
+                    m_endPos = m_localText1.IndexOf( Defines.END_TXT_S_SIGN_TITLE );
                     m_length = m_endPos - m_startPos;
                     m_serverSignPage = m_localText1.Substring( m_startPos , m_length );
                 }
@@ -438,7 +385,7 @@ namespace trackID3TagSwitcher
                     ( m_serverKey == String.Empty ) ||
                     ( m_serverSignPage == String.Empty ) ||
                     ( m_machineId == String.Empty ) ||
-                    ( m_serverSettingInfo == String.Empty ) ||
+                    // ( m_serverSettingInfo == String.Empty ) ||
                     ( m_serverAccPage == String.Empty ) )
             {
                 messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Get_ServerInfo] +
@@ -487,7 +434,7 @@ namespace trackID3TagSwitcher
             {
                 SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Get_Server_List] );
 
-                foreach ( Paste paste in await m_userAsync.ListPastesAsync( SERVER_MAX_PAGE ) )
+                foreach ( Paste paste in await m_userAsync.ListPastesAsync( Defines.SERVER_MAX_PAGE ) )
                 {
                     if ( paste.Title == m_serverAccPage )
                     {
@@ -540,12 +487,12 @@ namespace trackID3TagSwitcher
             {
                 SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Get_Data_List] );
                 m_serverContent = await m_webClient.DownloadStringTaskAsync( m_uriAsync );
-                if ( m_serverContent.Contains( START_TXT ) )
+                if ( m_serverContent.Contains( Defines.START_TXT ) )
                 {
                     /* アカウントリストを取得する範囲設定 */
-                    m_startPos = m_serverContent.IndexOf( START_TXT );
-                    m_startPos += START_TXT.Length;
-                    m_endPos = m_serverContent.IndexOf( END_TXT );
+                    m_startPos = m_serverContent.IndexOf( Defines.START_TXT );
+                    m_startPos += Defines.START_TXT.Length;
+                    m_endPos = m_serverContent.IndexOf( Defines.END_TXT );
                     m_length = m_endPos - m_startPos;
 
                     m_serverContent = m_serverContent.Substring( m_startPos , m_length );
@@ -612,7 +559,7 @@ namespace trackID3TagSwitcher
                 SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Find_Account] );
 
                 /* 入力されたユーザー名が存在しないパターン */
-                if ( !m_decryptContent.Contains( this.box_user.Text + SPACE_PASS ) )
+                if ( !m_decryptContent.Contains( this.box_user.Text + Defines.SPACE_PASS ) )
                 {
                     messageForm.SetFormState( MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Not_Found_Your_Account_Make_Now] , MessageForm.MODE_YN );
                     m_dResult = messageForm.ShowDialog( );
@@ -633,13 +580,13 @@ namespace trackID3TagSwitcher
                     m_line = m_sr.ReadLine( );
 
                     /* その行内にユーザー名がマッチ */
-                    if ( m_line.Contains( this.box_user.Text + SPACE_PASS ) )
+                    if ( m_line.Contains( this.box_user.Text + Defines.SPACE_PASS ) )
                     {
                         /* パスワードも一致 */
-                        if ( m_line.Contains( this.box_pass.Text + SPACE_MCNID ) )
+                        if ( m_line.Contains( this.box_pass.Text + Defines.SPACE_MCNID ) )
                         {
                             /* アカウント作成したPCのIDも一致 */
-                            if ( m_line.Contains( SPACE_MCNID + m_machineId ) )
+                            if ( m_line.Contains( Defines.SPACE_MCNID + m_machineId ) )
                             {
                                 isMatchMyAccount = true;
                                 return true;
@@ -697,8 +644,8 @@ namespace trackID3TagSwitcher
             {
                 SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Add_My_Info_To_Data_List] );
                 m_decryptContent += "\r\n";
-                m_decryptContent += this.box_user.Text + SPACE_PASS;
-                m_decryptContent += this.box_pass.Text + SPACE_MCNID;
+                m_decryptContent += this.box_user.Text + Defines.SPACE_PASS;
+                m_decryptContent += this.box_pass.Text + Defines.SPACE_MCNID;
                 m_decryptContent += m_machineId;
                 await Task.Delay( 1 );
                 return true;
@@ -796,16 +743,16 @@ namespace trackID3TagSwitcher
         {
             try
             {
-                if ( serverLoginStatus == STATUS_SIGNOUT )
-                    m_localText1 = STATUS_SIGNIN;
-                else if ( serverLoginStatus == STATUS_SIGNIN )
-                    m_localText1 = STATUS_SIGNOUT;
+                if ( serverLoginStatus == Defines.STATUS_SIGNOUT )
+                    m_localText1 = Defines.STATUS_SIGNIN;
+                else if ( serverLoginStatus == Defines.STATUS_SIGNIN )
+                    m_localText1 = Defines.STATUS_SIGNOUT;
 
                 isUnlockLicence = false;
                 SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Find_Login_Status] );
 
                 /* 入力されたユーザー名が存在しないパターン*/
-                if ( !m_decryptContent.Contains( this.box_user.Text + SPACE_SIGN ) )
+                if ( !m_decryptContent.Contains( this.box_user.Text + Defines.SPACE_SIGN ) )
                 {
                     isNeedCreateStatus = true;
                     return true;
@@ -819,16 +766,16 @@ namespace trackID3TagSwitcher
                     m_line = m_sr.ReadLine( );
 
                     /* その行内にユーザー名がマッチ */
-                    if ( m_line.Contains( this.box_user.Text + SPACE_SIGN ) )
+                    if ( m_line.Contains( this.box_user.Text + Defines.SPACE_SIGN ) )
                     {
                         /* 指定されたログインステータスになっている */
-                        if ( m_line.Contains( SPACE_SIGN + serverLoginStatus ) )
+                        if ( m_line.Contains( Defines.SPACE_SIGN + serverLoginStatus ) )
                         {
                             isNeedCreateStatus = false;
                             return true;
                         }
                         /* 指定されたログインステータスになっていない場合 */
-                        else if ( m_line.Contains( SPACE_SIGN + m_localText1 ) )
+                        else if ( m_line.Contains( Defines.SPACE_SIGN + m_localText1 ) )
                         {
                             /* 前回アプリを正常終了していない形跡があるなら、サーバーステータスと一致しないのは当然なので、このまま処理する */
                             if ( Form1.isExitStatus == Defines.ExitStatus.ForceClosed )
@@ -873,7 +820,7 @@ namespace trackID3TagSwitcher
             {
                 SetLog( this.lbl_progressContent , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Progress_Try_Add_My_Login_To_Data_List] );
                 m_decryptContent += "\r\n";
-                m_decryptContent += this.box_user.Text + SPACE_SIGN + STATUS_SIGNIN;
+                m_decryptContent += this.box_user.Text + Defines.SPACE_SIGN + Defines.STATUS_SIGNIN;
                 await Task.Delay( 1 );
                 return true;
             }
@@ -898,12 +845,12 @@ namespace trackID3TagSwitcher
 
                 if ( !loginStatus )
                 {
-                    if ( m_decryptContent.Contains( this.box_user.Text + SPACE_SIGN + STATUS_SIGNIN ) )
+                    if ( m_decryptContent.Contains( this.box_user.Text + Defines.SPACE_SIGN + Defines.STATUS_SIGNIN ) )
                     {
-                        m_decryptContent.Replace( this.box_user.Text + SPACE_SIGN + STATUS_SIGNIN , this.box_user.Text + SPACE_SIGN + STATUS_SIGNOUT );
+                        m_decryptContent.Replace( this.box_user.Text + Defines.SPACE_SIGN + Defines.STATUS_SIGNIN , this.box_user.Text + Defines.SPACE_SIGN + Defines.STATUS_SIGNOUT );
                         return true;
                     }
-                    else if ( m_decryptContent.Contains( this.box_user.Text + SPACE_SIGN + STATUS_SIGNOUT ) )
+                    else if ( m_decryptContent.Contains( this.box_user.Text + Defines.SPACE_SIGN + Defines.STATUS_SIGNOUT ) )
                     {
                         /* 前回アプリを正常終了していない形跡があるなら、サーバーステータスと一致しないのは当然なので、このまま処理する */
                         if ( Form1.isExitStatus == Defines.ExitStatus.ForceClosed )
@@ -922,12 +869,12 @@ namespace trackID3TagSwitcher
                 }
                 else
                 {
-                    if ( m_decryptContent.Contains( this.box_user.Text + SPACE_SIGN + STATUS_SIGNOUT ) )
+                    if ( m_decryptContent.Contains( this.box_user.Text + Defines.SPACE_SIGN + Defines.STATUS_SIGNOUT ) )
                     {
-                        m_decryptContent.Replace( this.box_user.Text + SPACE_SIGN + STATUS_SIGNOUT , this.box_user.Text + SPACE_SIGN + STATUS_SIGNIN );
+                        m_decryptContent.Replace( this.box_user.Text + Defines.SPACE_SIGN + Defines.STATUS_SIGNOUT , this.box_user.Text + Defines.SPACE_SIGN + Defines.STATUS_SIGNIN );
                         return true;
                     }
-                    else if ( m_decryptContent.Contains( this.box_user.Text + SPACE_SIGN + STATUS_SIGNIN ) )
+                    else if ( m_decryptContent.Contains( this.box_user.Text + Defines.SPACE_SIGN + Defines.STATUS_SIGNIN ) )
                     {
                         /* 前回アプリを正常終了していない形跡があるなら、サーバーステータスと一致しないのは当然なので、このまま処理する */
                         if ( Form1.isExitStatus == Defines.ExitStatus.ForceClosed )
@@ -1042,7 +989,10 @@ namespace trackID3TagSwitcher
                 StreamReader sr = new StreamReader( path );
                 text = sr.ReadToEnd( );
                 sr.Close( );
-                text = NetworkFunc.DecryptHtmlWithMessage( text , ENCRYPT_SHIFT_SIZE_CONFIG_FILE );
+                text = NetworkFunc.DecryptHtmlWithMessage( text , Defines.Encrypt_Shift_Size_Config_File );
+#if DEBUG
+                MessageBox.Show( text );
+#endif
 
                 string line = "";
                 string target = "";
@@ -1092,20 +1042,21 @@ namespace trackID3TagSwitcher
                     }
 
                     */
-                    target = "l_user:";
+                    target = Defines.ACC_USERNAME + ":";
                     if ( line.Contains( target ) )
                     {
                         st = target.Length;
                         ed = line.Length - st;
                         this.box_user.Text = line.Substring( st , ed );
                     }
-                    target = "l_pass:";
+                    target = Defines.ACC_PASSWORD + ":";
                     if ( line.Contains( target ) )
                     {
                         st = target.Length;
                         ed = line.Length - st;
                         this.box_pass.Text = line.Substring( st , ed );
                     }
+                    /*
                     target = "s_settingInfo:";
                     if ( line.Contains( target ) )
                     {
@@ -1113,6 +1064,7 @@ namespace trackID3TagSwitcher
                         ed = line.Length - st;
                         m_serverSettingInfo = line.Substring( st , ed );
                     }
+                    */
                 }
             }
             else
@@ -1136,9 +1088,9 @@ namespace trackID3TagSwitcher
             */
             text = "l_user:" + this.box_user.Text + "\r\n";
             text += "l_pass:" + this.box_pass.Text + "\r\n";
-            text += "s_settingInfo:" + m_serverSettingInfo + "\r\n";
+            //text += "s_settingInfo:" + m_serverSettingInfo + "\r\n";
 
-            text = NetworkFunc.EncryptHtmlWithMessage( text , ENCRYPT_SHIFT_SIZE_CONFIG_FILE );
+            text = NetworkFunc.EncryptHtmlWithMessage( text , Defines.Encrypt_Shift_Size_Config_File );
             
             StreamWriter sw = new StreamWriter( path , false );
             sw.Write( text );
@@ -1162,7 +1114,7 @@ namespace trackID3TagSwitcher
             // LockLogin( false );
             SetLog( this.lblAppLogText , Color.AliceBlue , MsgList.SYS_MSG_LIST[(int)MsgList.STRNUM.Failed_Login_noticeBar] );
 
-            this.webProgressBar.Maximum = SERVER_FUNC_NUM;
+            this.webProgressBar.Maximum = Defines.SERVER_FUNC_NUM;
             this.webProgressBar.Value = 0;
 
             if ( await LoginThink( isSign: false ) == false )
@@ -1193,7 +1145,7 @@ namespace trackID3TagSwitcher
 
             LockLogin( false );
 
-            this.webProgressBar.Maximum = SERVER_FUNC_NUM;
+            this.webProgressBar.Maximum = Defines.SERVER_FUNC_NUM;
             this.webProgressBar.Value = 0;
 
             if ( await LoginThink( isSign: true ) == false )
@@ -1220,11 +1172,12 @@ namespace trackID3TagSwitcher
                 return m_coroutine_flag;
             this.webProgressBar.Value++;
 
-            /* 3 */
+            /* 3 
             m_coroutine_task = GetServerSettingsAsync( m_serverSettingInfo );
             m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
                 return m_coroutine_flag;
+            */
             this.webProgressBar.Value++;
 
             /* 4 */
@@ -1250,14 +1203,14 @@ namespace trackID3TagSwitcher
 
             /* 7 */
             /* ここからアカウントリストページ関連の処理 */
-            m_coroutine_task = GetHtmlAsync( m_serverAccPageUri , START_TXT , END_TXT );
+            m_coroutine_task = GetHtmlAsync( m_serverAccPageUri , Defines.START_TXT , Defines.END_TXT );
             m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
                 return m_coroutine_flag;
             this.webProgressBar.Value++;
 
             /* 8 */
-            m_coroutine_task = DecryptHtmlAsync( ENCRYPT_SHIFT_SIZE_ACC_PAGE );
+            m_coroutine_task = DecryptHtmlAsync( Defines.ENCRYPT_SHIFT_SIZE_ACC_PAGE );
             m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
                 return m_coroutine_flag;
@@ -1281,7 +1234,7 @@ namespace trackID3TagSwitcher
                 this.webProgressBar.Value++;
 
                 /* 11 */
-                m_coroutine_task = EncryptHtmlAsync( ENCRYPT_SHIFT_SIZE_ACC_PAGE );
+                m_coroutine_task = EncryptHtmlAsync( Defines.ENCRYPT_SHIFT_SIZE_ACC_PAGE );
                 m_coroutine_flag = await m_coroutine_task;
                 if ( !m_coroutine_flag )
                     return m_coroutine_flag;
@@ -1320,14 +1273,14 @@ namespace trackID3TagSwitcher
 
             /* 14 */
             /* ここからログインリストページ関連の処理 */
-            m_coroutine_task = GetHtmlAsync( m_serverSignPageUri , START_TXT , END_TXT );
+            m_coroutine_task = GetHtmlAsync( m_serverSignPageUri , Defines.START_TXT , Defines.END_TXT );
             m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
                 return m_coroutine_flag;
             this.webProgressBar.Value++;
 
             /* 15 */
-            m_coroutine_task = DecryptHtmlAsync( ENCRYPT_SHIFT_SIZE_SIGN_PAGE );
+            m_coroutine_task = DecryptHtmlAsync( Defines.ENCRYPT_SHIFT_SIZE_SIGN_PAGE );
             m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
                 return m_coroutine_flag;
@@ -1336,9 +1289,9 @@ namespace trackID3TagSwitcher
             /* 16 */
             string status = String.Empty;
             if ( isSign )
-                status = STATUS_SIGNOUT;
+                status = Defines.STATUS_SIGNOUT;
             else
-                status = STATUS_SIGNIN;
+                status = Defines.STATUS_SIGNIN;
             m_coroutine_task = CheckAccountLoginAsync( status );
             m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
@@ -1366,7 +1319,7 @@ namespace trackID3TagSwitcher
             }
 
             /* 18 */
-            m_coroutine_task = EncryptHtmlAsync( ENCRYPT_SHIFT_SIZE_SIGN_PAGE );
+            m_coroutine_task = EncryptHtmlAsync( Defines.ENCRYPT_SHIFT_SIZE_SIGN_PAGE );
             m_coroutine_flag = await m_coroutine_task;
             if ( !m_coroutine_flag )
                 return m_coroutine_flag;

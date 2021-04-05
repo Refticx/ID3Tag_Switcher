@@ -110,5 +110,59 @@ namespace trackID3TagSwitcher
             Non_License,
             Need_License,
         }
+
+
+        /* プログレスバー設定 */
+        /// <summary>
+        /// プログレスバーに割り当てる、async処理内のファンクション数
+        /// </summary>
+        public const int SERVER_FUNC_NUM = 20;
+
+        /* ==================== サーバー設定 ==================== */
+
+        /// <summary>
+        /// サーバーから取得するページの最大件数
+        /// </summary>
+        public const int SERVER_MAX_PAGE = 3;
+
+        /// <summary>
+        /// アカウントリストのページの暗号化の際の移動オフセット量
+        /// </summary>
+        public const int ENCRYPT_SHIFT_SIZE_ACC_PAGE = 2;
+
+        /// <summary>
+        /// サインインリストのページの暗号化の際の移動オフセット量
+        /// </summary>
+        public const int ENCRYPT_SHIFT_SIZE_SIGN_PAGE = 3;
+
+        /// <summary>
+        /// アカウントコンフィグファイルの暗号化の際の移動オフセット量
+        /// </summary>
+        public static int Encrypt_Shift_Size_Config_File = 5;
+
+        /// <summary>
+        /// サーバーアカウントデータの暗号化の際の移動オフセット量
+        /// </summary>
+        public const int ENCRYPT_SHIFT_SIZE_SERVER_ACC = 6;
+
+        /* 各関数処理用変数 */
+        public const string START_TXT = "<textarea class=\"textarea\">";
+        public const string END_TXT = "</textarea>";
+        public const string SPACE_PASS = "[+@]";
+        public const string SPACE_MCNID = "[+=]";
+        public const string SPACE_UNQID = "[+!]";
+        public const string SPACE_SIGN = "[+*]";
+        public const string STATUS_SIGNIN = "1";
+        public const string STATUS_SIGNOUT = "0";
+        public const string START_TXT_S_USER = "<s_user>";
+        public const string END_TXT_S_USER = "</s_user>";
+        public const string START_TXT_S_PASS = "<s_pass>";
+        public const string END_TXT_S_PASS = "</s_pass>";
+        public const string START_TXT_S_KEY = "<s_key>";
+        public const string END_TXT_S_KEY = "</s_key>";
+        public const string START_TXT_S_ACC_TITLE = "<s_acctitle>";
+        public const string END_TXT_S_ACC_TITLE = "</s_acctitle>";
+        public const string START_TXT_S_SIGN_TITLE = "<s_signtitle>";
+        public const string END_TXT_S_SIGN_TITLE = "</s_signtitle>";
     }
 }
